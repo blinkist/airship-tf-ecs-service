@@ -266,6 +266,10 @@ module "ecs_service" {
 
   # This way we force the aws_lb_listener_rule to have finished before creating the ecs_service
   aws_lb_listener_rules = "${module.alb_handling.aws_lb_listener_rules}"
+
+  # This if for adding the service to a pre-created service discovery namespace
+  service_discovery_namespace_arn  = "${var.service_discovery_namespace_arn}"
+  service_discovery_container_name = "${var.service_discovery_container_name}"
 }
 
 #

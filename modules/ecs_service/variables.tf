@@ -59,3 +59,11 @@ variable "lb_attached" {
 
 # Spread tasks over ECS Cluster based on AZ, Instance-id, memory
 variable "with_placement_strategy" {}
+
+# The service discovery namespace arn to register the services against
+variable "service_discovery_namespace_arn" {}
+
+# (Optional) The container name value, already specified in the task definition, to be used for your service discovery service
+variable "service_discovery_container_name" {
+  default = ""
+}
