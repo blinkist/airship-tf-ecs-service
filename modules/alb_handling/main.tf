@@ -56,6 +56,8 @@ resource "aws_lb_target_group" "service" {
     path                = "${var.health_uri}"
     unhealthy_threshold = "${var.unhealthy_threshold}"
   }
+
+  tags = "${local.tags}"
 }
 
 ##

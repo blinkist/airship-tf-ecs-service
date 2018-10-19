@@ -30,12 +30,14 @@ variable "scaling_properties" {
 
 variable "tags" {
   description = "A map of tags to apply to all resources"
-  type = "map"
-  default = {}
+  type        = "map"
+  default     = {}
 }
+
 locals {
   name_map = {
     "Name" = "${var.ecs_service_name}"
   }
+
   tags = "${merge(var.tags, local.name_map)}"
 }

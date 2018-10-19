@@ -69,6 +69,4 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
   network_mode = "${var.awsvpc_enabled ? "awsvpc" : "bridge"}"
 
   requires_compatibilities = ["${var.launch_type}"]
-
-  
 }

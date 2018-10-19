@@ -9,10 +9,14 @@ variable "create" {
 variable "ecs_cluster_id" {}
 
 # Number of days for the cloudwatch logs for the containers to be retained
-variable "log_retention_in_days" { default = "14"}
+variable "log_retention_in_days" {
+  default = "14"
+}
 
 # kms_key for the cloudwatch logs
-variable "cloudwatch_kms_key" { default = "" }
+variable "cloudwatch_kms_key" {
+  default = ""
+}
 
 # Region of the ECS Cluster
 variable "region" {}
@@ -352,12 +356,14 @@ variable "service_discovery_container_name" {
 
 variable "tags" {
   description = "A map of tags to apply to all taggable resources"
-  type = "map"
-  default = {}
+  type        = "map"
+  default     = {}
 }
+
 locals {
   name_map = {
     "Name" = "${var.container_name}"
   }
+
   tags = "${merge(var.tags, local.name_map)}"
 }

@@ -84,6 +84,7 @@ resource "aws_ecs_service" "app_with_lb_spread" {
   lifecycle {
     ignore_changes = ["desired_count"]
   }
+
   depends_on = ["null_resource.aws_lb_listener_rules"]
 }
 

@@ -67,3 +67,8 @@ variable "service_discovery_namespace_arn" {}
 variable "service_discovery_container_name" {
   default = ""
 }
+
+variable "tags" {
+  type    = "map"
+  default = {}
+}
