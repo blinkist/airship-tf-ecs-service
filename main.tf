@@ -96,13 +96,18 @@ module "alb_handling" {
 
   # target_type is the alb_target_group target, in case of EC2 it's instance, in case of FARGATE it's IP
   target_type = "${var.awsvpc_enabled ? "ip" : "instance"}"
+
+  tags = "${local.tags}"
 }
 
 ###### CloudWatch Logs
 resource "aws_cloudwatch_log_group" "app" {
   count             = "${var.create ? 1 : 0}"
   name              = "${local.ecs_cluster_name}/${var.name}"
-  retention_in_days = 14
+  retention_in_days = "${var.log_retention_in_days}"
+  kms_key_id        = "${var.cloudwatch_kms_key}"
+
+  tags = "${var.tags}"
 }
 
 #
@@ -270,6 +275,8 @@ module "ecs_service" {
   # This if for adding the service to a pre-created service discovery namespace
   service_discovery_namespace_arn  = "${var.service_discovery_namespace_arn}"
   service_discovery_container_name = "${var.service_discovery_container_name}"
+
+  tags = "${var.tags}"
 }
 
 #
@@ -294,4 +301,6 @@ module "ecs_autoscaling" {
 
   # scaling_properties holds a list of maps with the scaling properties defined.
   scaling_properties = "${var.scaling_properties}"
+
+  tags = "${var.tags}"
 }

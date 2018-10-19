@@ -8,6 +8,12 @@ variable "create" {
 # ecs_cluster_id is the cluster to which the ECS Service will be added.
 variable "ecs_cluster_id" {}
 
+# Number of days for the cloudwatch logs for the containers to be retained
+variable "log_retention_in_days" { default = "14"}
+
+# kms_key for the cloudwatch logs
+variable "cloudwatch_kms_key" { default = "" }
+
 # Region of the ECS Cluster
 variable "region" {}
 
@@ -342,4 +348,16 @@ variable "service_discovery_namespace_arn" {
 # (Optional) The container name value, already specified in the task definition, to be used for your service discovery service
 variable "service_discovery_container_name" {
   default = ""
+}
+
+variable "tags" {
+  description = "A map of tags to apply to all taggable resources"
+  type = "map"
+  default = {}
+}
+locals {
+  name_map = {
+    "Name" = "${var.container_name}"
+  }
+  tags = "${merge(var.tags, local.name_map)}"
 }

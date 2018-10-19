@@ -109,3 +109,15 @@ variable "log_options" {
     "awslogs-stream-prefix" = "default"
   }
 }
+
+variable "tags" {
+  description = "A map of tags to apply to all resources"
+  type = "map"
+  default = {}
+}
+locals {
+  name_map = {
+    "Name" = "${var.container_name}"
+  }
+  tags = "${merge(var.tags, local.name_map)}"
+}

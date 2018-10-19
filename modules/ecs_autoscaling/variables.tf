@@ -27,3 +27,15 @@ variable "desired_max_capacity" {}
 variable "scaling_properties" {
   default = []
 }
+
+variable "tags" {
+  description = "A map of tags to apply to all resources"
+  type = "map"
+  default = {}
+}
+locals {
+  name_map = {
+    "Name" = "${var.ecs_service_name}"
+  }
+  tags = "${merge(var.tags, local.name_map)}"
+}
