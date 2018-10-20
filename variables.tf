@@ -202,6 +202,11 @@ variable "container_memory_reservation" {
   default = ""
 }
 
+variable "privileged" {
+  description = "Bool. Run the container with elevated privilege."
+  default     = false
+}
+
 # port defines the needed port of the container
 variable "container_port" {
   default = ""

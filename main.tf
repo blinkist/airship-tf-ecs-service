@@ -142,6 +142,8 @@ module "container_definition" {
 
   container_envvars = "${var.container_envvars}"
 
+  privileged = "${var.privileged}"
+
   mountpoints = ["${var.mountpoints}"]
 
   log_options = {
