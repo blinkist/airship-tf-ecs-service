@@ -8,3 +8,7 @@ output "ecs_service_name" {
                 ( local.lb_attached ? ( var.with_placement_strategy ? join("",aws_ecs_service.app_with_lb_spread.*.name) : join("",aws_ecs_service.app_with_lb.*.name)) : join("",aws_ecs_service.app.*.name) ) 
   }"
 }
+
+output "service_discovery_container_name" {
+  value = "${var.service_discovery_container_name == "" ? var.container_name : var.service_discovery_container_name }"
+}
