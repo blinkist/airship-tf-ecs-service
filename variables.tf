@@ -52,6 +52,11 @@ variable "load_balancing_enabled" {
   default = false
 }
 
+# The target group of an existing load balancer
+variable "lb_tg_arn" {
+  default = ""
+}
+
 ## load_balancing_properties map defines the map for services hooked to a load balancer
 variable "load_balancing_properties" {
   type = "map"

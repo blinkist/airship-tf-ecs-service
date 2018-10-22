@@ -17,6 +17,11 @@ output "service_discovery_container_name" {
 output "ecs_service_name" {
   value = "${module.ecs_service.ecs_service_name}"
 }
+
 output "ecs_cluster_name" {
   value = "${local.ecs_cluster_name}"
+}
+
+output "container_definition" {
+  value = "${module.container_definition.json}"
 }

@@ -12,5 +12,5 @@ output "json" {
   #  - Convert `"true"` and `"false"` to `true` and `false`
   #  - Convert quoted numbers (e.g. `"123"`) to `123`.
   # Environment variables are kept as strings.
-  value = "${replace(replace(replace(jsonencode(local.container_definitions), "/(\\[\\]|\\[\"\"\\]|\"\"|{})/", "null"), "/(\"[^v][[:alpha:]]+\":)\"([0-9]+\\.?[0-9]*|true|false)\"/", "$1$2"),local.safe_search_replace_string,"")}"
+  value = "${replace(replace(replace(jsonencode(local.container_definitions[local.use_port]), "/(\\[\\]|\\[\"\"\\]|\"\"|{})/", "null"), "/(\"[^v][[:alpha:]]+\":)\"([0-9]+\\.?[0-9]*|true|false)\"/", "$1$2"),local.safe_search_replace_string,"")}"
 }

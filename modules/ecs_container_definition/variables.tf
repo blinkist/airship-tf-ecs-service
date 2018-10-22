@@ -23,12 +23,12 @@ variable "container_memory_reservation" {
 
 variable "container_port" {
   description = "The port number on the container bound to assigned host_port."
-  default     = 80
+  default     = ""
 }
 
 variable "host_port" {
   description = "The port number on the container instance (host) to reserve for the container_port. If using containers in a task with the awsvpc or host network mode, the hostPort can either be left blank or set to the same value as the containerPort."
-  default     = 80
+  default     = ""
 }
 
 variable "protocol" {

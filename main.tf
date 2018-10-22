@@ -1,6 +1,8 @@
 locals {
-  ecs_cluster_name = "${element(split("/",var.ecs_cluster_id),3)}"
+  ecs_cluster_name = "${basename(var.ecs_cluster_id)}"
   launch_type      = "${var.fargate_enabled ? "FARGATE" : "EC2" }"
+
+  lb_target_group_arn = "${var.lb_tg_arn == "" ?  module.alb_handling.lb_target_group_arn : var.lb_tg_arn }"
 }
 
 #
@@ -245,7 +247,7 @@ module "ecs_service" {
   # deployment_minimum_healthy_percent sets the minimum % in capacity at depployment
   deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
 
-  lb_attached = "${length(lookup(var.load_balancing_properties,"lb_arn", "")) > 0 ? true : false}"
+  lb_attached = "${var.lb_tg_arn == "" ? "${length(lookup(var.load_balancing_properties,"lb_arn", "")) > 0 ? true : false}" : true }"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"
@@ -254,7 +256,7 @@ module "ecs_service" {
   awsvpc_security_group_ids = "${var.awsvpc_security_group_ids}"
 
   # lb_target_group_arn sets the arn of the target_group the service needs to connect to
-  lb_target_group_arn = "${module.alb_handling.lb_target_group_arn}"
+  lb_target_group_arn = "${local.lb_target_group_arn}"
 
   # desired_capacity sets the initial capacity in task of the ECS Service, ignored when scheduling_strategy is DAEMON
   desired_capacity = "${lookup(var.capacity_properties,"desired_capacity", var.default_capacity_properties_desired_capacity)}"
