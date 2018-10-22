@@ -18,73 +18,21 @@ resource "null_resource" "envvars_as_list_of_maps" {
 }
 
 locals {
-  use_port = "${var.container_port == "" ? "without_port" : "with_port" }"
+  port_mappings = {
+    with_port = [
+      {
+        containerPort = "${var.container_port}"
+        hostPort      = "${var.host_port}"
+        protocol      = "${var.protocol}"
+      },
+    ]
 
-  container_definitions = {
-    with_port = [{
-      name                   = "${var.container_name}"
-      image                  = "${var.container_image}"
-      memory                 = "${var.container_memory}"
-      memoryReservation      = "${var.container_memory_reservation}"
-      cpu                    = "${var.container_cpu}"
-      essential              = "${var.essential}"
-      entryPoint             = "${var.entrypoint}"
-      command                = "${var.command}"
-      workingDirectory       = "${var.working_directory}"
-      readonlyRootFilesystem = "${var.readonly_root_filesystem}"
-      privileged             = "${var.privileged}"
-
-      hostname = "${var.hostname}"
-
-      environment = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
-
-      mountPoints = ["${var.mountpoints}"]
-
-      portMappings = [
-        {
-          containerPort = "${var.container_port}"
-          hostPort      = "${var.host_port}"
-          protocol      = "${var.protocol}"
-        },
-      ]
-
-      healthCheck = "${var.healthcheck}"
-
-      logConfiguration = {
-        logDriver = "${var.log_driver}"
-        options   = "${var.log_options}"
-      }
-    }]
-
-    without_port = [{
-      name                   = "${var.container_name}"
-      image                  = "${var.container_image}"
-      memory                 = "${var.container_memory}"
-      memoryReservation      = "${var.container_memory_reservation}"
-      cpu                    = "${var.container_cpu}"
-      essential              = "${var.essential}"
-      entryPoint             = "${var.entrypoint}"
-      command                = "${var.command}"
-      workingDirectory       = "${var.working_directory}"
-      readonlyRootFilesystem = "${var.readonly_root_filesystem}"
-      privileged             = "${var.privileged}"
-
-      hostname = "${var.hostname}"
-
-      environment = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
-
-      mountPoints = ["${var.mountpoints}"]
-
-      healthCheck = "${var.healthcheck}"
-
-      logConfiguration = {
-        logDriver = "${var.log_driver}"
-        options   = "${var.log_options}"
-      }
-    }]
+    without_port = []
   }
 
-  c_d = [{
+  use_port = "${var.container_port == "" ? "without_port" : "with_port" }"
+
+  container_definitions = [{
     name                   = "${var.container_name}"
     image                  = "${var.container_image}"
     memory                 = "${var.container_memory}"
@@ -103,13 +51,7 @@ locals {
 
     mountPoints = ["${var.mountpoints}"]
 
-    portMappings = [
-      {
-        containerPort = "${var.container_port}"
-        hostPort      = "${var.host_port}"
-        protocol      = "${var.protocol}"
-      },
-    ]
+    portMappings = "${local.port_mappings[local.use_port]}"
 
     healthCheck = "${var.healthcheck}"
 
