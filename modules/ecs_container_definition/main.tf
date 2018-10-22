@@ -18,6 +18,17 @@ resource "null_resource" "envvars_as_list_of_maps" {
 }
 
 locals {
+  port_mappings = {
+    with_port = [
+      {
+        containerPort = "${var.container_port}"
+        hostPort      = "${var.host_port}"
+        protocol      = "${var.protocol}"
+      },
+    ]
+    without_port = []
+  }
+  use_port = "${var.container_port == "" ? "without_port" : "with_port" }"
   container_definitions = [{
     name                   = "${var.container_name}"
     image                  = "${var.container_image}"
@@ -37,13 +48,7 @@ locals {
 
     mountPoints = ["${var.mountpoints}"]
 
-    portMappings = [
-      {
-        containerPort = "${var.container_port}"
-        hostPort      = "${var.host_port}"
-        protocol      = "${var.protocol}"
-      },
-    ]
+    portMappings = ["${local.port_mappings[local.use_port]}"]
 
     healthCheck = "${var.healthcheck}"
 
