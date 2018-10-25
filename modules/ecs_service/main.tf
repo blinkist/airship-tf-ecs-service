@@ -134,7 +134,7 @@ resource "aws_ecs_service" "app_with_service_registry" {
 
   service_registries {
     registry_arn   = "${var.service_discovery_namespace_arn}"
-    container_name = "${var.service_discovery_container_name == "" ? var.container_name : var.service_discovery_container_name }"
+    container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
   }
 }
 
@@ -162,7 +162,7 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
 
   service_registries {
     registry_arn   = "${var.service_discovery_namespace_arn}"
-    container_name = "${var.service_discovery_container_name == "" ? var.container_name : var.service_discovery_container_name }"
+    container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
   }
 }
 
