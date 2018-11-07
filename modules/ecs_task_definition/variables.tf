@@ -19,6 +19,11 @@ variable "fargate_enabled" {
   default = false
 }
 
+variable "host_path_volume" {
+  type    = "map"
+  default = {}
+}
+
 # container_definitions set the json with the container definitions
 variable "container_definitions" {}
 

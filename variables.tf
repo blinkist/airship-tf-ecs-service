@@ -94,6 +94,23 @@ variable "load_balancing_properties" {
   }
 }
 
+## load_balancing_properties map defines the map for services hooked to a load balancer
+variable "network_load_balancing_properties" {
+  type = "map"
+
+  default = {
+    /*
+    Note that since Terraform doesn't support partial map defaults (see
+    https://github.com/hashicorp/terraform/issues/16517), the default values here
+    are set in the independent default_load_balancing_properties_* variables
+
+    lb_arn is the NLB listener arn for any protocol
+    lb_arn = ""
+
+    */
+  }
+}
+
 variable "default_load_balancing_properties_lb_listener_arn" {
   default = ""
 }
@@ -130,11 +147,11 @@ variable "default_load_balancing_properties_route53_record_identifier" {
   default = "identifier"
 }
 
-# By default we create a CNAME to the ALB, the moment terraform can handle CNAME to ALIAS A record changes
+# By default we create a NO record to the ALB, the moment terraform can handle CNAME to ALIAS A record changes
 # Route53 Alias A will be the default.
 # https://github.com/terraform-providers/terraform-provider-aws/issues/5280
 variable "default_load_balancing_properties_route53_record_type" {
-  default = "CNAME"
+  default = "NONE"
 }
 
 ## capacity_properties map defines the capacity properties of the service
@@ -189,7 +206,9 @@ variable "default_capacity_properties_deployment_minimum_healthy_percent" {
 }
 
 # image_url defines the docker image location
-variable "container_image" {}
+variable "container_image" {
+  default = ""
+}
 
 # Container name 
 variable "container_name" {
@@ -342,6 +361,11 @@ variable "host_path_volumes" {
   # },
 }
 
+variable "host_path_volume" {
+  type    = "map"
+  default = {}
+}
+
 # list of mount points to add to every container in the task
 variable "mountpoints" {
   type    = "list"
@@ -352,6 +376,10 @@ variable "mountpoints" {
   #     container_path = "/foo",
   #     read_only = "false"
   # },
+}
+
+variable "enable_service_discovery" {
+  default = "false"
 }
 
 # The service discovery namespace arn to register the services against

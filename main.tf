@@ -1,8 +1,6 @@
 locals {
   ecs_cluster_name = "${basename(var.ecs_cluster_id)}"
   launch_type      = "${var.fargate_enabled ? "FARGATE" : "EC2" }"
-
-  lb_target_group_arn = "${var.lb_tg_arn == "" ?  module.alb_handling.lb_target_group_arn : var.lb_tg_arn }"
 }
 
 #
@@ -62,6 +60,8 @@ module "alb_handling" {
   # lb_arn defines the arn of the ALB
   lb_arn = "${lookup(var.load_balancing_properties,"lb_arn", "")}"
 
+  load_balancer_type = "${lookup(var.load_balancing_properties,"load_balancer_type", "application")}"
+
   # lb_listener_arn is the arn of the listener ( HTTP )
   lb_listener_arn = "${lookup(var.load_balancing_properties,"lb_listener_arn", "")}"
 
@@ -117,7 +117,7 @@ resource "aws_cloudwatch_log_group" "app" {
 #
 module "live_task_lookup" {
   source           = "./modules/live_task_lookup/"
-  create           = "${ var.create && var.container_image == ""}"
+  create           = "${ var.create ? 1 : 0 }"
   ecs_cluster_id   = "${var.ecs_cluster_id}"
   ecs_service_name = "${var.name}"
   container_name   = "${var.container_name}"
@@ -199,6 +199,7 @@ module "ecs_task_definition" {
 
   # list of host paths to add as volumes to the task
   host_path_volumes = "${var.host_path_volumes}"
+  host_path_volume  = "${var.host_path_volume}"
 }
 
 #
@@ -247,7 +248,8 @@ module "ecs_service" {
   # deployment_minimum_healthy_percent sets the minimum % in capacity at depployment
   deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
 
-  lb_attached = "${var.lb_tg_arn == "" ? "${length(lookup(var.load_balancing_properties,"lb_arn", "")) > 0 ? true : false}" : true }"
+  lb_attached  = "${lookup(var.load_balancing_properties,"lb_arn", "") != "" && var.lb_tg_arn != "" ? true : false}"
+  nlb_attached = "${lookup(var.network_load_balancing_properties,"lb_arn", "") != "" && var.lb_tg_arn != "" ? true : false}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"
@@ -256,7 +258,7 @@ module "ecs_service" {
   awsvpc_security_group_ids = "${var.awsvpc_security_group_ids}"
 
   # lb_target_group_arn sets the arn of the target_group the service needs to connect to
-  lb_target_group_arn = "${local.lb_target_group_arn}"
+  lb_target_group_arn = "${var.lb_tg_arn == "" ?  module.alb_handling.lb_target_group_arn : var.lb_tg_arn }"
 
   # desired_capacity sets the initial capacity in task of the ECS Service, ignored when scheduling_strategy is DAEMON
   desired_capacity = "${lookup(var.capacity_properties,"desired_capacity", var.default_capacity_properties_desired_capacity)}"
@@ -279,6 +281,7 @@ module "ecs_service" {
   # This if for adding the service to a pre-created service discovery namespace
   service_discovery_namespace_arn  = "${var.service_discovery_namespace_arn}"
   service_discovery_container_name = "${var.service_discovery_container_name}"
+  enable_service_discovery         = "${var.enable_service_discovery}"
 
   tags = "${var.tags}"
 }

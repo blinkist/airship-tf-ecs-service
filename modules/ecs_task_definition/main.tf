@@ -20,7 +20,11 @@ resource "aws_ecs_task_definition" "app" {
   # mimic multiple `volume` statements
   # This WILL break in Terraform 0.12: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361358928
   # but we need something that works before then
-  volume = ["${var.host_path_volumes}"]
+  # volume = ["${var.host_path_volumes}"]
+  volume {
+    name      = "${lookup(var.host_path_volume, "name", "novolume")}"
+    host_path = "${lookup(var.host_path_volume, "host_path", "/var/tmp/novolume")}"
+  }
 
   container_definitions = "${var.container_definitions}"
   network_mode          = "${var.awsvpc_enabled ? "awsvpc" : "bridge"}"
@@ -48,13 +52,17 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
   # mimic multiple `volume` statements
   # This WILL break in Terraform 0.12: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361358928
   # but we need something that works before then
-  volume = ["${var.host_path_volumes}"]
+  #  volume = ["${var.host_path_volumes}"]
+  volume {
+    name      = "${var.host_path_volume["name"]}"
+    host_path = "${var.host_path_volume["host_path"]}"
+  }
 
   # Unfortunately, the same hack doesn't work for a list of Docker volume
   # blocks because they include a nested map; therefore the only way to
   # currently sanely support Docker volume blocks is to only consider the
   # single volume case.
-  volume = {
+  volume {
     name = "${local.docker_volume_name}"
 
     docker_volume_configuration {

@@ -57,8 +57,16 @@ variable "lb_attached" {
   default = true
 }
 
+variable "nlb_attached" {
+  default = false
+}
+
 # Spread tasks over ECS Cluster based on AZ, Instance-id, memory
 variable "with_placement_strategy" {}
+
+variable "enable_service_discovery" {
+  default = "false"
+}
 
 # The service discovery namespace arn to register the services against
 variable "service_discovery_namespace_arn" {

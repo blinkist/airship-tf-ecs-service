@@ -49,6 +49,11 @@ variable "health_uri" {
   default = ""
 }
 
+variable "load_balancer_type" {
+  type    = "string"
+  default = "application"
+}
+
 # Route53 Zone to add subdomain to. 
 # Example:
 # 
@@ -74,7 +79,9 @@ variable "allowed_record_types" {
 }
 
 # route53_record_type, one of the allowed values of the map allowed_record_types
-variable "route53_record_type" {}
+variable "route53_record_type" {
+  default = "NONE"
+}
 
 # the custom_listen_hosts will be added as a host route rule as aws_lb_listener_rule to the given service e.g. www.domain.com -> Service
 variable "custom_listen_hosts" {

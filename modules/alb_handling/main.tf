@@ -5,12 +5,12 @@ data "aws_lb" "main" {
 
 locals {
   # Validate the record type by looking up the map with valid record types
-  route53_record_type = "${lookup(var.allowed_record_types,var.route53_record_type)}"
+  route53_record_type = "${lookup(var.allowed_record_types,var.route53_record_type, "NONE")}"
 }
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record" {
-  count   = "${(var.create && local.route53_record_type == "CNAME" ) ? 1 : 0 }"
+  count   = "${var.create && local.route53_record_type == "CNAME"  ? 1 : 0 }"
   zone_id = "${var.route53_zone_id}"
   name    = "${var.route53_name}"
   type    = "CNAME"
@@ -20,7 +20,7 @@ resource "aws_route53_record" "record" {
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record_alias_a" {
-  count   = "${(var.create && local.route53_record_type == "ALIAS") ? 1 : 0 }"
+  count   = "${var.create && local.route53_record_type == "ALIAS" ? 1 : 0 }"
   zone_id = "${var.route53_zone_id}"
   name    = "${var.route53_name}"
   type    = "A"

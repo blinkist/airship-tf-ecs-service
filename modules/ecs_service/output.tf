@@ -11,11 +11,12 @@ output "ecs_service_name" {
     aws_ecs_service.app_with_lb.*.name,
     aws_ecs_service.app.*.name,
     aws_ecs_service.app_awsvpc_with_service_registry.*.name,
-    aws_ecs_service.app_with_service_registry.*.name
+    aws_ecs_service.app_with_service_registry.*.name,
+    aws_ecs_service.app_with_network_lb.*.name
     ) ) )
   }"
 }
 
 output "service_discovery_container_name" {
-  value = "${var.service_discovery_container_name == "" ? var.container_name : var.service_discovery_container_name }"
+  value = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
 }
