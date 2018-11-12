@@ -275,7 +275,7 @@ module "ecs_service" {
   service_discovery_namespace_arn  = "${var.service_discovery_namespace_arn}"
   service_discovery_container_name = "${var.service_discovery_container_name}"
   enable_service_discovery         = "${var.enable_service_discovery}"
-  tags = "${var.tags}"
+  tags                             = "${var.tags}"
 }
 
 #

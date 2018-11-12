@@ -200,7 +200,7 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
 }
 
 resource "aws_ecs_service" "app" {
-  count = "${var.create && !  var.lb_attached && ! var.nlb_attached && ! local.awsvpc_enabled && ! var.enable_service_discovery? 1 : 0 }"
+  count = "${var.create && ! var.lb_attached && ! var.nlb_attached && ! local.awsvpc_enabled && ! var.enable_service_discovery ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
