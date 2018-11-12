@@ -117,7 +117,7 @@ resource "aws_cloudwatch_log_group" "app" {
 #
 module "live_task_lookup" {
   source           = "./modules/live_task_lookup/"
-  create           = "${ var.create ? 1 : 0 }"
+  create           = "${ var.create && var.container_image == "" }"
   ecs_cluster_id   = "${var.ecs_cluster_id}"
   ecs_service_name = "${var.name}"
   container_name   = "${var.container_name}"
