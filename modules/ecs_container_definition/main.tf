@@ -46,11 +46,11 @@ locals {
 
     # privileged             = "${var.privileged}"
 
-    hostname = "${var.hostname}"
-    environment = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
-    mountPoints = ["${var.mountpoints}"]
+    hostname     = "${var.hostname}"
+    environment  = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
+    mountPoints  = ["${var.mountpoints}"]
     portMappings = "${local.port_mappings[local.use_port]}"
-    healthCheck = "${var.healthcheck}"
+    healthCheck  = "${var.healthcheck}"
     logConfiguration = {
       logDriver = "${var.log_driver}"
       options   = "${var.log_options}"

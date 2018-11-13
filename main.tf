@@ -251,26 +251,33 @@ module "ecs_service" {
   lb_attached  = "${(lookup(var.load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
   nlb_attached = "${(lookup(var.network_load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
 
-  #&& var.lb_tg_arn != ""
-
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"
+
   # awsvpc_security_group_ids defines the vpc_security_group_ids for an awsvpc module
   awsvpc_security_group_ids = "${var.awsvpc_security_group_ids}"
+
   # lb_target_group_arn sets the arn of the target_group the service needs to connect to
-  lb_target_group_arn = "${var.lb_tg_arn == "" ?  module.alb_handling.lb_target_group_arn : var.lb_tg_arn }"
+  lb_target_group_arn = "${var.lb_tg_arn == "" ?  (lookup(var.load_balancing_properties,"lb_tg_arn", "") == "" ? module.alb_handling.lb_target_group_arn : lookup(var.load_balancing_properties,"lb_tg_arn", "")) : var.lb_tg_arn }"
+
   # desired_capacity sets the initial capacity in task of the ECS Service, ignored when scheduling_strategy is DAEMON
   desired_capacity = "${lookup(var.capacity_properties,"desired_capacity", var.default_capacity_properties_desired_capacity)}"
+
   # scheduling_strategy
   scheduling_strategy = "${var.scheduling_strategy}"
+
   # with_placement_strategy, if true spread tasks over ECS Cluster based on AZ, Instance-id, Memory
   with_placement_strategy = "${var.with_placement_strategy}"
+
   # container_name sets the name of the container, this is used for the load balancer section inside the ecs_service to connect to a container_name defined inside the 
   # task definition, container_port sets the port for the same container.
   container_name = "${var.container_name}"
+
   container_port = "${var.container_port}"
+
   # This way we force the aws_lb_listener_rule to have finished before creating the ecs_service
   aws_lb_listener_rules = "${module.alb_handling.aws_lb_listener_rules}"
+
   # This if for adding the service to a pre-created service discovery namespace
   service_discovery_namespace_arn  = "${var.service_discovery_namespace_arn}"
   service_discovery_container_name = "${var.service_discovery_container_name}"
