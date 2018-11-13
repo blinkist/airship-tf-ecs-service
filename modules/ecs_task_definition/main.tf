@@ -52,11 +52,12 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
   # mimic multiple `volume` statements
   # This WILL break in Terraform 0.12: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361358928
   # but we need something that works before then
-  #  volume = ["${var.host_path_volumes}"]
-  volume {
-    name      = "${var.host_path_volume["name"]}"
-    host_path = "${var.host_path_volume["host_path"]}"
-  }
+  volume = ["${var.host_path_volumes}"]
+
+  # volume {
+  #   name      = "${lookup(var.host_path_volume, "name", "novolume")}"
+  #   host_path = "${lookup(var.host_path_volume, "host_path", "/tmp/empty")}"
+  # }
 
   # Unfortunately, the same hack doesn't work for a list of Docker volume
   # blocks because they include a nested map; therefore the only way to
@@ -71,10 +72,7 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
       driver        = "${lookup(var.docker_volume, "driver", "")}"
     }
   }
-
   container_definitions = "${var.container_definitions}"
-
   network_mode = "${var.awsvpc_enabled ? "awsvpc" : "bridge"}"
-
   requires_compatibilities = ["${var.launch_type}"]
 }
