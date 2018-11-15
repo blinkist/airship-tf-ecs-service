@@ -70,7 +70,7 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
   # currently sanely support Docker volume blocks is to only consider the
   # single volume case.
   volume {
-    name = "${local.docker_volume_name}"
+    name = "${null_resource.docker.volume_name}"
 
     docker_volume_configuration {
       autoprovision = "${lookup(var.docker_volume, "autoprovision", false)}"
