@@ -53,13 +53,6 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
   cpu    = "${var.cpu}"
   memory = "${var.memory}"
 
-  # This is a hack: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361202716
-  # Specifically, we are assigning a list of maps to the `volume` block to
-  # mimic multiple `volume` statements
-  # This WILL break in Terraform 0.12: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361358928
-  # but we need something that works before then
-  volume = ["${var.host_path_volumes}"]
-
   # volume {
   #   name      = "${lookup(var.host_path_volume, "name", "novolume")}"
   #   host_path = "${lookup(var.host_path_volume, "host_path", "/tmp/empty")}"
@@ -78,6 +71,13 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
       driver        = "${lookup(var.docker_volume, "driver", "")}"
     }
   }
+  # This is a hack: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361202716
+  # Specifically, we are assigning a list of maps to the `volume` block to
+  # mimic multiple `volume` statements
+  # This WILL break in Terraform 0.12: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361358928
+  # but we need something that works before then
+  # 
+  volume = ["${var.host_path_volumes}"]
   container_definitions    = "${var.container_definitions}"
   network_mode             = "${var.awsvpc_enabled ? "awsvpc" : "bridge"}"
   requires_compatibilities = ["${var.launch_type}"]
