@@ -18,6 +18,10 @@ output "ecs_service_name" {
   value = "${module.ecs_service.ecs_service_name}"
 }
 
+output "ecs_task_name" {
+  value = "${var.name}"
+}
+
 output "ecs_cluster_name" {
   value = "${local.ecs_cluster_name}"
 }
