@@ -5,7 +5,7 @@ resource "null_resource" "docker" {
 }
 
 resource "aws_ecs_task_definition" "app" {
-  count = "${(var.create && (local.docker_volume_name == "")) ? 1 : 0 }"
+  count = "${(var.create && ("${null_resource.docker.volume_name}" == "")) ? 1 : 0 }"
 
   depends_on = ["null_resource.docker"]
 
@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "app" {
 }
 
 resource "aws_ecs_task_definition" "app_with_docker_volume" {
-  count = "${(var.create && (local.docker_volume_name != "")) ? 1 : 0 }"
+  count = "${(var.create && ("${null_resource.docker.volume_name}" != "")) ? 1 : 0 }"
 
   depends_on = ["null_resource.docker"]
 
