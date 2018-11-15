@@ -9,7 +9,6 @@ output "ecs_service_name" {
     aws_ecs_service.app_awsvpc.*.name,
     aws_ecs_service.app_with_lb_spread.*.name,
     aws_ecs_service.app_with_lb.*.name,
-    aws_ecs_service.app_with_network_lb.*.name,
     aws_ecs_service.app.*.name,
     aws_ecs_service.app_awsvpc_with_service_registry.*.name,
     aws_ecs_service.app_with_service_registry.*.name,
