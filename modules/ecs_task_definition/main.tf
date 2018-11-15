@@ -1,9 +1,13 @@
-locals {
-  docker_volume_name = "${lookup(var.docker_volume, "name", "")}"
+resource "null_resource" "docker" {
+  triggers {
+    volume_name = "${lookup(var.docker_volume, "name", "")}"
+  }
 }
 
 resource "aws_ecs_task_definition" "app" {
   count = "${(var.create && (local.docker_volume_name == "")) ? 1 : 0 }"
+
+  depends_on = ["null_resource.docker"]
 
   family        = "${var.name}"
   task_role_arn = "${var.ecs_taskrole_arn}"
@@ -36,6 +40,8 @@ resource "aws_ecs_task_definition" "app" {
 
 resource "aws_ecs_task_definition" "app_with_docker_volume" {
   count = "${(var.create && (local.docker_volume_name != "")) ? 1 : 0 }"
+
+  depends_on = ["null_resource.docker"]
 
   family        = "${var.name}"
   task_role_arn = "${var.ecs_taskrole_arn}"
@@ -72,7 +78,7 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
       driver        = "${lookup(var.docker_volume, "driver", "")}"
     }
   }
-  container_definitions = "${var.container_definitions}"
-  network_mode = "${var.awsvpc_enabled ? "awsvpc" : "bridge"}"
+  container_definitions    = "${var.container_definitions}"
+  network_mode             = "${var.awsvpc_enabled ? "awsvpc" : "bridge"}"
   requires_compatibilities = ["${var.launch_type}"]
 }
