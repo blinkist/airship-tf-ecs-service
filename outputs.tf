@@ -19,7 +19,7 @@ output "ecs_service_name" {
 }
 
 output "ecs_task_name" {
-  value = "${var.name}"
+  value = "${module.ecs_task_definition.aws_ecs_task_definition_family}"
 }
 
 output "ecs_cluster_name" {
