@@ -1,6 +1,6 @@
 resource "null_resource" "docker" {
   triggers {
-    volume_name = "${lookup(var.docker_volume, "name", "")}"
+    volume_name = "${lookup(var.docker_volume, "name", "NONAME")}"
   }
 }
 
@@ -77,8 +77,8 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
   # This WILL break in Terraform 0.12: https://github.com/hashicorp/terraform/issues/14037#issuecomment-361358928
   # but we need something that works before then
   # 
-  volume = ["${var.host_path_volumes}"]
-  container_definitions    = "${var.container_definitions}"
+  # volume = ["${var.host_path_volumes}"]
+  container_definitions = "${var.container_definitions}"
   network_mode             = "${var.awsvpc_enabled ? "awsvpc" : "bridge"}"
   requires_compatibilities = ["${var.launch_type}"]
 }
