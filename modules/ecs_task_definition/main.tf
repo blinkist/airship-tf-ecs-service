@@ -1,13 +1,13 @@
-resource "null_resource" "docker" {
-  triggers {
+data "null_data_source" "docker" {
+  inputs = {
     volume_name = "${lookup(var.docker_volume, "name", "NONAME")}"
   }
 }
 
 resource "aws_ecs_task_definition" "app" {
-  count = "${(var.create && ("${null_resource.docker.volume_name}" == "")) ? 1 : 0 }"
+  count = "${(var.create && ("${data.null_data_source.docker.outputs["volume_name"]}" == "")) ? 1 : 0 }"
 
-  depends_on = ["null_resource.docker"]
+  depends_on = ["data.null_data_source.docker"]
 
   family        = "${var.name}"
   task_role_arn = "${var.ecs_taskrole_arn}"
@@ -39,9 +39,9 @@ resource "aws_ecs_task_definition" "app" {
 }
 
 resource "aws_ecs_task_definition" "app_with_docker_volume" {
-  count = "${(var.create && ("${null_resource.docker.volume_name}" != "")) ? 1 : 0 }"
+  count = "${(var.create && ("${data.null_data_source.docker.outputs["volume_name"]}" != "")) ? 1 : 0 }"
 
-  depends_on = ["null_resource.docker"]
+  depends_on = ["data.null_data_source.docker"]
 
   family        = "${var.name}"
   task_role_arn = "${var.ecs_taskrole_arn}"
@@ -63,7 +63,7 @@ resource "aws_ecs_task_definition" "app_with_docker_volume" {
   # currently sanely support Docker volume blocks is to only consider the
   # single volume case.
   volume {
-    name = "${null_resource.docker.volume_name}"
+    name = "${data.null_data_source.docker.outputs["volume_name"]}"
 
     docker_volume_configuration {
       autoprovision = "${lookup(var.docker_volume, "autoprovision", false)}"
