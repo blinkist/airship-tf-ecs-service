@@ -26,6 +26,7 @@ resource "aws_ecs_service" "app_with_lb_awsvpc" {
   scheduling_strategy                = "${var.scheduling_strategy}"
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+  health_check_grace_period_seconds  = "${var.health_check_grace_period_seconds}"
 
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
@@ -51,7 +52,8 @@ resource "aws_ecs_service" "app_with_lb_spread" {
   launch_type = "${var.launch_type}"
   cluster     = "${var.cluster_id}"
 
-  task_definition = "${var.selected_task_definition}"
+  task_definition                   = "${var.selected_task_definition}"
+  health_check_grace_period_seconds = "${var.health_check_grace_period_seconds}"
 
   desired_count       = "${var.desired_capacity}"
   scheduling_strategy = "${var.scheduling_strategy}"
@@ -88,11 +90,12 @@ resource "aws_ecs_service" "app_with_lb_spread" {
 }
 
 resource "aws_ecs_service" "app_with_lb" {
-  count           = "${var.create && !local.awsvpc_enabled &&  var.lb_attached && var.container_port != ""  && !var.with_placement_strategy ? 1 : 0}"
-  name            = "${var.name}"
-  launch_type     = "${var.launch_type}"
-  cluster         = "${var.cluster_id}"
-  task_definition = "${var.selected_task_definition}"
+  count                             = "${var.create && !local.awsvpc_enabled &&  var.lb_attached && var.container_port != ""  && !var.with_placement_strategy ? 1 : 0}"
+  name                              = "${var.name}"
+  launch_type                       = "${var.launch_type}"
+  cluster                           = "${var.cluster_id}"
+  task_definition                   = "${var.selected_task_definition}"
+  health_check_grace_period_seconds = "${var.health_check_grace_period_seconds}"
 
   desired_count       = "${var.desired_capacity}"
   scheduling_strategy = "${var.scheduling_strategy}"
@@ -114,11 +117,12 @@ resource "aws_ecs_service" "app_with_lb" {
 }
 
 resource "aws_ecs_service" "app_with_network_lb" {
-  count           = "${var.create && !local.awsvpc_enabled && ! var.lb_attached && var.nlb_attached && var.container_port != "" && !var.with_placement_strategy ? 1 : 0}"
-  name            = "${var.name}"
-  launch_type     = "${var.launch_type}"
-  cluster         = "${var.cluster_id}"
-  task_definition = "${var.selected_task_definition}"
+  count                             = "${var.create && !local.awsvpc_enabled && ! var.lb_attached && var.nlb_attached && var.container_port != "" && !var.with_placement_strategy ? 1 : 0}"
+  name                              = "${var.name}"
+  launch_type                       = "${var.launch_type}"
+  cluster                           = "${var.cluster_id}"
+  task_definition                   = "${var.selected_task_definition}"
+  health_check_grace_period_seconds = "${var.health_check_grace_period_seconds}"
 
   desired_count       = "${var.desired_capacity}"
   scheduling_strategy = "${var.scheduling_strategy}"

@@ -78,6 +78,10 @@ variable "service_discovery_container_name" {
   default = ""
 }
 
+variable "health_check_grace_period_seconds" {
+  default = "300"
+}
+
 variable "tags" {
   type    = "map"
   default = {}
