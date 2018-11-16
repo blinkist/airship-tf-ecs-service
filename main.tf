@@ -250,7 +250,7 @@ module "ecs_service" {
 
   lb_attached                       = "${(lookup(var.load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
   nlb_attached                      = "${(lookup(var.network_load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
-  health_check_grace_period_seconds = "${coalescelist(list("${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "")}", "${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "300")}"))}"
+  health_check_grace_period_seconds = "${coalesce("${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "")}", "${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "300")}")}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"
