@@ -17,6 +17,6 @@ locals {
   # select the current task definition for deployment
   # Otherwise, keep using the current live task definition
 
-  revision        = "${local.has_changed && var.allow_terraform_deploy ? var.aws_ecs_task_definition_revision : var.live_aws_ecs_task_definition_revision}"
+  revision        = "${(local.has_changed || var.allow_terraform_deploy) ? var.aws_ecs_task_definition_revision : var.live_aws_ecs_task_definition_revision}"
   task_definition = "${var.aws_ecs_task_definition_family}:${local.revision}"
 }
