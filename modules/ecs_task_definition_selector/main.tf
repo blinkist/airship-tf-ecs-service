@@ -7,7 +7,7 @@ data "aws_ecs_container_definition" "current" {
 locals {
   # Calculate if there is an actual change between the current terraform task definition in the state
   # and the current live one
-  has_changed = "${ data.aws_ecs_container_definition.current.image != var.live_aws_ecs_task_definition_image ||
+  has_changed = "${ var.allow_terraform_deploy || data.aws_ecs_container_definition.current.image != var.live_aws_ecs_task_definition_image ||
                    data.aws_ecs_container_definition.current.cpu != var.live_aws_ecs_task_definition_cpu ||
                    data.aws_ecs_container_definition.current.memory != var.live_aws_ecs_task_definition_memory ||
                    data.aws_ecs_container_definition.current.memory_reservation != var.live_aws_ecs_task_definition_memory_reservation ||
@@ -17,6 +17,6 @@ locals {
   # select the current task definition for deployment
   # Otherwise, keep using the current live task definition
 
-  revision        = "${(local.has_changed || var.allow_terraform_deploy) ? var.aws_ecs_task_definition_revision : var.live_aws_ecs_task_definition_revision}"
+  revision        = "${local.has_changed ? var.aws_ecs_task_definition_revision : var.live_aws_ecs_task_definition_revision}"
   task_definition = "${var.aws_ecs_task_definition_family}:${local.revision}"
 }

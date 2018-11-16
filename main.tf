@@ -208,8 +208,9 @@ module "ecs_task_definition" {
 # if there isn't a difference then the current live one should be used to be deployed; this
 # way no actual deployment will happen.
 module "ecs_task_definition_selector" {
-  source             = "./modules/ecs_task_definition_selector/"
-  ecs_container_name = "${var.container_name}"
+  source                 = "./modules/ecs_task_definition_selector/"
+  ecs_container_name     = "${var.container_name}"
+  allow_terraform_deploy = "${var.allow_terraform_deploy}"
 
   # Terraform state task definition
   aws_ecs_task_definition_family   = "${module.ecs_task_definition.aws_ecs_task_definition_family}"

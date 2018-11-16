@@ -8,6 +8,11 @@ variable "create" {
 # ecs_cluster_id is the cluster to which the ECS Service will be added.
 variable "ecs_cluster_id" {}
 
+variable "allow_terraform_deploy" {
+  description = "When true, forces task update from Terraform."
+  default     = "true"
+}
+
 # Number of days for the cloudwatch logs for the containers to be retained
 variable "log_retention_in_days" {
   default = "14"
