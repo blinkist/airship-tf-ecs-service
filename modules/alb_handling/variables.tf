@@ -13,6 +13,18 @@ resource "null_resource" "alb_depend" {
   }
 }
 
+variable "load_balancing_properties" {
+  type = "map"
+}
+
+variable "default_load_balancing_properties" {
+  type = "map"
+}
+
+variable "lb_target_group_arn" {
+  type = "string"
+}
+
 ###
 locals {
   # lb_vpc_id sets the VPC ID of where the LB resides

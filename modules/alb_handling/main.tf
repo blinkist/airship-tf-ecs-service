@@ -11,7 +11,7 @@ data "aws_lb" "main" {
 ## Route53 DNS Record
 resource "aws_route53_record" "record" {
   count      = "${var.create && local.route53_record_type == "CNAME"  ? 1 : 0 }"
-  zone_id    = "${var.route53_zone_id}"
+  zone_id    = "${local.route53_zone_id}"
   name       = "${var.route53_name}"
   type       = "CNAME"
   ttl        = "300"
@@ -22,7 +22,7 @@ resource "aws_route53_record" "record" {
 ## Route53 DNS Record
 resource "aws_route53_record" "record_alias_a" {
   count   = "${var.create && local.route53_record_type == "ALIAS" ? 1 : 0 }"
-  zone_id = "${var.route53_zone_id}"
+  zone_id = "${local.route53_zone_id}"
   name    = "${var.route53_name}"
   type    = "A"
 
@@ -38,7 +38,7 @@ resource "aws_route53_record" "record_alias_a" {
     weight = 0
   }
 
-  set_identifier = "${var.route53_record_identifier}"
+  set_identifier = "${local.route53_record_identifier}"
   depends_on     = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
@@ -52,7 +52,7 @@ resource "aws_lb_target_group" "service" {
   protocol             = "HTTP"
   vpc_id               = "${var.lb_vpc_id}"
   target_type          = "${var.target_type}"
-  deregistration_delay = "${var.deregistration_delay}"
+  deregistration_delay = "${local.deregistration_delay}"
 
   health_check {
     path                = "${var.health_uri}"
@@ -68,7 +68,7 @@ resource "aws_lb_target_group" "service" {
 resource "aws_lb_listener_rule" "host_based_routing" {
   count = "${var.create && local.route53_record_type != "NONE" ? 1 : 0 }"
 
-  listener_arn = "${var.lb_listener_arn}"
+  listener_arn = "${local.lb_listener_arn}"
 
   action {
     type             = "forward"
@@ -93,7 +93,7 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 resource "aws_lb_listener_rule" "host_based_routing_ssl" {
   count = "${var.create && local.route53_record_type != "NONE" ? 1 : 0 }"
 
-  listener_arn = "${var.lb_listener_arn_https}"
+  listener_arn = "${local.lb_listener_arn_https}"
 
   action {
     type             = "forward"
@@ -128,7 +128,7 @@ data "template_file" "custom_listen_host" {
 resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
   count = "${var.create ? length(var.custom_listen_hosts) : 0 }"
 
-  listener_arn = "${var.lb_listener_arn}"
+  listener_arn = "${local.lb_listener_arn}"
 
   action {
     type             = "forward"
@@ -148,7 +148,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
   count = "${var.create ? length(var.custom_listen_hosts) : 0 }"
 
-  listener_arn = "${var.lb_listener_arn_https}"
+  listener_arn = "${local.lb_listener_arn_https}"
 
   action {
     type             = "forward"
@@ -161,9 +161,4 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
   }
 
   depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
-}
-
-# This is an output the ecs_service depends on. This to make sure the target_group is attached to an alb before adding to a service. The actual content is useless
-output "aws_lb_listener_rules" {
-  value = ["${concat(aws_lb_listener_rule.host_based_routing.*.arn,aws_lb_listener_rule.host_based_routing_custom_listen_host.*.arn, list())}"]
 }
