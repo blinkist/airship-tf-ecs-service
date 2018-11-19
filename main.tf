@@ -54,11 +54,22 @@ locals {
     route53_record_type       = "${var.default_load_balancing_properties_route53_record_type}"
     route53_record_identifier = "${var.default_load_balancing_properties_route53_record_identifier}"
     health_uri                = "${var.default_load_balancing_properties_health_uri}"
+    tg_port                   = "${var.default_load_balancing_properties_tg_port}"
+    load_balancer_type        = "${var.default_load_balancing_properties_load_balancer_type}"
+
+    lb_listener_arn       = "${var.default_load_balancing_properties_lb_listener_arn}"
+    lb_listener_arn_https = "${var.default_load_balancing_properties_lb_listener_arn_https}"
+    lb_vpc_id             = "${var.default_load_balancing_properties_lb_vpc_id}"
+    route53_zone_id       = "${var.default_load_balancing_properties_route53_zone_id}"
+    tg_arn                = "${var.default_load_balancing_properties_tg_arn}"
+    tg_protocol           = "${var.default_load_balancing_properties_tg_protocol}"
   }
+
+  load_balancing_properties = "${merge(local.default_load_balancing_properties, var.load_balancing_properties)}"
 }
 
-module "alb_handling" {
-  source = "./modules/alb_handling/"
+module "lb_handling" {
+  source = "./modules/lb_handling/"
 
   name         = "${var.name}"
   cluster_name = "${local.ecs_cluster_name}"
@@ -69,15 +80,13 @@ module "alb_handling" {
   # Create defines if we need to create resources inside this module
   create = "${var.create && var.load_balancing_enabled}"
 
-  default_load_balancing_properties = "${local.default_load_balancing_properties}"
-  load_balancing_properties         = "${var.load_balancing_properties}"
+  load_balancing_properties = "${local.load_balancing_properties}"
 
   # custom_listen_hosts will be added as a host route rule as aws_lb_listener_rule to the given service e.g. www.domain.com -> Service
   custom_listen_hosts = "${var.custom_listen_hosts}"
 
   # target_type is the alb_target_group target, in case of EC2 it's instance, in case of FARGATE it's IP
-  target_type         = "${var.awsvpc_enabled ? "ip" : "instance"}"
-  lb_target_group_arn = "${var.lb_tg_arn}"
+  target_type = "${var.awsvpc_enabled ? "ip" : "instance"}"
 
   tags = "${local.tags}"
 }
@@ -229,8 +238,7 @@ module "ecs_service" {
   # deployment_minimum_healthy_percent sets the minimum % in capacity at depployment
   deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
 
-  lb_attached                       = "${(lookup(var.load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
-  nlb_attached                      = "${(lookup(var.network_load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
+  lb_attached                       = "${var.load_balancing_enabled}"
   health_check_grace_period_seconds = "${coalesce("${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "")}", "${lookup(var.load_balancing_properties,"health_check_grace_period_seconds", "300")}")}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
@@ -240,7 +248,7 @@ module "ecs_service" {
   awsvpc_security_group_ids = "${var.awsvpc_security_group_ids}"
 
   # lb_target_group_arn sets the arn of the target_group the service needs to connect to
-  lb_target_group_arn = "${var.lb_tg_arn == "" ?  (lookup(var.load_balancing_properties,"lb_tg_arn", "") == "" ? module.alb_handling.lb_target_group_arn : lookup(var.load_balancing_properties,"lb_tg_arn", "")) : var.lb_tg_arn }"
+  lb_target_group_arn = "${module.lb_handling.lb_target_group_arn}"
 
   # desired_capacity sets the initial capacity in task of the ECS Service, ignored when scheduling_strategy is DAEMON
   desired_capacity = "${lookup(var.capacity_properties,"desired_capacity", var.default_capacity_properties_desired_capacity)}"
@@ -258,7 +266,7 @@ module "ecs_service" {
   container_port = "${var.container_port}"
 
   # This way we force the aws_lb_listener_rule to have finished before creating the ecs_service
-  aws_lb_listener_rules = "${module.alb_handling.aws_lb_listener_rules}"
+  aws_lb_listener_rules = "${module.lb_handling.aws_lb_listener_rules}"
 
   # This if for adding the service to a pre-created service discovery namespace
   service_discovery_namespace_arn  = "${var.service_discovery_namespace_arn}"

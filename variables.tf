@@ -57,11 +57,6 @@ variable "load_balancing_enabled" {
   default = false
 }
 
-# The target group of an existing load balancer
-variable "lb_tg_arn" {
-  default = ""
-}
-
 ## load_balancing_properties map defines the map for services hooked to a load balancer
 variable "load_balancing_properties" {
   type = "map"
@@ -100,20 +95,25 @@ variable "load_balancing_properties" {
 }
 
 ## load_balancing_properties map defines the map for services hooked to a load balancer
-variable "network_load_balancing_properties" {
-  type = "map"
 
-  default = {
-    /*
-    Note that since Terraform doesn't support partial map defaults (see
-    https://github.com/hashicorp/terraform/issues/16517), the default values here
-    are set in the independent default_load_balancing_properties_* variables
+variable "default_load_balancing_properties_tg_port" {
+  description = "This is the port that the container listens on"
+  default     = "80"
+}
 
-    lb_arn is the NLB listener arn for any protocol
-    lb_arn = ""
+variable "default_load_balancing_properties_tg_arn" {
+  description = "This is the target group arn that the container uses"
+  default     = ""
+}
 
-    */
-  }
+variable "default_load_balancing_properties_tg_protocol" {
+  description = "This is the target group protocol that the container uses"
+  default     = "HTTP"
+}
+
+variable "default_load_balancing_properties_load_balancer_type" {
+  description = "This can be application or network"
+  default     = "application"
 }
 
 variable "default_load_balancing_properties_lb_listener_arn" {

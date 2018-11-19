@@ -46,7 +46,7 @@ resource "aws_route53_record" "record_alias_a" {
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service" {
-  count                = "${var.create && var.lb_target_group_arn == "" ? 1 : 0 }"
+  count                = "${var.create && local.tg_arn == "" ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
   port                 = 80
   protocol             = "HTTP"
