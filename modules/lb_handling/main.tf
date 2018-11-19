@@ -16,7 +16,7 @@ resource "aws_route53_record" "record" {
   type       = "CNAME"
   ttl        = "300"
   records    = ["${data.aws_lb.main.dns_name}"]
-  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
 ## Route53 DNS Record
@@ -39,7 +39,7 @@ resource "aws_route53_record" "record_alias_a" {
   }
 
   set_identifier = "${local.route53_record_identifier}"
-  depends_on     = ["data.aws_lb.main", "null_resource.alb_depend"]
+  depends_on     = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
 ##
@@ -48,8 +48,8 @@ resource "aws_route53_record" "record_alias_a" {
 resource "aws_lb_target_group" "service" {
   count                = "${var.create && local.tg_arn == "" ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
-  port                 = 80
-  protocol             = "HTTP"
+  port                 = "${local.tg_arn}"
+  protocol             = "${local.tg_protocol}"
   vpc_id               = "${local.lb_vpc_id}"
   target_type          = "${var.target_type}"
   deregistration_delay = "${local.deregistration_delay}"
@@ -60,19 +60,19 @@ resource "aws_lb_target_group" "service" {
   }
 
   tags       = "${local.tags}"
-  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing" {
-  count = "${var.create && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && local.route53_record_type != "NONE"  && local.load_balancer_type == "application" ? 1 : 0 }"
 
   listener_arn = "${local.lb_listener_arn}"
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
@@ -85,19 +85,19 @@ resource "aws_lb_listener_rule" "host_based_routing" {
        }"]
   }
 
-  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl" {
-  count = "${var.create && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && local.route53_record_type != "NONE" && local.load_balancer_type == "application" ? 1 : 0 }"
 
   listener_arn = "${local.lb_listener_arn_https}"
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
@@ -110,7 +110,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
        }"]
   }
 
-  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
 data "template_file" "custom_listen_host" {
@@ -126,13 +126,13 @@ data "template_file" "custom_listen_host" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
-  count = "${var.create ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create  && local.load_balancer_type == "application" ? length(var.custom_listen_hosts) : 0 }"
 
   listener_arn = "${local.lb_listener_arn}"
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
@@ -140,19 +140,19 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
 
-  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
-  count = "${var.create ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create  && local.load_balancer_type == "application" ? length(var.custom_listen_hosts) : 0 }"
 
   listener_arn = "${local.lb_listener_arn_https}"
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
@@ -160,5 +160,5 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
 
-  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
 }

@@ -5,24 +5,16 @@ variable "create" {
   default = true
 }
 
-resource "null_resource" "alb_depend" {
+resource "null_resource" "lb_depend" {
   triggers {
     arn      = "${local.lb_arn}"
     listener = "${local.lb_listener_arn}"
-    target   = "${var.lb_target_group_arn}"
+    target   = "${var.tg_arn}"
   }
 }
 
 variable "load_balancing_properties" {
   type = "map"
-}
-
-variable "default_load_balancing_properties" {
-  type = "map"
-}
-
-variable "lb_target_group_arn" {
-  type = "string"
 }
 
 ###

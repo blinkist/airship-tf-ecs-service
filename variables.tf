@@ -107,7 +107,7 @@ variable "default_load_balancing_properties_tg_arn" {
 }
 
 variable "default_load_balancing_properties_tg_protocol" {
-  description = "This is the target group protocol that the container uses"
+  description = "This is the target group protocol that the container uses. The protocol to use for routing traffic to the targets. Should be one of TCP, HTTP, HTTPS or TLS."
   default     = "HTTP"
 }
 
