@@ -9,7 +9,7 @@ resource "null_resource" "alb_depend" {
   triggers {
     arn      = "${local.lb_arn}"
     listener = "${local.lb_listener_arn}"
-    target   = "${local.lb_tg_arn}"
+    target   = "${var.lb_target_group_arn}"
   }
 }
 
