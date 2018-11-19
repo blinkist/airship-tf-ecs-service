@@ -10,11 +10,16 @@ resource "null_resource" "lb_depend" {
     arn      = "${local.lb_arn}"
     listener = "${local.lb_listener_arn}"
     target   = "${local.tg_arn}"
+    type     = "${local.load_balancer_type}"
   }
 }
 
 variable "load_balancing_properties" {
   type = "map"
+}
+
+variable "load_balancing_enabled" {
+  default = "false"
 }
 
 ###

@@ -78,7 +78,8 @@ module "lb_handling" {
   route53_name = "${var.name}"
 
   # Create defines if we need to create resources inside this module
-  create = "${var.create && var.load_balancing_enabled}"
+  create                 = "${var.create}"
+  load_balancing_enabled = "${var.load_balancing_enabled}"
 
   load_balancing_properties = "${local.load_balancing_properties}"
 
