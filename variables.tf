@@ -148,6 +148,10 @@ variable "default_load_balancing_properties_https_enabled" {
   default = true
 }
 
+variable "default_load_balancing_properties_lb_arn" {
+  default = ""
+}
+
 variable "default_load_balancing_properties_route53_record_identifier" {
   default = "identifier"
 }

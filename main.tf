@@ -48,6 +48,7 @@ module "iam" {
 
 locals {
   default_load_balancing_properties = {
+    lb_arn                    = "${var.default_load_balancing_properties_lb_arn}"
     unhealthy_threshold       = "${var.default_load_balancing_properties_unhealthy_threshold}"
     https_enabled             = "${var.default_load_balancing_properties_https_enabled}"
     deregistration_delay      = "${var.default_load_balancing_properties_deregistration_delay}"
