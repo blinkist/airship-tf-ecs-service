@@ -1,21 +1,22 @@
 data "aws_lb" "main" {
   count = "${var.create ? 1 : 0}"
-  arn   = "${var.lb_arn}"
+  arn   = "${local.lb_arn}"
 }
 
-locals {
-  # Validate the record type by looking up the map with valid record types
-  route53_record_type = "${lookup(var.allowed_record_types,var.route53_record_type, "NONE")}"
-}
+# locals {
+#   # Validate the record type by looking up the map with valid record types
+#   route53_record_type = "${lookup(var.allowed_record_types,local.route53_record_type, "NONE")}"
+# }
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record" {
-  count   = "${var.create && local.route53_record_type == "CNAME"  ? 1 : 0 }"
-  zone_id = "${var.route53_zone_id}"
-  name    = "${var.route53_name}"
-  type    = "CNAME"
-  ttl     = "300"
-  records = ["${data.aws_lb.main.dns_name}"]
+  count      = "${var.create && local.route53_record_type == "CNAME"  ? 1 : 0 }"
+  zone_id    = "${var.route53_zone_id}"
+  name       = "${var.route53_name}"
+  type       = "CNAME"
+  ttl        = "300"
+  records    = ["${data.aws_lb.main.dns_name}"]
+  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
 ## Route53 DNS Record
@@ -38,13 +39,14 @@ resource "aws_route53_record" "record_alias_a" {
   }
 
   set_identifier = "${var.route53_record_identifier}"
+  depends_on     = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
 ##
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service" {
-  count                = "${var.create ? 1 : 0 }"
+  count                = "${var.create && var.lb_target_group_arn == "" ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
   port                 = 80
   protocol             = "HTTP"
@@ -57,7 +59,8 @@ resource "aws_lb_target_group" "service" {
     unhealthy_threshold = "${var.unhealthy_threshold}"
   }
 
-  tags = "${local.tags}"
+  tags       = "${local.tags}"
+  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
 ##
@@ -69,7 +72,7 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.service.arn}"
+    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
@@ -81,6 +84,8 @@ resource "aws_lb_listener_rule" "host_based_routing" {
        join("",aws_route53_record.record_alias_a.*.fqdn)
        }"]
   }
+
+  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
 ##
@@ -92,7 +97,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.service.arn}"
+    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
@@ -104,6 +109,8 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
        join("",aws_route53_record.record_alias_a.*.fqdn)
        }"]
   }
+
+  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
 data "template_file" "custom_listen_host" {
@@ -125,13 +132,15 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.service.arn}"
+    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
     field  = "host-header"
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
+
+  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
 ##
@@ -143,13 +152,15 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.service.arn}"
+    target_group_arn = "${join("",concat(list(var.lb_target_group_arn),aws_lb_target_group.service.*.arn))}"
   }
 
   condition {
     field  = "host-header"
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
+
+  depends_on = ["data.aws_lb.main", "null_resource.alb_depend"]
 }
 
 # This is an output the ecs_service depends on. This to make sure the target_group is attached to an alb before adding to a service. The actual content is useless

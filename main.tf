@@ -45,59 +45,39 @@ module "iam" {
 #
 # The alb-handling sub-module creates everything regarding the connection of an ecs service to an Application Load Balancer
 # 
+
+locals {
+  default_load_balancing_properties = {
+    unhealthy_threshold       = "${var.default_load_balancing_properties_unhealthy_threshold}"
+    https_enabled             = "${var.default_load_balancing_properties_https_enabled}"
+    deregistration_delay      = "${var.default_load_balancing_properties_deregistration_delay}"
+    route53_record_type       = "${var.default_load_balancing_properties_route53_record_type}"
+    route53_record_identifier = "${var.default_load_balancing_properties_route53_record_identifier}"
+    health_uri                = "${var.default_load_balancing_properties_health_uri}"
+  }
+}
+
 module "alb_handling" {
   source = "./modules/alb_handling/"
 
   name         = "${var.name}"
   cluster_name = "${local.ecs_cluster_name}"
 
-  # Create defines if we need to create resources inside this module
-  create = "${var.create && var.load_balancing_enabled}"
-
-  # lb_vpc_id sets the VPC ID of where the LB resides
-  lb_vpc_id = "${lookup(var.load_balancing_properties,"lb_vpc_id", "")}"
-
-  # lb_arn defines the arn of the ALB
-  lb_arn = "${lookup(var.load_balancing_properties,"lb_arn", "")}"
-
-  load_balancer_type = "${lookup(var.load_balancing_properties,"load_balancer_type", "application")}"
-
-  # lb_listener_arn is the arn of the listener ( HTTP )
-  lb_listener_arn = "${lookup(var.load_balancing_properties,"lb_listener_arn", "")}"
-
-  # lb_listener_arn_https is the arn of the listener ( HTTPS )
-  lb_listener_arn_https = "${lookup(var.load_balancing_properties,"lb_listener_arn_https", "")}"
-
-  # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
-  unhealthy_threshold = "${lookup(var.load_balancing_properties,"unhealthy_threshold", var.default_load_balancing_properties_unhealthy_threshold)}"
-
-  # if https_enabled is true, listener rules are made for the ssl listener
-  https_enabled = "${lookup(var.load_balancing_properties,"https_enabled", var.default_load_balancing_properties_https_enabled)}"
-
-  # Sets the deregistration_delay for the targetgroup
-  deregistration_delay = "${lookup(var.load_balancing_properties,"deregistration_delay", var.default_load_balancing_properties_deregistration_delay)}"
-
-  # route53_record_type sets the record type of the route53 record, can be ALIAS, CNAME or NONE,  defaults to CNAME
-  # In case of NONE no record will be made
-  route53_record_type = "${lookup(var.load_balancing_properties,"route53_record_type", var.default_load_balancing_properties_route53_record_type)}"
-
-  # Sets the zone in which the sub-domain will be added for this service
-  route53_zone_id = "${lookup(var.load_balancing_properties,"route53_zone_id", "")}"
-
   # Sets name for the sub-domain, we default to *name
   route53_name = "${var.name}"
 
-  # route53_a_record_identifier sets the identifier of the weighted Alias A record
-  route53_record_identifier = "${lookup(var.load_balancing_properties,"route53_record_identifier", var.default_load_balancing_properties_route53_record_identifier)}"
+  # Create defines if we need to create resources inside this module
+  create = "${var.create && var.load_balancing_enabled}"
+
+  default_load_balancing_properties = "${local.default_load_balancing_properties}"
+  load_balancing_properties         = "${var.load_balancing_properties}"
 
   # custom_listen_hosts will be added as a host route rule as aws_lb_listener_rule to the given service e.g. www.domain.com -> Service
   custom_listen_hosts = "${var.custom_listen_hosts}"
 
-  # health_uri defines which health-check uri the target group needs to check on for health_check
-  health_uri = "${lookup(var.load_balancing_properties,"health_uri", var.default_load_balancing_properties_health_uri)}"
-
   # target_type is the alb_target_group target, in case of EC2 it's instance, in case of FARGATE it's IP
-  target_type = "${var.awsvpc_enabled ? "ip" : "instance"}"
+  target_type         = "${var.awsvpc_enabled ? "ip" : "instance"}"
+  lb_target_group_arn = "${var.lb_tg_arn}"
 
   tags = "${local.tags}"
 }
@@ -251,7 +231,7 @@ module "ecs_service" {
 
   lb_attached                       = "${(lookup(var.load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
   nlb_attached                      = "${(lookup(var.network_load_balancing_properties,"lb_arn", "") != "" ) ? true : false}"
-  health_check_grace_period_seconds = "${coalesce("${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "")}", "${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "300")}")}"
+  health_check_grace_period_seconds = "${coalesce("${lookup(var.network_load_balancing_properties,"health_check_grace_period_seconds", "")}", "${lookup(var.load_balancing_properties,"health_check_grace_period_seconds", "300")}")}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"
