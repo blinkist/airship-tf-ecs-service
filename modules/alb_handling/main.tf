@@ -50,13 +50,13 @@ resource "aws_lb_target_group" "service" {
   name                 = "${var.cluster_name}-${var.name}"
   port                 = 80
   protocol             = "HTTP"
-  vpc_id               = "${var.lb_vpc_id}"
+  vpc_id               = "${local.lb_vpc_id}"
   target_type          = "${var.target_type}"
   deregistration_delay = "${local.deregistration_delay}"
 
   health_check {
-    path                = "${var.health_uri}"
-    unhealthy_threshold = "${var.unhealthy_threshold}"
+    path                = "${local.health_uri}"
+    unhealthy_threshold = "${local.unhealthy_threshold}"
   }
 
   tags       = "${local.tags}"
