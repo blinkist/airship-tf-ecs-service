@@ -48,7 +48,7 @@ resource "aws_route53_record" "record_alias_a" {
 resource "aws_lb_target_group" "service_alb" {
   count                = "${var.create && var.load_balancing_enabled && local.tg_arn == ""&& local.load_balancer_type == "application"  ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
-  port                 = "${local.tg_arn}"
+  port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
   vpc_id               = "${local.lb_vpc_id}"
   target_type          = "${var.target_type}"
@@ -71,7 +71,7 @@ resource "aws_lb_target_group" "service_alb" {
 resource "aws_lb_target_group" "service_nlb" {
   count                = "${var.create && var.load_balancing_enabled && local.tg_arn == "" && local.load_balancer_type == "network" ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
-  port                 = "${local.tg_arn}"
+  port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
   vpc_id               = "${local.lb_vpc_id}"
   target_type          = "${var.target_type}"
