@@ -241,8 +241,8 @@ module "ecs_service" {
   deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
 
   lb_attached                       = "${var.load_balancing_enabled}"
-  health_check_grace_period_seconds = "${lookup(var.load_balancing_properties,"health_check_grace_period_seconds", "300")}"
-  load_balancer_type                = "${lookup(var.load_balancing_properties,"load_balancer_type")}"
+  health_check_grace_period_seconds = "${lookup(local.load_balancing_properties,"health_check_grace_period_seconds", "300")}"
+  load_balancer_type                = "${lookup(local.load_balancing_properties,"load_balancer_type")}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"
