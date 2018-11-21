@@ -1,9 +1,9 @@
 output "lb_target_group_arn" {
-  value = "${join("",concat(list(""),list(local.tg_arn),concat(list(),aws_lb_target_group.service_alb.*.arn), concat(list(),aws_lb_target_group.service_nlb.*.arn)))}"
+  value = "${format("%v%v",local.alb_target_group_arn, local.nlb_target_group_arn)}"
 }
 
 output "lb_target_group_arn_suffix" {
-  value = "${join("",concat(list(""),concat(list(),aws_lb_target_group.service_alb.*.arn_suffix), concat(list(),aws_lb_target_group.service_nlb.*.arn_suffix)))}"
+  value = "${format("%v%v",local.alb_target_group_arn_suffix, local.nlb_target_group_arn_suffix)}"
 }
 
 output "lb_arn_suffix" {
