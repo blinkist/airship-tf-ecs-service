@@ -321,7 +321,9 @@ module "ecs_scheduled_tasks" {
   # create defines if resources inside this module are being created.
   create = "${var.create && length(var.ecs_scheduled_tasks) > 0 ? true : false }"
 
-  cluster_id = "${var.ecs_cluster_id}"
+  ecs_cluster_id = "${var.ecs_cluster_id}"
+
+  container_name = "${var.container_name}"
 
   # ecs_service_name is derived from the actual ecs_service, this to force dependency at creation.
   ecs_service_name = "${module.ecs_service.ecs_service_name}"
