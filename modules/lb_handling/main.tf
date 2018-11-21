@@ -44,9 +44,9 @@ resource "aws_route53_record" "record_alias_a" {
 
 ##
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
-## It will not be created when the service is not attached to a load balancer like a worker
+## It will not be created when the service is not attached to a load balancer like a worker && local.load_balancer_type == "application"
 resource "aws_lb_target_group" "service_alb" {
-  count                = "${var.create && var.load_balancing_enabled && local.load_balancer_type == "application"  ? 1 : 0 }"
+  count                = "${var.create && var.load_balancing_enabled   ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
@@ -96,7 +96,7 @@ resource "aws_lb_target_group" "service_nlb" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached && local.load_balancer_type == "application"
 resource "aws_lb_listener_rule" "host_based_routing" {
-  count = "${var.create && var.load_balancing_enabled && local.route53_record_type != "NONE"   ? 1 : 0 }"
+  count = "${var.create && var.load_balancing_enabled && local.route53_record_type != "NONE"  && local.load_balancer_type == "application" ? 1 : 0 }"
 
   listener_arn = "${local.lb_listener_arn}"
 
