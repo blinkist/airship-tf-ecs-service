@@ -46,7 +46,7 @@ resource "aws_route53_record" "record_alias_a" {
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service_alb" {
-  count                = "${var.create && var.load_balancing_enabled && local.tg_arn == ""&& local.load_balancer_type == "application"  ? 1 : 0 }"
+  count                = "${var.create && var.load_balancing_enabled && local.tg_arn == "" && local.load_balancer_type == "application"  ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
@@ -62,6 +62,10 @@ resource "aws_lb_target_group" "service_alb" {
 
   tags       = "${local.tags}"
   depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
+}
+
+locals {
+  alb_target_group_arn = "${join("",concat(list(),list(local.tg_arn),concat(list(),aws_lb_target_group.service_alb.*.arn)))}"
 }
 
 # Network service load_balancer_type
@@ -95,7 +99,7 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(""),list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
+    target_group_arn = "${local.alb_target_group_arn}"
   }
 
   condition {
@@ -120,7 +124,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(""),list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
+    target_group_arn = "${local.alb_target_group_arn}"
   }
 
   condition {
@@ -155,7 +159,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(""),list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
+    target_group_arn = "${local.alb_target_group_arn}"
   }
 
   condition {
@@ -163,7 +167,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
 
-  # depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
 ##
@@ -175,7 +179,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(""),list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
+    target_group_arn = "${local.alb_target_group_arn}"
   }
 
   condition {
