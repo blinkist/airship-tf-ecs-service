@@ -95,7 +95,7 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",coalescelist(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn))}"
+    target_group_arn = "${join("",coalescelist(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
   }
 
   condition {
@@ -120,7 +120,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",coalescelist(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn))}"
+    target_group_arn = "${join("",coalescelist(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
   }
 
   condition {
@@ -155,7 +155,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn)}"
+    target_group_arn = "${join("",coalescelist(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
   }
 
   condition {
@@ -175,7 +175,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn)}"
+    target_group_arn = "${join("",coalescelist(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn))}"
   }
 
   condition {
