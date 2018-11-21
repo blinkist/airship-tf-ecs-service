@@ -42,28 +42,6 @@ resource "aws_route53_record" "record_alias_a" {
   depends_on     = ["data.aws_lb.main", "null_resource.lb_depend"]
 }
 
-##
-## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
-## It will not be created when the service is not attached to a load balancer like a worker 
-resource "aws_lb_target_group" "service_alb" {
-  count                = "${var.create  && var.load_balancing_enabled && local.load_balancer_type == "application" ? 1 : 0 }"
-  name                 = "${local.tg_name}"
-  port                 = "${local.tg_port}"
-  protocol             = "${local.tg_protocol}"
-  vpc_id               = "${local.lb_vpc_id}"
-  target_type          = "${var.target_type}"
-  deregistration_delay = "${local.deregistration_delay}"
-
-  health_check {
-    protocol            = "${local.tg_protocol}"
-    path                = "${local.health_uri}"
-    unhealthy_threshold = "${local.unhealthy_threshold}"
-  }
-
-  tags       = "${local.tags}"
-  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
-}
-
 locals {
   alb_target_group_arn        = "${local.load_balancer_type == "application" ? element(concat(aws_lb_target_group.service_alb.*.arn, list("")), 0) : ""}"
   nlb_target_group_arn        = "${local.load_balancer_type == "network" ? element(concat(aws_lb_target_group.service_nlb.*.arn, list("")), 0) : ""}"
@@ -86,6 +64,42 @@ resource "aws_lb_target_group" "service_nlb" {
 
   health_check {
     protocol            = "${local.tg_protocol}"
+    unhealthy_threshold = "${local.unhealthy_threshold}"
+  }
+
+  tags       = "${local.tags}"
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
+}
+
+resource "aws_lb_listener" "nlb_listener" {
+  count             = "${var.create && var.load_balancing_enabled  && local.load_balancer_type == "network" ? 1 : 0 }"
+  load_balancer_arn = "${local.lb_arn}"
+  port              = "${local.tg_port}"
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.nlb_tg.arn}"
+    type             = "forward"
+  }
+
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend", "aws_lb_target_group.service_nlb"]
+}
+
+##
+## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
+## It will not be created when the service is not attached to a load balancer like a worker 
+resource "aws_lb_target_group" "service_alb" {
+  count                = "${var.create  && var.load_balancing_enabled && local.load_balancer_type == "application" ? 1 : 0 }"
+  name                 = "${local.tg_name}"
+  port                 = "${local.tg_port}"
+  protocol             = "${local.tg_protocol}"
+  vpc_id               = "${local.lb_vpc_id}"
+  target_type          = "${var.target_type}"
+  deregistration_delay = "${local.deregistration_delay}"
+
+  health_check {
+    protocol            = "${local.tg_protocol}"
+    path                = "${local.health_uri}"
     unhealthy_threshold = "${local.unhealthy_threshold}"
   }
 
