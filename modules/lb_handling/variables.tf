@@ -58,7 +58,7 @@ locals {
   route53_record_identifier = "${lookup(var.load_balancing_properties,"route53_record_identifier")}"
 
   local_tg_name = "${lookup(var.load_balancing_properties,"tg_name", "")}"
-  tg_name       = "${substr(local.local_tg_name == "" ? format("%v-%v", var.cluster_name, var.name) : local.local_tg_name, 0, 32) }"
+  tg_name       = "${substr(local.local_tg_name == "" ? format("%v-%v", var.cluster_name, var.name) : local.local_tg_name, 0, min(31, local.local_tg_name)) }"
 
   # health_uri defines which health-check uri the target group needs to check on for health_check
   health_uri = "${lookup(var.load_balancing_properties,"health_uri")}"
