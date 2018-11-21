@@ -48,21 +48,22 @@ module "iam" {
 
 locals {
   default_load_balancing_properties = {
-    lb_arn                    = "${var.default_load_balancing_properties_lb_arn}"
-    unhealthy_threshold       = "${var.default_load_balancing_properties_unhealthy_threshold}"
-    https_enabled             = "${var.default_load_balancing_properties_https_enabled}"
-    deregistration_delay      = "${var.default_load_balancing_properties_deregistration_delay}"
-    route53_record_type       = "${var.default_load_balancing_properties_route53_record_type}"
-    route53_record_identifier = "${var.default_load_balancing_properties_route53_record_identifier}"
-    route53_zone_id           = "${var.default_load_balancing_properties_route53_zone_id}"
-    load_balancer_type        = "${var.default_load_balancing_properties_load_balancer_type}"
-    lb_listener_arn           = "${var.default_load_balancing_properties_lb_listener_arn}"
-    lb_listener_arn_https     = "${var.default_load_balancing_properties_lb_listener_arn_https}"
-    lb_vpc_id                 = "${var.default_load_balancing_properties_lb_vpc_id}"
-    health_uri                = "${var.default_load_balancing_properties_health_uri}"
-    tg_arn                    = "${var.default_load_balancing_properties_tg_arn}"
-    tg_protocol               = "${var.default_load_balancing_properties_tg_protocol}"
-    tg_port                   = "${var.default_load_balancing_properties_tg_port}"
+    lb_arn                            = "${var.default_load_balancing_properties_lb_arn}"
+    unhealthy_threshold               = "${var.default_load_balancing_properties_unhealthy_threshold}"
+    https_enabled                     = "${var.default_load_balancing_properties_https_enabled}"
+    deregistration_delay              = "${var.default_load_balancing_properties_deregistration_delay}"
+    route53_record_type               = "${var.default_load_balancing_properties_route53_record_type}"
+    route53_record_identifier         = "${var.default_load_balancing_properties_route53_record_identifier}"
+    route53_zone_id                   = "${var.default_load_balancing_properties_route53_zone_id}"
+    load_balancer_type                = "${var.default_load_balancing_properties_load_balancer_type}"
+    lb_listener_arn                   = "${var.default_load_balancing_properties_lb_listener_arn}"
+    lb_listener_arn_https             = "${var.default_load_balancing_properties_lb_listener_arn_https}"
+    lb_vpc_id                         = "${var.default_load_balancing_properties_lb_vpc_id}"
+    health_uri                        = "${var.default_load_balancing_properties_health_uri}"
+    tg_arn                            = "${var.default_load_balancing_properties_tg_arn}"
+    tg_protocol                       = "${var.default_load_balancing_properties_tg_protocol}"
+    tg_port                           = "${var.default_load_balancing_properties_tg_port}"
+    health_check_grace_period_seconds = "${var.default_load_balancing_properties_health_check_grace_period_seconds}"
   }
 
   load_balancing_properties = "${merge(local.default_load_balancing_properties, var.load_balancing_properties)}"
@@ -240,7 +241,8 @@ module "ecs_service" {
   deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
 
   lb_attached                       = "${var.load_balancing_enabled}"
-  health_check_grace_period_seconds = "${"${lookup(var.load_balancing_properties,"health_check_grace_period_seconds", "300")}"}"
+  health_check_grace_period_seconds = "${lookup(var.load_balancing_properties,"health_check_grace_period_seconds", "300")}"
+  load_balancer_type                = "${lookup(var.load_balancing_properties,"load_balancer_type")}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"

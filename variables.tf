@@ -163,6 +163,10 @@ variable "default_load_balancing_properties_route53_record_type" {
   default = "NONE"
 }
 
+variable "default_load_balancing_properties_health_check_grace_period_seconds" {
+  default = "300"
+}
+
 ## capacity_properties map defines the capacity properties of the service
 variable "capacity_properties" {
   type = "map"
