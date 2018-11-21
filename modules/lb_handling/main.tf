@@ -46,7 +46,7 @@ resource "aws_route53_record" "record_alias_a" {
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service_alb" {
-  count                = "${var.create && var.load_balancing_enabled && local.tg_arn == "" && local.load_balancer_type == "application"  ? 1 : 0 }"
+  count                = "${var.create && var.load_balancing_enabled && local.load_balancer_type == "application"  ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
@@ -76,7 +76,7 @@ locals {
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service_nlb" {
-  count                = "${var.create && var.load_balancing_enabled && local.tg_arn == "" && local.load_balancer_type == "network" ? 1 : 0 }"
+  count                = "${var.create && var.load_balancing_enabled && local.load_balancer_type == "network" ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
