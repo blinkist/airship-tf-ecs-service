@@ -25,6 +25,9 @@ variable "desired_capacity" {}
 # The container name
 variable "container_name" {}
 
+# The lb type network, or application
+variable "load_balancer_type" {}
+
 # The container port
 variable "container_port" {}
 

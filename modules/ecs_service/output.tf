@@ -20,3 +20,7 @@ output "ecs_service_name" {
 output "service_discovery_container_name" {
   value = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
 }
+
+output "load_balancer_type" {
+  value = "${var.load_balancer_type}"
+}

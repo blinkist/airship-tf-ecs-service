@@ -15,7 +15,7 @@ resource "null_resource" "aws_lb_listener_rules" {
 }
 
 resource "aws_ecs_service" "app_with_lb_awsvpc" {
-  count = "${var.create && local.awsvpc_enabled &&  var.lb_attached  ? 1 : 0}"
+  count = "${var.create && local.awsvpc_enabled &&  var.lb_attached && var.load_balancer_type == "application"  ? 1 : 0}"
 
   name    = "${var.name}"
   cluster = "${var.cluster_id}"
@@ -47,7 +47,7 @@ resource "aws_ecs_service" "app_with_lb_awsvpc" {
 }
 
 resource "aws_ecs_service" "app_with_lb_spread" {
-  count       = "${var.create && !local.awsvpc_enabled &&  var.lb_attached  && var.with_placement_strategy ? 1 : 0}"
+  count       = "${var.create && !local.awsvpc_enabled &&  var.lb_attached && var.load_balancer_type == "application"  && var.with_placement_strategy ? 1 : 0}"
   name        = "${var.name}"
   launch_type = "${var.launch_type}"
   cluster     = "${var.cluster_id}"
@@ -90,7 +90,7 @@ resource "aws_ecs_service" "app_with_lb_spread" {
 }
 
 resource "aws_ecs_service" "app_with_lb" {
-  count                             = "${var.create && !local.awsvpc_enabled &&  var.lb_attached && var.container_port != ""  && !var.with_placement_strategy ? 1 : 0}"
+  count                             = "${var.create && !local.awsvpc_enabled &&  var.lb_attached && var.load_balancer_type == "application" && var.container_port != ""  && !var.with_placement_strategy ? 1 : 0}"
   name                              = "${var.name}"
   launch_type                       = "${var.launch_type}"
   cluster                           = "${var.cluster_id}"
@@ -117,7 +117,7 @@ resource "aws_ecs_service" "app_with_lb" {
 }
 
 resource "aws_ecs_service" "app_with_network_lb" {
-  count                             = "${var.create && !local.awsvpc_enabled && ! var.lb_attached && var.nlb_attached && var.container_port != "" && !var.with_placement_strategy ? 1 : 0}"
+  count                             = "${var.create && !local.awsvpc_enabled && var.lb_attached && var.load_balancer_type == "network" && var.container_port != "" && !var.with_placement_strategy ? 1 : 0}"
   name                              = "${var.name}"
   launch_type                       = "${var.launch_type}"
   cluster                           = "${var.cluster_id}"
@@ -204,7 +204,7 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
 }
 
 resource "aws_ecs_service" "app" {
-  count = "${var.create && ! var.lb_attached && ! var.nlb_attached && ! local.awsvpc_enabled && ! var.enable_service_discovery ? 1 : 0 }"
+  count = "${var.create && ! var.lb_attached && ! local.awsvpc_enabled && ! var.enable_service_discovery ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
