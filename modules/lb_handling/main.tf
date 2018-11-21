@@ -78,7 +78,7 @@ resource "aws_lb_listener" "nlb_listener" {
   protocol          = "TCP"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.nlb_tg.arn}"
+    target_group_arn = "${aws_lb_target_group.service_nlb.arn}"
     type             = "forward"
   }
 
