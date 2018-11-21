@@ -88,7 +88,7 @@ resource "aws_lb_target_group" "service_nlb" {
 
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
-sdfsdf resource "aws_lb_listener_rule" "host_based_routing" {
+resource "aws_lb_listener_rule" "host_based_routing" {
   count = "${var.create && var.load_balancing_enabled && local.route53_record_type != "NONE"  && local.load_balancer_type == "application" ? 1 : 0 }"
 
   listener_arn = "${local.lb_listener_arn}"
