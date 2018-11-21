@@ -44,9 +44,9 @@ resource "aws_route53_record" "record_alias_a" {
 
 ##
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
-## It will not be created when the service is not attached to a load balancer like a worker && var.load_balancing_enabled && local.load_balancer_type == "application"
+## It will not be created when the service is not attached to a load balancer like a worker 
 resource "aws_lb_target_group" "service_alb" {
-  count                = "${var.create  && var.load_balancing_enabled ? 1 : 0 }"
+  count                = "${var.create  && var.load_balancing_enabled && local.load_balancer_type == "application" ? 1 : 0 }"
   name                 = "${local.tg_name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
@@ -65,10 +65,10 @@ resource "aws_lb_target_group" "service_alb" {
 }
 
 locals {
-  alb_target_group_arn        = "" // "${local.load_balancer_type == "application" ? element(concat(aws_lb_target_group.service_alb.*.arn, list("")), 0) : ""}"
-  nlb_target_group_arn        = "" //"${local.load_balancer_type == "network" ? element(concat(aws_lb_target_group.service_nlb.*.arn, list("")), 0) : ""}"
-  alb_target_group_arn_suffix = "" //"${local.load_balancer_type == "application" ? element(concat(aws_lb_target_group.service_alb.*.arn_suffix, list("")), 0) : ""}"
-  nlb_target_group_arn_suffix = "" //"${local.load_balancer_type == "network" ? element(concat(aws_lb_target_group.service_nlb.*.arn_suffix, list("")), 0) : ""}"
+  alb_target_group_arn        = "${local.load_balancer_type == "application" ? element(concat(aws_lb_target_group.service_alb.*.arn, list("")), 0) : ""}"
+  nlb_target_group_arn        = "${local.load_balancer_type == "network" ? element(concat(aws_lb_target_group.service_nlb.*.arn, list("")), 0) : ""}"
+  alb_target_group_arn_suffix = "${local.load_balancer_type == "application" ? element(concat(aws_lb_target_group.service_alb.*.arn_suffix, list("")), 0) : ""}"
+  nlb_target_group_arn_suffix = "${local.load_balancer_type == "network" ? element(concat(aws_lb_target_group.service_nlb.*.arn_suffix, list("")), 0) : ""}"
 }
 
 # Network service load_balancer_type
@@ -76,7 +76,7 @@ locals {
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service_nlb" {
-  count                = "${var.create && var.load_balancing_enabled ? 1 : 0 }"
+  count                = "${var.create && var.load_balancing_enabled  && local.load_balancer_type == "network" ? 1 : 0 }"
   name                 = "${local.tg_name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
