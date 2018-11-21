@@ -30,7 +30,7 @@ locals {
   # lb_arn defines the arn of the ALB
   lb_arn = "${lookup(var.load_balancing_properties,"lb_arn")}"
 
-  load_balancer_type = "${lookup(var.load_balancing_properties,"load_balancer_type")}"
+  load_balancer_type = "application" //"${lookup(var.load_balancing_properties,"load_balancer_type")}"
 
   # lb_listener_arn is the arn of the listener ( HTTP )
   lb_listener_arn = "${lookup(var.load_balancing_properties,"lb_listener_arn")}"
