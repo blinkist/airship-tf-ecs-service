@@ -65,10 +65,10 @@ resource "aws_lb_target_group" "service_alb" {
 }
 
 locals {
-  alb_target_group_arn        = "${element(concat(aws_lb_target_group.service_alb.*.arn, list()), 0)}"
-  nlb_target_group_arn        = "${element(concat(aws_lb_target_group.service_nlb.*.arn, list()), 0)}"
-  alb_target_group_arn_suffix = "${element(concat(aws_lb_target_group.service_alb.*.arn_suffix, list()), 0)}"
-  nlb_target_group_arn_suffix = "${element(concat(aws_lb_target_group.service_nlb.*.arn_suffix, list()), 0)}"
+  alb_target_group_arn        = "${element(concat(aws_lb_target_group.service_alb.*.arn, list("")), 0)}"
+  nlb_target_group_arn        = "${element(concat(aws_lb_target_group.service_nlb.*.arn, list("")), 0)}"
+  alb_target_group_arn_suffix = "${element(concat(aws_lb_target_group.service_alb.*.arn_suffix, list("")), 0)}"
+  nlb_target_group_arn_suffix = "${element(concat(aws_lb_target_group.service_nlb.*.arn_suffix, list("")), 0)}"
 }
 
 # Network service load_balancer_type
