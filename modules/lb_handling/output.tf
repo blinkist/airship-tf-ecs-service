@@ -14,3 +14,7 @@ output "aws_lb_listener_rules" {
 output "load_balancer_type" {
   value = "${local.load_balancer_type}"
 }
+
+output "lb_arn_suffix" {
+  value = "${join("", data.aws_lb.main.*.arn_suffix)}"
+}
