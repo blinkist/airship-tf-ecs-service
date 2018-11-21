@@ -1,11 +1,9 @@
 output "lb_target_group_arn" {
-  value      = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn))}"
-  depends_on = ["data.aws_lb.main", "null_resource.lb_depend", "aws_lb_target_group.service_alb"]
+  value = "${join("",concat(list(""),list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn))}"
 }
 
 output "lb_target_group_arn_suffix" {
-  value      = "${join("",concat(list(),aws_lb_target_group.service_alb.*.arn_suffix, aws_lb_target_group.service_nlb.*.arn_suffix))}"
-  depends_on = ["data.aws_lb.main", "null_resource.lb_depend", "aws_lb_target_group.service_alb"]
+  value = "${join("",concat(list(""),aws_lb_target_group.service_alb.*.arn_suffix, aws_lb_target_group.service_nlb.*.arn_suffix))}"
 }
 
 output "lb_arn_suffix" {
