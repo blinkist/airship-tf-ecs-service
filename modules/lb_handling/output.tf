@@ -18,3 +18,7 @@ output "aws_lb_listener_rules" {
 output "load_balancer_type" {
   value = "${local.load_balancer_type}"
 }
+
+output "tg_name" {
+  value = "${local.tg_name}"
+}

@@ -47,7 +47,7 @@ resource "aws_route53_record" "record_alias_a" {
 ## It will not be created when the service is not attached to a load balancer like a worker && var.load_balancing_enabled && local.load_balancer_type == "application"
 resource "aws_lb_target_group" "service_alb" {
   count                = "${var.create  && var.load_balancing_enabled ? 1 : 0 }"
-  name                 = "${var.cluster_name}-${var.name}"
+  name                 = "${local.tg_name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
   vpc_id               = "${local.lb_vpc_id}"
@@ -77,7 +77,7 @@ locals {
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service_nlb" {
   count                = "${var.create && var.load_balancing_enabled ? 1 : 0 }"
-  name                 = "${var.cluster_name}-${var.name}"
+  name                 = "${local.tg_name}"
   port                 = "${local.tg_port}"
   protocol             = "${local.tg_protocol}"
   vpc_id               = "${local.lb_vpc_id}"
