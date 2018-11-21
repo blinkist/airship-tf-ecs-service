@@ -45,8 +45,8 @@ resource "aws_route53_record" "record_alias_a" {
 ##
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
-resource "aws_lb_target_group" "service" {
-  count                = "${var.create && var.load_balancing_enabled && local.tg_arn == "" ? 1 : 0 }"
+resource "aws_lb_target_group" "service_alb" {
+  count                = "${var.create && var.load_balancing_enabled && local.tg_arn == ""&& local.load_balancer_type == "application"  ? 1 : 0 }"
   name                 = "${var.cluster_name}-${var.name}"
   port                 = "${local.tg_arn}"
   protocol             = "${local.tg_protocol}"
@@ -55,7 +55,30 @@ resource "aws_lb_target_group" "service" {
   deregistration_delay = "${local.deregistration_delay}"
 
   health_check {
+    protocol            = "${local.tg_protocol}"
     path                = "${local.health_uri}"
+    unhealthy_threshold = "${local.unhealthy_threshold}"
+  }
+
+  tags       = "${local.tags}"
+  depends_on = ["data.aws_lb.main", "null_resource.lb_depend"]
+}
+
+# Network service load_balancer_type
+##
+## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
+## It will not be created when the service is not attached to a load balancer like a worker
+resource "aws_lb_target_group" "service_nlb" {
+  count                = "${var.create && var.load_balancing_enabled && local.tg_arn == "" && local.load_balancer_type == "network" ? 1 : 0 }"
+  name                 = "${var.cluster_name}-${var.name}"
+  port                 = "${local.tg_arn}"
+  protocol             = "${local.tg_protocol}"
+  vpc_id               = "${local.lb_vpc_id}"
+  target_type          = "${var.target_type}"
+  deregistration_delay = "${local.deregistration_delay}"
+
+  health_check {
+    protocol            = "${local.tg_protocol}"
     unhealthy_threshold = "${local.unhealthy_threshold}"
   }
 
@@ -72,7 +95,7 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",coalescelist(concat(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn)))}"
   }
 
   condition {
@@ -97,7 +120,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",coalescelist(concat(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn)))}"
   }
 
   condition {
@@ -132,7 +155,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",coalescelist(concat(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn)))}"
   }
 
   condition {
@@ -152,7 +175,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 
   action {
     type             = "forward"
-    target_group_arn = "${join("",concat(list(local.tg_arn),aws_lb_target_group.service.*.arn))}"
+    target_group_arn = "${join("",coalescelist(concat(list(local.tg_arn),aws_lb_target_group.service_alb.*.arn, aws_lb_target_group.service_nlb.*.arn)))}"
   }
 
   condition {

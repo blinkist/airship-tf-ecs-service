@@ -57,10 +57,6 @@ variable "lb_attached" {
   default = true
 }
 
-variable "nlb_attached" {
-  default = false
-}
-
 # Spread tasks over ECS Cluster based on AZ, Instance-id, memory
 variable "with_placement_strategy" {}
 
