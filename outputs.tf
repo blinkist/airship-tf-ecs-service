@@ -10,6 +10,14 @@ output "lb_target_group_arn" {
   value = "${module.lb_handling.lb_target_group_arn}"
 }
 
+output "lb_target_group_arn_suffix" {
+  value = "${module.lb_handling.lb_target_group_arn_suffix}"
+}
+
+output "lb_arn_suffix" {
+  value = "${module.lb_handling.lb_arn_suffix}"
+}
+
 output "load_balancer_type" {
   value = "${module.lb_handling.load_balancer_type}"
 }
