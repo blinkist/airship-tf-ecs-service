@@ -311,3 +311,21 @@ module "ecs_autoscaling" {
   # scaling_properties holds a list of maps with the scaling properties defined.
   scaling_properties = "${var.scaling_properties}"
 }
+
+#
+# This modules creates scheduled tasks for the ecs service
+#
+module "ecs_scheduled_tasks" {
+  source = "./modules/ecs_scheduled_tasks/"
+
+  # create defines if resources inside this module are being created.
+  create = "${var.create && length(var.ecs_scheduled_tasks) > 0 ? true : false }"
+
+  cluster_id = "${var.ecs_cluster_id}"
+
+  # ecs_service_name is derived from the actual ecs_service, this to force dependency at creation.
+  ecs_service_name = "${module.ecs_service.ecs_service_name}"
+
+  # var.ecs_scheduled_tasks holds a list with maps regarding the scheduled tasks
+  ecs_scheduled_tasks = "${var.ecs_scheduled_tasks}"
+}

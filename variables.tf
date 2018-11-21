@@ -388,3 +388,24 @@ variable "mountpoints" {
   #     read_only = "false"
   # },
 }
+
+# ecs_scheduled_tasks holds a list of maps defining the scheduled jobs which need to run
+#
+#
+#  [{
+#     # name of the scheduled task
+#     job_name  = "vacuum_db"
+#     
+#     # expression defined in 
+#     # http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
+#     schedule_expression  = "cron(0 12 * * ? *)"
+#
+#     # command defines the command which needs to run inside the docker container
+#     command = "python vacuum_db.py"
+#
+#   },]
+
+variable "ecs_scheduled_tasks" {
+  type    = "list"
+  default = []
+}
