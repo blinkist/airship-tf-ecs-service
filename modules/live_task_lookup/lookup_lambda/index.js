@@ -32,7 +32,7 @@ exports.handler = async (event) => {
   // Throw an error when the lookup returns more than one service
   // Return empty definitions in case no services have been found
   if (res.services.length > 1) {
-    const error = new AirshipLambdaError("multiple services with name %s found in cluster %s Not Found" % event.ecs_service, event.ecs_cluster);
+    const error = new AirshipLambdaError("multiple services with name %s found in cluster %s" % event.ecs_service, event.ecs_cluster);
     throw error;
   } else if (res.services.length < 1) {
     console.log("Could not find service, returning empty map")
@@ -78,7 +78,7 @@ exports.handler = async (event) => {
   });
 
   returnMap['environment'] = JSON.stringify(envDict,Object.keys(envDict).sort());
-  console.log("Succesfully returning populated map")
+  console.log("Successfully returning populated map")
   console.log(returnMap)
   return returnMap;
 };

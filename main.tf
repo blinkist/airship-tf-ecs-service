@@ -145,7 +145,7 @@ module "container_definition" {
 
   # if var.force_bootstrap_container_image is enabled, we always take the terraform param as container_image
   # otherwise we take the image from the datasource lookup
-  # when the lookup does has '<ECS_SERVICE_DOES_NOT_EXIST_YET>' as result, the bootstrap image is taken
+  # when the lookup has '<ECS_SERVICE_DOES_NOT_EXIST_YET>' as result, the bootstrap image is taken
   container_image = "${var.force_bootstrap_container_image ? var.bootstrap_container_image :
                          ( module.live_task_lookup.image == "<ECS_SERVICE_DOES_NOT_EXIST_YET>" ? var.bootstrap_container_image : module.live_task_lookup.image )}"
 

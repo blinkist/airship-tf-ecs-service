@@ -20,6 +20,19 @@ variable "lookup_type" {
   default = "lambda"
 }
 
+# allowed_lookup_types is used for validating the lookup_type input
+variable "allowed_lookup_types" {
+  default = {
+    "lambda"     = true
+    "datasource" = true
+  }
+}
+
+locals {
+  # validating the var.lookup_type input
+  test_lookup_type = "${lookup(var.allowed_lookup_types,var.lookup_type)}"
+}
+
 # tags
 variable "tags" {
   default = {}
