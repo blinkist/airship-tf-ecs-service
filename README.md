@@ -91,6 +91,7 @@ The Role ARN of the ECS Service is exported, and can be used to add other permis
 * [x] Adding of Volumes / Mountpoints in case Docker Volume Drivers are used.
 * [x] HTTP to HTTP Redirect functionality
 * [x] Cognito Auth for https endpoints
+* [x] Scheduled 'jobs' (tasks) through AWS Lambda
 * [ ] ECS Service discovery
 * [ ] Path based ALB Rules
 * [ ] SSL SNI Adding for custom hostnames
@@ -102,7 +103,7 @@ The Role ARN of the ECS Service is exported, and can be used to add other permis
 
 module "demo_web" {
   source  = "blinkist/airship-ecs-service/aws"
-  version = "0.8.1"
+  version = "0.8.2"
 
   name   = "demo-web"
 
@@ -221,6 +222,22 @@ module "demo_web" {
     },
   ]
 
+  # ecs_cron_tasks holds a list of maps defining scheduled jobs
+  # when ecs_cron_tasks holds at least one 'job' a lambda will be created which will
+  # trigger jobs with the currently running task definition. The given command will be used
+  # to override the CMD in the dockerfile. The lambda will prepend this command with ["/bin/sh", "-c" ]
+  # ecs_cron_tasks = [{
+  #   # name of the scheduled task
+  #   job_name            = "vacuum_db"
+  #   # expression defined in
+  #   # http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
+  #   schedule_expression = "cron(0 12 * * ? *)"
+  #
+  #   # command defines the command which needs to run inside the docker container
+  #   command             = "/usr/local/bin/vacuum_db"
+  # }]
+
+
   # The KMS Keys which can be used for kms:decrypt
   kms_keys  = ["${module.global-kms.aws_kms_key_arn}", "${module.demo-kms.aws_kms_key_arn}"]
 
@@ -240,7 +257,7 @@ module "demo_web" {
 
 module "demo_web" {
   source  = "blinkist/airship-ecs-service/aws"
-  version = "0.8.1"
+  version = "0.8.2"
 
   name   = "demo-worker"
 
@@ -284,7 +301,7 @@ module "demo_web" {
 
 module "demo_web" {
   source  = "blinkist/airship-ecs-service/aws"
-  version = "0.8.1"
+  version = "0.8.2"
 
   name   = "demo5-web"
 
