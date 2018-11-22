@@ -1,22 +1,5 @@
-variable "create" {}
-variable "ecs_cluster_id" {}
-variable "ecs_service_name" {}
-variable "container_name" {}
-
-variable "lambda_ecs_task_scheduler_role_arn" {}
-
-variable "ecs_cron_tasks" {
-  type    = "list"
-  default = []
-}
-
-variable "tags" {
-  type    = "map"
-  default = {}
-}
-
 locals {
-  identifier = "${basename(var.ecs_cluster_id)}-${var.ecs_service_name}-task-runner"
+  identifier = "${basename(var.ecs_cluster_id)}-${var.ecs_service_name}-task-scheduler"
 }
 
 #
@@ -29,7 +12,7 @@ resource "aws_lambda_function" "lambda_task_runner" {
   runtime          = "nodejs8.10"
   timeout          = 30
   filename         = "${path.module}/ecs_task_scheduler.zip"
-  source_code_hash = "${base64sha256(file("${path.module}/ecs_task_runner.zip"))}"
+  source_code_hash = "${base64sha256(file("${path.module}/ecs_task_scheduler.zip"))}"
   role             = "${var.lambda_ecs_task_scheduler_role_arn}"
   publish          = true
   tags             = "${var.tags}"
@@ -52,12 +35,15 @@ resource "aws_cloudwatch_event_rule" "schedule_expressions" {
 locals {
   lambda_params = {
     job_identifier = "$${job_name}"
+    ecs_cluster    = "$${ecs_cluster}"
+    ecs_service    = "$${ecs_service}"
+    started_by     = "$${started_by}"
 
     overrides = {
       containerOverrides = [
         {
           name    = "$${container_name}"
-          command = "$${container_cmd}"
+          command = ["/bin/sh", "-c", "$${container_cmd}"]
         },
       ]
     }
@@ -70,6 +56,9 @@ data "template_file" "task_defs" {
   template = "${jsonencode(local.lambda_params)}"
 
   vars {
+    ecs_cluster    = "${var.ecs_cluster_id}"
+    ecs_service    = "${var.ecs_service_name}"
+    started_by     = "${local.identifier}-${lookup(var.ecs_cron_tasks[count.index],"job_name")}"
     job_name       = "${lookup(var.ecs_cron_tasks[count.index],"job_name")}"
     container_name = "${var.container_name}"
     container_cmd  = "${lookup(var.ecs_cron_tasks[count.index],"command","")}"

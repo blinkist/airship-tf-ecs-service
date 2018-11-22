@@ -259,7 +259,7 @@ data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
 # Role for the lambda
 resource "aws_iam_role" "lambda_ecs_task_scheduler" {
   count              = "${var.create ? 1 : 0}"
-  name               = "ecs-lambda-task_scheduler-${var.name}"
+  name               = "ecs-lambda-task-scheduler-${var.name}"
   assume_role_policy = "${data.aws_iam_policy_document.lambda_trust_policy.json}"
 }
 
