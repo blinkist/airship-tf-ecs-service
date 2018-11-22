@@ -127,13 +127,10 @@ resource "aws_iam_role_policy" "s3_ro_permissions" {
   policy = "${data.aws_iam_policy_document.s3_ro_permissions.json}"
 }
 
-### Lambda Support Role
+### Lambdas
 
-# ---------------------------------------------------------------------------------------------------------------------
-# CREATE INVOCATION POLICY
-# We need to permit the lambda be used @Edge as well as in the traditional manner.
-# ---------------------------------------------------------------------------------------------------------------------
-data "aws_iam_policy_document" "lambdaPolicy" {
+# Trust policy used by all lambda's 
+data "aws_iam_policy_document" "lambda_trust_policy" {
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -147,33 +144,8 @@ data "aws_iam_policy_document" "lambdaPolicy" {
   }
 }
 
-resource "aws_iam_role" "lambda_lookup" {
-  name               = "ecs-lambda-lookup-${var.name}"
-  description        = "Role permitting Lambda functions to be invoked from Lambda or Lambda@Edge"
-  assume_role_policy = "${data.aws_iam_policy_document.lambdaPolicy.json}"
-}
-
-data "aws_iam_policy_document" "logging_policy_document" {
-  statement {
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-
-    resources = ["${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*",var.region, data.aws_caller_identity.current.account_id, var.name)}"]
-    effect    = "Allow"
-  }
-
-  statement {
-    actions = ["logs:PutLogEvents"]
-
-    resources = ["${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*.*",var.region, data.aws_caller_identity.current.account_id, var.name)}"]
-    effect    = "Allow"
-  }
-}
-
-data "aws_iam_policy_document" "support_lambda_ecs_permissions" {
+# Policy for the ecs lookup lambda
+data "aws_iam_policy_document" "lambda_lookup_policy" {
   statement {
     effect = "Allow"
 
@@ -188,14 +160,111 @@ data "aws_iam_policy_document" "support_lambda_ecs_permissions" {
 
     resources = ["*"]
   }
+
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    resources = [
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+    ]
+
+    effect = "Allow"
+  }
+
+  statement {
+    actions = ["logs:PutLogEvents"]
+
+    resources = [
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*.*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+    ]
+
+    effect = "Allow"
+  }
 }
 
-resource "aws_iam_role_policy" "lambda_log_policy" {
-  role   = "${aws_iam_role.lambda_lookup.name}"
-  policy = "${data.aws_iam_policy_document.logging_policy_document.json}"
+# Role for lambda to lookup the ecs cluster & services
+resource "aws_iam_role" "lambda_lookup" {
+  count              = "${var.create ? 1 : 0 }"
+  name               = "ecs-lambda-lookup-${var.name}"
+  description        = "Role permitting Lambda functions to be invoked from Lambda"
+  assume_role_policy = "${data.aws_iam_policy_document.lambda_trust_policy.json}"
 }
 
 resource "aws_iam_role_policy" "lambda_lookup_policy" {
+  count  = "${var.create ? 1 : 0 }"
   role   = "${aws_iam_role.lambda_lookup.name}"
-  policy = "${data.aws_iam_policy_document.support_lambda_ecs_permissions.json}"
+  policy = "${data.aws_iam_policy_document.lambda_lookup_policy.json}"
+}
+
+# Policy for the Lambda Logging & ECS
+data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
+  statement {
+    actions = [
+      "ecs:RunTask",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "ecs:cluster"
+      values   = ["${var.ecs_cluster_id}"]
+    }
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ecs:DeregisterTaskDefinition",
+      "ecs:DescribeServices",
+      "ecs:DescribeTaskDefinition",
+      "ecs:DescribeTasks",
+      "ecs:ListTasks",
+      "ecs:ListTaskDefinitions",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+
+    resources = [
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-task-scheduler:*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+    ]
+
+    effect = "Allow"
+  }
+
+  statement {
+    actions = ["logs:PutLogEvents"]
+
+    resources = [
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-task-scheduler:*.*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+    ]
+
+    effect = "Allow"
+  }
+}
+
+# Role for the lambda
+resource "aws_iam_role" "lambda_ecs_task_scheduler" {
+  count              = "${var.create ? 1 : 0}"
+  name               = "ecs-lambda-task_scheduler-${var.name}"
+  assume_role_policy = "${data.aws_iam_policy_document.lambda_trust_policy.json}"
+}
+
+resource "aws_iam_role_policy" "lambda_ecs_task_scheduler_policy" {
+  count  = "${var.create ? 1 : 0 }"
+  role   = "${aws_iam_role.lambda_ecs_task_scheduler.name}"
+  policy = "${data.aws_iam_policy_document.lambda_ecs_task_scheduler_policy.json}"
 }

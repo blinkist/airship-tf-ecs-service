@@ -22,3 +22,8 @@ output "lambda_lookup_role_arn" {
 output "lambda_lookup_role_name" {
   value = "${element(concat(aws_iam_role.lambda_lookup.*.name, list("")), 0)}"
 }
+
+# IAM Role arn of the lambda lookup helper
+output "lambda_ecs_task_scheduler_role_arn" {
+  value = "${element(concat(aws_iam_role.lambda_ecs_task_scheduler.*.arn, list("")), 0)}"
+}

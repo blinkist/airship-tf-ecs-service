@@ -15,6 +15,9 @@ module "iam" {
   # Create defines if any resources need to be created inside the module
   create = "${var.create}"
 
+  # cluster_id
+  cluster_id = "${var.cluster_id}"
+
   # Region ..
   region = "${var.region}"
 
@@ -315,8 +318,8 @@ module "ecs_autoscaling" {
 #
 # This modules creates scheduled tasks for the ecs service
 #
-module "ecs_scheduled_tasks" {
-  source = "./modules/ecs_scheduled_tasks/"
+module "lambda_ecs_task_scheduler" {
+  source = "./modules/lambda_ecs_task_scheduler/"
 
   # create defines if resources inside this module are being created.
   create = "${var.create && length(var.ecs_scheduled_tasks) > 0 ? true : false }"
@@ -329,5 +332,8 @@ module "ecs_scheduled_tasks" {
   ecs_service_name = "${module.ecs_service.ecs_service_name}"
 
   # var.ecs_scheduled_tasks holds a list with maps regarding the scheduled tasks
-  ecs_scheduled_tasks = "${var.ecs_scheduled_tasks}"
+  ecs_cron_tasks = "${var.ecs_cron_tasks}"
+
+  # lambda_ecs_task_scheduler_role_arn sets the role arn of the task scheduling lambda
+  lambda_ecs_task_scheduler_role_arn = "${module.iam.lambda_ecs_task_scheduler_role_arn}"
 }

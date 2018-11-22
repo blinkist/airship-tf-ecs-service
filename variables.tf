@@ -389,7 +389,7 @@ variable "mountpoints" {
   # },
 }
 
-# ecs_scheduled_tasks holds a list of maps defining the scheduled jobs which need to run
+# ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to run
 #
 #
 #  [{
@@ -405,7 +405,7 @@ variable "mountpoints" {
 #
 #   },]
 
-variable "ecs_scheduled_tasks" {
+variable "ecs_cron_tasks" {
   type    = "list"
   default = []
 }
