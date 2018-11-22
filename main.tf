@@ -16,7 +16,7 @@ module "iam" {
   create = "${var.create}"
 
   # cluster_id
-  cluster_id = "${var.cluster_id}"
+  ecs_cluster_id = "${var.ecs_cluster_id}"
 
   # Region ..
   region = "${var.region}"
@@ -322,7 +322,7 @@ module "lambda_ecs_task_scheduler" {
   source = "./modules/lambda_ecs_task_scheduler/"
 
   # create defines if resources inside this module are being created.
-  create = "${var.create && length(var.ecs_scheduled_tasks) > 0 ? true : false }"
+  create = "${var.create && length(var.ecs_cron_tasks) > 0 ? true : false }"
 
   ecs_cluster_id = "${var.ecs_cluster_id}"
 

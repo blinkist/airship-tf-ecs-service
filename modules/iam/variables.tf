@@ -10,6 +10,8 @@ variable "name" {
   default = ""
 }
 
+variable "ecs_cluster_id" {}
+
 variable "fargate_enabled" {
   default = false
 }
