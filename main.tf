@@ -46,7 +46,8 @@ module "iam" {
 }
 
 #
-# The alb-handling sub-module creates everything regarding the connection of an ecs service to an Application Load Balancer
+# The lb-handling sub-module creates everything regarding the connection of an ecs service to an Application Load Balancer
+# called alb_handling for legacy reasons, TODO hcl2 refactor
 # 
 module "alb_handling" {
   source = "./modules/alb_handling/"
@@ -55,12 +56,15 @@ module "alb_handling" {
   cluster_name = "${local.ecs_cluster_name}"
 
   # Create defines if we need to create resources inside this module
-  create = "${var.create && var.load_balancing_enabled}"
+  create = "${var.create && var.load_balancing_type != "NONE"}"
+
+  # load_balancing_type sets the type, either "NONE", "APPLICATION", or "NETWORK"
+  load_balancing_type = "${var.load_balancing_type}"
 
   # lb_vpc_id sets the VPC ID of where the LB resides
   lb_vpc_id = "${lookup(var.load_balancing_properties,"lb_vpc_id", "")}"
 
-  # lb_arn defines the arn of the ALB
+  # lb_arn defines the arn of the LB
   lb_arn = "${lookup(var.load_balancing_properties,"lb_arn", "")}"
 
   # lb_listener_arn is the arn of the listener ( HTTP )
@@ -68,6 +72,9 @@ module "alb_handling" {
 
   # lb_listener_arn_https is the arn of the listener ( HTTPS )
   lb_listener_arn_https = "${lookup(var.load_balancing_properties,"lb_listener_arn_https", "")}"
+
+  # nlb_listener_port sets the listener port of the nlb listener
+  nlb_listener_port = "${lookup(var.load_balancing_properties,"nlb_listener_port", var.default_load_balancing_properties_nlb_listener_port)}"
 
   # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
   unhealthy_threshold = "${lookup(var.load_balancing_properties,"unhealthy_threshold", var.default_load_balancing_properties_unhealthy_threshold)}"
@@ -99,6 +106,9 @@ module "alb_handling" {
 
   # health_uri defines which health-check uri the target group needs to check on for health_check
   health_uri = "${lookup(var.load_balancing_properties,"health_uri", var.default_load_balancing_properties_health_uri)}"
+
+  # health_protocol defines which health-check uri the target group needs to check on for health_check
+  health_protocol = "${lookup(var.load_balancing_properties,"health_protocol", var.default_load_balancing_properties_health_protocol)}"
 
   # target_type is the alb_target_group target, in case of EC2 it's instance, in case of FARGATE it's IP
   target_type = "${var.awsvpc_enabled ? "ip" : "instance"}"
@@ -250,6 +260,8 @@ module "ecs_service" {
 
   cluster_id = "${var.ecs_cluster_id}"
 
+  awsvpc_enabled = "${var.awsvpc_enabled}"
+
   # launch_type either EC2 or FARGATE
   launch_type = "${local.launch_type}"
 
@@ -261,7 +273,8 @@ module "ecs_service" {
   # deployment_minimum_healthy_percent sets the minimum % in capacity at deployment
   deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
 
-  lb_attached = "${var.load_balancing_enabled}"
+  # load_balancing_type sets the type, either "NONE", "APPLICATION", or "NETWORK"
+  load_balancing_type = "${var.load_balancing_type}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module
   awsvpc_subnets = "${var.awsvpc_subnets}"

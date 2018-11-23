@@ -11,6 +11,8 @@ variable "create" {
   default = true
 }
 
+variable "awsvpc_enabled" {}
+
 variable "selected_task_definition" {}
 
 # The cluster ID
@@ -52,10 +54,8 @@ variable "lb_target_group_arn" {
   default = ""
 }
 
-# Do we have a load balancer attached
-variable "lb_attached" {
-  default = true
-}
+# What kind of load balancing
+variable "load_balancing_type" {}
 
 # Spread tasks over ECS Cluster based on AZ, Instance-id, memory
 variable "with_placement_strategy" {}

@@ -42,6 +42,11 @@ variable "load_balancing_enabled" {
   default = false
 }
 
+# load_balancing_type is either "NONE", "NETWORK","APPLICATION"
+variable "load_balancing_type" {
+  default = "NONE"
+}
+
 ## load_balancing_properties map defines the map for services hooked to a load balancer
 variable "load_balancing_properties" {
   type = "map"
@@ -119,6 +124,14 @@ variable "default_load_balancing_properties_route53_zone_id" {
 
 variable "default_load_balancing_properties_health_uri" {
   default = "/ping"
+}
+
+variable "default_load_balancing_properties_health_protocol" {
+  default = "HTTP"
+}
+
+variable "default_load_balancing_properties_nlb_listener_port" {
+  default = "80"
 }
 
 variable "default_load_balancing_properties_unhealthy_threshold" {

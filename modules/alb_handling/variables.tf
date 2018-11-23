@@ -5,6 +5,11 @@ variable "create" {
   default = true
 }
 
+# What kind of load balancing, "NONE", "APPLICATON", "NETWORK"
+variable "load_balancing_type" {
+  type = "string"
+}
+
 # The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. 
 variable "deregistration_delay" {}
 
@@ -39,9 +44,31 @@ variable "redirect_http_to_https" {
   default = false
 }
 
+variable "load_balancer" {
+  default = "ALB"
+}
+
+variable "allowed_load_balancer_types" {
+  default = {
+    "ALB"  = true
+    "NLB"  = true
+    "NONE" = true
+  }
+}
+
 # target_type is the alb_target_group target, in case of EC2 it's instance, in case of FARGATE it's IP
 variable "target_type" {
   default = ""
+}
+
+# target_group_port sets the port of the target group
+variable "target_group_port" {
+  default = "80"
+}
+
+# nlb_listen_port sets the default listen port
+variable "nlb_listener_port" {
+  default = "80"
 }
 
 # The VPC ID of the VPC where the ALB is residing
@@ -52,6 +79,11 @@ variable "lb_vpc_id" {
 # health_uri defines sets which health-check uri the target group needs to check on for health_check
 variable "health_uri" {
   default = ""
+}
+
+# health_protocol defines the protocol used for doing the health check, either HTTP, HTTPS, or TCP
+variable "health_protocol" {
+  default = "HTTP"
 }
 
 # Route53 Zone to add subdomain to. 
@@ -113,4 +145,18 @@ variable "cognito_user_pool_client_id" {
 # cognito_user_pool_domain sets the domain of the cognito_user_pool
 variable "cognito_user_pool_domain" {
   default = ""
+}
+
+variable "tags" {
+  description = "A map of tags to apply to all resources"
+  type        = "map"
+  default     = {}
+}
+
+locals {
+  name_map = {
+    "Name" = "${var.name}"
+  }
+
+  tags = "${merge(var.tags, local.name_map)}"
 }

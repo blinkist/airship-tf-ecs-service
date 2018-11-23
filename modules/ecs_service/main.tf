@@ -1,12 +1,16 @@
+#
+# With HCL1 it's not possible to add dynamic blocks for the aws_ecs_service resource. For this
+# reason many aws_ecs_service's are repeated for their different goals.
+#
+
 locals {
-  awsvpc_enabled = "${length(var.awsvpc_subnets) > 0 ? true : false }"
-  lb_attached    = "${var.lb_attached}"
+  lb_attached = "${var.load_balancing_type != "NONE"}"
 }
 
 # Make an LB connected service dependent of this rule
 # This to make sure the Target Group is linked to a Load Balancer before the aws_ecs_service is created
 resource "null_resource" "aws_lb_listener_rules" {
-  count = "${var.create && local.lb_attached ? 1 : 0}"
+  count = "${var.create ? 1 : 0}"
 
   triggers {
     listeners = "${join(",", var.aws_lb_listener_rules)}"
@@ -14,7 +18,7 @@ resource "null_resource" "aws_lb_listener_rules" {
 }
 
 resource "aws_ecs_service" "app_with_lb_awsvpc" {
-  count = "${var.create && local.awsvpc_enabled && local.lb_attached ? 1 : 0}"
+  count = "${var.create && var.awsvpc_enabled && local.lb_attached ? 1 : 0}"
 
   name    = "${var.name}"
   cluster = "${var.cluster_id}"
@@ -45,7 +49,7 @@ resource "aws_ecs_service" "app_with_lb_awsvpc" {
 }
 
 resource "aws_ecs_service" "app_with_lb_spread" {
-  count       = "${var.create && !local.awsvpc_enabled && local.lb_attached && var.with_placement_strategy ? 1 : 0}"
+  count       = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy ? 1 : 0}"
   name        = "${var.name}"
   launch_type = "${var.launch_type}"
   cluster     = "${var.cluster_id}"
@@ -87,7 +91,7 @@ resource "aws_ecs_service" "app_with_lb_spread" {
 }
 
 resource "aws_ecs_service" "app_with_lb" {
-  count           = "${var.create && !local.awsvpc_enabled && local.lb_attached && !var.with_placement_strategy ? 1 : 0}"
+  count           = "${var.create && !var.awsvpc_enabled && local.lb_attached && !var.with_placement_strategy ? 1 : 0}"
   name            = "${var.name}"
   launch_type     = "${var.launch_type}"
   cluster         = "${var.cluster_id}"
@@ -113,7 +117,7 @@ resource "aws_ecs_service" "app_with_lb" {
 }
 
 resource "aws_ecs_service" "app" {
-  count = "${var.create && ! local.lb_attached && ! local.awsvpc_enabled ? 1 : 0 }"
+  count = "${var.create && ! local.lb_attached && ! var.awsvpc_enabled ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
@@ -132,7 +136,7 @@ resource "aws_ecs_service" "app" {
 }
 
 resource "aws_ecs_service" "app_awsvpc" {
-  count = "${var.create && ! local.lb_attached && local.awsvpc_enabled ? 1 : 0 }"
+  count = "${var.create && ! local.lb_attached && var.awsvpc_enabled ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
