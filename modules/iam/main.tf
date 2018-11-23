@@ -130,7 +130,6 @@ resource "aws_iam_role_policy" "s3_ro_permissions" {
 ### Lambdas
 
 data "aws_iam_policy_document" "lambda_trust_policy" {
-
   statement {
     actions = ["sts:AssumeRole"]
 
