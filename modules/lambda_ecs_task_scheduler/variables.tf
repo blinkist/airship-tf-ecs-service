@@ -13,7 +13,7 @@ variable "container_name" {}
 # Role of the AWS Lambda
 variable "lambda_ecs_task_scheduler_role_arn" {}
 
-# /* ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to run
+# ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to run
 #
 #
 #  [{
@@ -27,7 +27,7 @@ variable "lambda_ecs_task_scheduler_role_arn" {}
 #     # command defines the command which needs to run inside the docker container
 #     command = "python vacuum_db.py"
 #
-#   },] */
+#   },]
 variable "ecs_cron_tasks" {
   type    = "list"
   default = []

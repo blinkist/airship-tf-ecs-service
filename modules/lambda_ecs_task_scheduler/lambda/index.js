@@ -21,9 +21,8 @@ exports.handler = async (event, context) => {
     services: [ecs_service]
   }).promise();
 
-  // Return empty definitions in case no services have been found
   if (res.services.length > 1) {
-    const error = new AirshipLambdaError("multiple services with name %s found in cluster %s Not Found" % ecs_service, ecs_cluster);
+    const error = new AirshipLambdaError("multiple services with name %s found in cluster %s" % ecs_service, ecs_cluster);
     throw error;
   } else if (res.services.length < 1) {
     const error = new AirshipLambdaError("Could not find service");
@@ -45,7 +44,7 @@ exports.handler = async (event, context) => {
   }
 
   const count        = event.count || 1
-  const started_by   = event.started_by || 'unknown-lambda'
+  const started_by   = event.started_by
 
   var params = {
       taskDefinition: taskDefinition,
