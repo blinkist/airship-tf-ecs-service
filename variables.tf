@@ -37,11 +37,6 @@ variable "custom_listen_hosts" {
   type    = "list"
 }
 
-# load_balancing_enabled defines if we are using a load balancer for our ecs service
-variable "load_balancing_enabled" {
-  default = false
-}
-
 # load_balancing_type is either "NONE", "NETWORK","APPLICATION"
 variable "load_balancing_type" {
   default = "NONE"
@@ -62,6 +57,9 @@ variable "load_balancing_properties" {
 
     lb_listener_arn_https is the ALB listener arn for HTTPS
     lb_listener_arn_https = ""
+
+    nlb_listener_port is the default port for the NLB to listen on
+    nlb_listener_port = "80"
 
     lb_vpc_id is the vpc_id for the target_group to reside in
     lb_vpc_id = ""

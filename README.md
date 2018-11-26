@@ -92,6 +92,7 @@ The Role ARN of the ECS Service is exported, and can be used to add other permis
 * [x] HTTP to HTTP Redirect functionality
 * [x] Cognito Auth for https endpoints
 * [x] Scheduled 'jobs' (tasks) through AWS Lambda
+* [x] Support for services connected to a Network Load Balancer
 * [ ] ECS Service discovery
 * [ ] Path based ALB Rules
 * [ ] SSL SNI Adding for custom hostnames
@@ -103,7 +104,7 @@ The Role ARN of the ECS Service is exported, and can be used to add other permis
 
 module "demo_web" {
   source  = "blinkist/airship-ecs-service/aws"
-  version = "0.8.2"
+  version = "0.8.3"
 
   name   = "demo-web"
 
@@ -121,10 +122,10 @@ module "demo_web" {
   awsvpc_security_group_ids = ["${module.demo_sg.this_security_group_id}"]
 
   # load_balancing_enabled sets if a load balancer will be attached to the ecs service / target group
-  load_balancing_enabled = true
+  load_balancing_type = "APPLICATION"
   load_balancing_properties {
     # The default route53 record type, can be CNAME, ALIAS or NONE, currently CNAME to be backwards compatible
-    # route53_record_type = "CNAME"
+    route53_record_type = "ALIAS"
 
     # Unique identifier for the weighted IN A Alias Record 
     # route53_a_record_identifier = "identifier"
@@ -257,7 +258,7 @@ module "demo_web" {
 
 module "demo_web" {
   source  = "blinkist/airship-ecs-service/aws"
-  version = "0.8.2"
+  version = "0.8.3"
 
   name   = "demo-worker"
 
@@ -273,6 +274,8 @@ module "demo_web" {
   # AWSVPC Block, with awsvpc_subnets defined the network_mode for the ECS task definition will be awsvpc, defaults to bridge 
   awsvpc_subnets            = ["${module.vpc.private_subnets}"]
   awsvpc_security_group_ids = ["${module.demo_sg.this_security_group_id}"]
+
+  # load_balancing_type = "NONE"
 
   container_cpu    = 256
   container_memory = 512
@@ -301,7 +304,7 @@ module "demo_web" {
 
 module "demo_web" {
   source  = "blinkist/airship-ecs-service/aws"
-  version = "0.8.2"
+  version = "0.8.3"
 
   name   = "demo5-web"
 
@@ -312,10 +315,10 @@ module "demo_web" {
   # scheduling_strategy = "REPLICA""""
 
   # use_alb needs to be set to true
-  load_balancing_enabled = true
+  load_balancing_type = "APPLICATION"
   load_balancing_properties {
     # The default route53 record type, currently CNAME to be backwards compatible
-    # route53_record_type = "CNAME"
+    route53_record_type = "ALIAS"
     # Unique identifier for the weighted IN A Alias Record 
     # route53_record_identifier = "identifier"
     lb_arn                = "${module.alb_shared_services_ext.load_balancer_id}"
@@ -353,6 +356,68 @@ module "demo_web" {
 }
 
 ```
+
+## ECS Service on EC2-ECS with AWS-VPC and a Network Load Balancer Attached without autoscaling
+
+```hcl
+
+module "demo_nlb" {
+  source  = "blinkist/airship-ecs-service/aws"
+  version = "0.8.3"
+
+  name   = "demo-nlb"
+
+  ecs_cluster_id = "${local.cluster_id}"
+
+  region         = "eu-central-1"
+
+  awsvpc_enabled = true
+  awsvpc_subnets            = ["${module.vpc.private_subnets}"]
+  awsvpc_security_group_ids = ["${module.demo_sg.this_security_group_id}"]
+
+
+  # use_alb needs to be set to true
+  load_balancing_type = "NETWORK"
+  load_balancing_properties {
+    route53_record_type = "ALIAS"
+    lb_arn                = "${module.nlb.load_balancer_id}"
+    lb_vpc_id             = "${module.vpc.vpc_id}"
+    route53_zone_id       = "${aws_route53_zone.shared_ext_services_domain.zone_id}"
+    # unhealthy_threshold   = "3"
+    health_uri = "/ping"
+    # health_protocol = "HTTP"
+
+    # nlb_listener_port sets the port of the lb_listener
+    # nlb_listener_port = 80
+  }
+
+  container_cpu    = 256
+  container_memory = 512
+  container_port   = 80
+  bootstrap_container_image  = "nginx:latest"
+
+  # Initial ENV Variables for the ECS Task definition
+  container_envvars  {
+       SSM_ENABLED = "true"
+       TASK_TYPE = "web" 
+  } 
+
+  # capacity_properties defines the size in task for the ECS Service.
+  # Without scaling enabled, desired_capacity is the only necessary property
+  # With scaling enabled, desired_min_capacity and desired_max_capacity define the lower and upper boundary in task size
+  capacity_properties {
+    desired_capacity     = "1"
+  }
+
+  # The KMS Keys which can be used for kms:decrypt
+  kms_keys  = ["${module.global-kms.aws_kms_key_arn}", "${module.demo-kms.aws_kms_key_arn}"]
+
+  # The SSM paths which are allowed to do kms:GetParameter and ssm:GetParametersByPath for
+  ssm_paths = ["${module.global-kms.name}", "${module.demo-kms.name}"]
+}
+
+```
+
 
 ## Outputs
 
