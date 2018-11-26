@@ -258,6 +258,7 @@ module "demo_web" {
 
 module "demo_web" {
   source  = "blinkist/airship-ecs-service/aws"
+
   version = "0.8.3"
 
   name   = "demo-worker"
