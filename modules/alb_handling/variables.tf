@@ -77,11 +77,6 @@ variable "health_uri" {
   default = ""
 }
 
-# health_protocol defines the protocol used for doing the health check, either HTTP, HTTPS, or TCP
-variable "health_protocol" {
-  default = "HTTP"
-}
-
 # Route53 Zone to add subdomain to. 
 # Example:
 # 

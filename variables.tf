@@ -124,10 +124,6 @@ variable "default_load_balancing_properties_health_uri" {
   default = "/ping"
 }
 
-variable "default_load_balancing_properties_health_protocol" {
-  default = "HTTP"
-}
-
 variable "default_load_balancing_properties_nlb_listener_port" {
   default = "80"
 }

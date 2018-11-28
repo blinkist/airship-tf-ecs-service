@@ -384,9 +384,6 @@ module "demo_nlb" {
     lb_vpc_id             = "${module.vpc.vpc_id}"
     route53_zone_id       = "${aws_route53_zone.shared_ext_services_domain.zone_id}"
     # unhealthy_threshold   = "3"
-    health_uri = "/ping"
-    # health_protocol = "HTTP"
-
     # nlb_listener_port sets the port of the lb_listener
     # nlb_listener_port = 80
   }

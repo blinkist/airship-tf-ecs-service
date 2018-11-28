@@ -57,8 +57,7 @@ resource "aws_lb_target_group" "service_nlb" {
   deregistration_delay = "${var.deregistration_delay}"
 
   health_check {
-    protocol            = "${var.health_protocol}"
-    path                = "${var.health_protocol == "HTTP" || var.health_protocol == "HTTPS" ? var.health_uri : ""}"
+    protocol            = "TCP"
     unhealthy_threshold = "${var.unhealthy_threshold}"
   }
 
