@@ -46,9 +46,7 @@ module "iam" {
 }
 
 #
-# The lb-handling sub-module creates everything regarding the connection of an ecs service to an Application Load Balancer
-# called alb_handling for legacy reasons, TODO hcl2 refactor
-# 
+# The lb-handling sub-module creates everything regarding the connection of an ecs service to an Application Load Balancer# or or Network Load Balancer, it is called alb_handling for legacy reasons, TODO hcl2 refactor
 module "alb_handling" {
   source = "./modules/alb_handling/"
 

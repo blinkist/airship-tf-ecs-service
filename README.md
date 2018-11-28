@@ -313,9 +313,8 @@ module "demo_web" {
 
   region         = "eu-central-1"
 
-  # scheduling_strategy = "REPLICA""""
+  # scheduling_strategy = "REPLICA"
 
-  # use_alb needs to be set to true
   load_balancing_type = "APPLICATION"
   load_balancing_properties {
     # The default route53 record type, currently CNAME to be backwards compatible

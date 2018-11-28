@@ -4,10 +4,13 @@ data "aws_lb" "main" {
 }
 
 locals {
+  # Validate the load_balancing_type type by looking up the map with var.allowed_load_balancing_types
+  validate_load_balancing_type = "${lookup(var.allowed_load_balancing_types,var.load_balancing_type)}"
+
   # Validate the record type by looking up the map with valid record types
   route53_record_type = "${lookup(var.allowed_record_types,var.route53_record_type)}"
 
-  # We limit the target group name to a length o f32
+  # We limit the target group name to a length of 32
   tg_name = "${format("%.32s",format("%v-%v", var.cluster_name, var.name))}"
 }
 

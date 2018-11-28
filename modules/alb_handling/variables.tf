@@ -5,7 +5,7 @@ variable "create" {
   default = true
 }
 
-# What kind of load balancing, "NONE", "APPLICATON", "NETWORK"
+# What kind of load balancing, "NONE", "APPLICATION", "NETWORK"
 variable "load_balancing_type" {
   type = "string"
 }
@@ -44,11 +44,7 @@ variable "redirect_http_to_https" {
   default = false
 }
 
-variable "load_balancer" {
-  default = "ALB"
-}
-
-variable "allowed_load_balancer_types" {
+variable "allowed_load_balancing_types" {
   default = {
     "ALB"  = true
     "NLB"  = true
@@ -66,7 +62,7 @@ variable "target_group_port" {
   default = "80"
 }
 
-# nlb_listen_port sets the default listen port
+# nlb_listener_port sets the default listen port
 variable "nlb_listener_port" {
   default = "80"
 }
