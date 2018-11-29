@@ -5,7 +5,7 @@ variable "create" {
   default = true
 }
 
-# What kind of load balancing, "NONE", "APPLICATION", "NETWORK"
+# What kind of load balancing, "none", "application", "network"
 variable "load_balancing_type" {
   type = "string"
 }
@@ -46,9 +46,9 @@ variable "redirect_http_to_https" {
 
 variable "allowed_load_balancing_types" {
   default = {
-    "ALB"  = true
-    "NLB"  = true
-    "NONE" = true
+    "application" = true
+    "network"     = true
+    "none"        = true
   }
 }
 

@@ -54,9 +54,9 @@ module "alb_handling" {
   cluster_name = "${local.ecs_cluster_name}"
 
   # Create defines if we need to create resources inside this module
-  create = "${var.create && var.load_balancing_type != "NONE"}"
+  create = "${var.create && var.load_balancing_type != "none"}"
 
-  # load_balancing_type sets the type, either "NONE", "APPLICATION", or "NETWORK"
+  # load_balancing_type sets the type, either "none", "application", or "network"
   load_balancing_type = "${var.load_balancing_type}"
 
   # lb_vpc_id sets the VPC ID of where the LB resides
@@ -268,7 +268,7 @@ module "ecs_service" {
   # deployment_minimum_healthy_percent sets the minimum % in capacity at deployment
   deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
 
-  # load_balancing_type sets the type, either "NONE", "APPLICATION", or "NETWORK"
+  # load_balancing_type sets the type, either "none", "application", or "network"
   load_balancing_type = "${var.load_balancing_type}"
 
   # awsvpc_subnets defines the subnets for an awsvpc ecs module

@@ -37,9 +37,9 @@ variable "custom_listen_hosts" {
   type    = "list"
 }
 
-# load_balancing_type is either "NONE", "NETWORK","APPLICATION"
+# load_balancing_type is either "none", "network","application"
 variable "load_balancing_type" {
-  default = "NONE"
+  default = "none"
 }
 
 ## load_balancing_properties map defines the map for services hooked to a load balancer
@@ -58,7 +58,7 @@ variable "load_balancing_properties" {
     lb_listener_arn_https is the ALB listener arn for HTTPS
     lb_listener_arn_https = ""
 
-    nlb_listener_port is the default port for the NLB to listen on
+    nlb_listener_port is the default port for the Network Load Balancer to listen on
     nlb_listener_port = "80"
 
     lb_vpc_id is the vpc_id for the target_group to reside in

@@ -122,10 +122,10 @@ module "demo_web" {
   awsvpc_security_group_ids = ["${module.demo_sg.this_security_group_id}"]
 
   # load_balancing_enabled sets if a load balancer will be attached to the ecs service / target group
-  load_balancing_type = "APPLICATION"
+  load_balancing_type = "application"
   load_balancing_properties {
-    # The default route53 record type, can be CNAME, ALIAS or NONE, currently CNAME to be backwards compatible
-    route53_record_type = "ALIAS"
+    # The default route53 record type, can be CNAME, ALIAS or NONE
+    # route53_record_type = "ALIAS"
 
     # Unique identifier for the weighted IN A Alias Record 
     # route53_a_record_identifier = "identifier"
@@ -242,7 +242,7 @@ module "demo_web" {
   # The KMS Keys which can be used for kms:decrypt
   kms_keys  = ["${module.global-kms.aws_kms_key_arn}", "${module.demo-kms.aws_kms_key_arn}"]
 
-  # The SSM paths which are allowed to do kms:GetParameter and ssm:GetParametersByPath for
+  # The SSM paths for which the service will be allowed to ssm:GetParameter and ssm:GetParametersByPath on
   #
   # https://medium.com/@tdi/ssm-parameter-store-for-keeping-secrets-in-a-structured-way-53a25d48166a
   # "arn:aws:ssm:region:123456:parameter/application/%s/*"
@@ -315,7 +315,7 @@ module "demo_web" {
 
   # scheduling_strategy = "REPLICA"
 
-  load_balancing_type = "APPLICATION"
+  load_balancing_type = "application"
   load_balancing_properties {
     # The default route53 record type, currently CNAME to be backwards compatible
     route53_record_type = "ALIAS"
@@ -351,7 +351,7 @@ module "demo_web" {
   # The KMS Keys which can be used for kms:decrypt
   kms_keys  = ["${module.global-kms.aws_kms_key_arn}", "${module.demo-kms.aws_kms_key_arn}"]
 
-  # The SSM paths which are allowed to do kms:GetParameter and ssm:GetParametersByPath for
+  # The SSM paths for which the service will be allowed to ssm:GetParameter and ssm:GetParametersByPath on
   ssm_paths = ["${module.global-kms.name}", "${module.demo-kms.name}"]
 }
 
@@ -376,8 +376,7 @@ module "demo_nlb" {
   awsvpc_security_group_ids = ["${module.demo_sg.this_security_group_id}"]
 
 
-  # use_alb needs to be set to true
-  load_balancing_type = "NETWORK"
+  load_balancing_type = "network"
   load_balancing_properties {
     route53_record_type = "ALIAS"
     lb_arn                = "${module.nlb.load_balancer_id}"
@@ -409,7 +408,7 @@ module "demo_nlb" {
   # The KMS Keys which can be used for kms:decrypt
   kms_keys  = ["${module.global-kms.aws_kms_key_arn}", "${module.demo-kms.aws_kms_key_arn}"]
 
-  # The SSM paths which are allowed to do kms:GetParameter and ssm:GetParametersByPath for
+  # The SSM paths for which the service will be allowed to ssm:GetParameter and ssm:GetParametersByPath on
   ssm_paths = ["${module.global-kms.name}", "${module.demo-kms.name}"]
 }
 

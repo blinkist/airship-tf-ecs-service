@@ -48,7 +48,7 @@ resource "aws_route53_record" "record_alias_a" {
 
 # Network service load_balancer_type
 resource "aws_lb_target_group" "service_nlb" {
-  count                = "${var.create && var.load_balancing_type == "NETWORK" ? 1 : 0 }"
+  count                = "${var.create && var.load_balancing_type == "network" ? 1 : 0 }"
   name                 = "${local.tg_name}"
   port                 = "${var.target_group_port}"
   protocol             = "TCP"
@@ -65,7 +65,7 @@ resource "aws_lb_target_group" "service_nlb" {
 }
 
 resource "aws_lb_listener" "nlb_listener" {
-  count             = "${var.create && var.load_balancing_type == "NETWORK" ? 1 : 0 }"
+  count             = "${var.create && var.load_balancing_type == "network" ? 1 : 0 }"
   load_balancer_arn = "${var.lb_arn}"
   port              = "${var.nlb_listener_port}"
   protocol          = "TCP"
@@ -80,7 +80,7 @@ resource "aws_lb_listener" "nlb_listener" {
 ## aws_lb_target_group inside the ECS Task will be created when the service is not the default forwarding service
 ## It will not be created when the service is not attached to a load balancer like a worker
 resource "aws_lb_target_group" "service" {
-  count                = "${var.create && var.load_balancing_type == "APPLICATION" ? 1 : 0 }"
+  count                = "${var.create && var.load_balancing_type == "application" ? 1 : 0 }"
   name                 = "${local.tg_name}"
   port                 = 80
   protocol             = "HTTP"
@@ -97,7 +97,7 @@ resource "aws_lb_target_group" "service" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && ! var.redirect_http_to_https && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && ! var.redirect_http_to_https && local.route53_record_type != "NONE" ? 1 : 0 }"
 
   listener_arn = "${var.lb_listener_arn}"
 
@@ -120,7 +120,7 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 ##
 ## aws_lb_listener_rule which redirects http to https
 resource "aws_lb_listener_rule" "host_based_routing_redirect_to_https" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && var.redirect_http_to_https && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && var.redirect_http_to_https && local.route53_record_type != "NONE" ? 1 : 0 }"
 
   listener_arn = "${var.lb_listener_arn}"
 
@@ -148,7 +148,7 @@ resource "aws_lb_listener_rule" "host_based_routing_redirect_to_https" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && ! var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && ! var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
@@ -171,7 +171,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_cognito_auth" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
@@ -214,7 +214,7 @@ data "template_file" "custom_listen_host" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && ! var.redirect_http_to_https ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && ! var.redirect_http_to_https ? length(var.custom_listen_hosts) : 0 }"
 
   listener_arn = "${var.lb_listener_arn}"
 
@@ -232,7 +232,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
 ##
 ## aws_lb_listener_rule which redirects http to https for the custom listen hosts
 resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host_redirect_to_https" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && var.redirect_http_to_https ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && var.redirect_http_to_https ? length(var.custom_listen_hosts) : 0 }"
 
   listener_arn = "${var.lb_listener_arn}"
 
@@ -255,7 +255,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host_redirect_
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && ! var.cognito_auth_enabled ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && ! var.cognito_auth_enabled ? length(var.custom_listen_hosts) : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
@@ -273,7 +273,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host_cognito_auth" {
-  count = "${var.create && var.load_balancing_type == "APPLICATION" && var.cognito_auth_enabled ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? length(var.custom_listen_hosts) : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
