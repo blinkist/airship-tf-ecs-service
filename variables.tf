@@ -61,6 +61,9 @@ variable "load_balancing_properties" {
     nlb_listener_port is the default port for the Network Load Balancer to listen on
     nlb_listener_port = "80"
 
+    target_group_port sets the port for the alb or nlb target group, this generally can stay 80 regardless of the service port
+    target_group_port  = "80"
+
     lb_vpc_id is the vpc_id for the target_group to reside in
     lb_vpc_id = ""
 
@@ -125,6 +128,10 @@ variable "default_load_balancing_properties_health_uri" {
 }
 
 variable "default_load_balancing_properties_nlb_listener_port" {
+  default = "80"
+}
+
+variable "default_load_balancing_properties_target_group_port" {
   default = "80"
 }
 

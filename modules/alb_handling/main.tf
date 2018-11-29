@@ -82,7 +82,7 @@ resource "aws_lb_listener" "nlb_listener" {
 resource "aws_lb_target_group" "service" {
   count                = "${var.create && var.load_balancing_type == "application" ? 1 : 0 }"
   name                 = "${local.tg_name}"
-  port                 = 80
+  port                 = "${var.target_group_port}"
   protocol             = "HTTP"
   vpc_id               = "${var.lb_vpc_id}"
   target_type          = "${var.target_type}"

@@ -74,6 +74,9 @@ module "alb_handling" {
   # nlb_listener_port sets the listener port of the nlb listener
   nlb_listener_port = "${lookup(var.load_balancing_properties,"nlb_listener_port", var.default_load_balancing_properties_nlb_listener_port)}"
 
+  # target_group_port sets the port of the target group, by default 80 
+  target_group_port = "${lookup(var.load_balancing_properties,"target_group_port", var.default_load_balancing_properties_target_group_port)}"
+
   # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
   unhealthy_threshold = "${lookup(var.load_balancing_properties,"unhealthy_threshold", var.default_load_balancing_properties_unhealthy_threshold)}"
 
