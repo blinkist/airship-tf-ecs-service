@@ -1,6 +1,12 @@
 locals {
   ecs_cluster_name = "${basename(var.ecs_cluster_id)}"
   launch_type      = "${var.fargate_enabled ? "FARGATE" : "EC2" }"
+
+  name_map = {
+    "Name" = "${local.ecs_cluster_name}-${var.name}"
+  }
+
+  tags = "${merge(var.tags, local.name_map)}"
 }
 
 #
@@ -128,7 +134,8 @@ module "alb_handling" {
 resource "aws_cloudwatch_log_group" "app" {
   count             = "${var.create ? 1 : 0}"
   name              = "${local.ecs_cluster_name}/${var.name}"
-  retention_in_days = 14
+  retention_in_days = "${var.log_retention_in_days}"
+  kms_key_id        = "${var.cloudwatch_kms_key}"
 }
 
 #

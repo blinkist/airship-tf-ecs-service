@@ -9,3 +9,36 @@ output "ecs_taskrole_name" {
 output "lb_target_group_arn" {
   value = "${module.alb_handling.lb_target_group_arn}"
 }
+
+#output "lb_target_group_arn_suffix" {
+#  value = "${module.alb_handling.lb_target_group_arn_suffix}"
+#}
+#
+#output "lb_arn_suffix" {
+#  value = "${module.alb_handling.lb_arn_suffix}"
+#}
+#
+#output "load_balancer_type" {
+#  value = "${module.alb_handling.load_balancer_type}"
+#}
+#
+#output "service_discovery_container_name" {
+#  value = "${module.ecs_service.service_discovery_container_name}"
+#}
+#
+#output "ecs_service_name" {
+#  value = "${module.ecs_service.ecs_service_name}"
+#}
+#
+#output "ecs_task_name" {
+#  value = "${module.ecs_task_definition.aws_ecs_task_definition_family}"
+#}
+#
+#output "ecs_cluster_name" {
+#  value = "${local.ecs_cluster_name}"
+#}
+#
+#output "container_definition" {
+#  value = "${module.container_definition.json}"
+#}
+

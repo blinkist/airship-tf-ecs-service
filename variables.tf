@@ -21,6 +21,16 @@ variable "awsvpc_enabled" {
   default = false
 }
 
+# Number of days for the cloudwatch logs for the containers to be retained
+variable "log_retention_in_days" {
+  default = "14"
+}
+
+# kms_key for the cloudwatch logs
+variable "cloudwatch_kms_key" {
+  default = ""
+}
+
 # scheduling_strategy defaults to REPLICA
 variable "scheduling_strategy" {
   default = "REPLICA"
@@ -422,4 +432,24 @@ variable "mountpoints" {
 variable "ecs_cron_tasks" {
   type    = "list"
   default = []
+}
+
+variable "enable_service_discovery" {
+  default = "false"
+}
+
+# The service discovery namespace arn to register the services against
+variable "service_discovery_namespace_arn" {
+  default = ""
+}
+
+# (Optional) The container name value, already specified in the task definition, to be used for your service discovery service
+variable "service_discovery_container_name" {
+  default = ""
+}
+
+variable "tags" {
+  description = "A map of tags to apply to all taggable resources"
+  type        = "map"
+  default     = {}
 }
