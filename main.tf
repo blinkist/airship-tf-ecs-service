@@ -307,6 +307,19 @@ module "ecs_service" {
 
   # This way we force the aws_lb_listener_rule to have finished before creating the ecs_service
   aws_lb_listener_rules = "${module.alb_handling.aws_lb_listener_rules}"
+
+  # https://aws.amazon.com/blogs/aws/amazon-ecs-service-discovery/
+  # enable_service_discovery defaults to false
+  enable_service_discovery = "${var.enable_service_discovery}"
+
+  # service_discovery_namespace_arn 
+  service_discovery_namespace_arn = "${var.service_discovery_namespace_arn}"
+
+  # service_discovery_container_name overrides the default container name used for the service discovery.
+  service_discovery_container_name = "${var.service_discovery_container_name}"
+
+  # tags
+  tags = "${var.tags}"
 }
 
 #
