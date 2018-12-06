@@ -27,7 +27,7 @@ resource "aws_lambda_function" "lambda_task_runner" {
 #
 resource "aws_cloudwatch_event_rule" "schedule_expressions" {
   count               = "${length(var.ecs_cron_tasks)}"
-  name                = "${local.identifier}-${lookup(var.ecs_cron_tasks[count.index],"job_name")}"
+  name                = "${format("job-%.32s",lookup(var.ecs_cron_tasks[count.index],"job_name"))}"
   description         = "${local.identifier}-${lookup(var.ecs_cron_tasks[count.index],"job_name")}"
   schedule_expression = "${lookup(var.ecs_cron_tasks[count.index],"schedule_expression")}"
 }
@@ -58,7 +58,7 @@ data "template_file" "task_defs" {
   vars {
     ecs_cluster    = "${var.ecs_cluster_id}"
     ecs_service    = "${var.ecs_service_name}"
-    started_by     = "${local.identifier}-${lookup(var.ecs_cron_tasks[count.index],"job_name")}"
+    started_by     = "${format("job-%.32s",lookup(var.ecs_cron_tasks[count.index],"job_name"))}"
     job_name       = "${lookup(var.ecs_cron_tasks[count.index],"job_name")}"
     container_name = "${var.container_name}"
     container_cmd  = "${lookup(var.ecs_cron_tasks[count.index],"command","")}"
@@ -70,7 +70,8 @@ resource "aws_cloudwatch_event_target" "call_task_runner_scheduler" {
   rule      = "${aws_cloudwatch_event_rule.schedule_expressions.*.name[count.index]}"
   target_id = "${aws_lambda_function.lambda_task_runner.function_name}"
   arn       = "${aws_lambda_function.lambda_task_runner.arn}"
-  input     = "${data.template_file.task_defs.*.rendered[count.index]}"
+
+  input = "${data.template_file.task_defs.*.rendered[count.index]}"
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_task_runner" {
@@ -80,4 +81,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_task_runner" {
   function_name = "${aws_lambda_function.lambda_task_runner.function_name}"
   principal     = "events.amazonaws.com"
   source_arn    = "${aws_cloudwatch_event_rule.schedule_expressions.*.arn[count.index]}"
+  qualifier     = "${aws_lambda_function.lambda_task_runner.version}"
 }
