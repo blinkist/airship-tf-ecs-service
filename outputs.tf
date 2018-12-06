@@ -18,6 +18,10 @@ output "lb_arn_suffix" {
   value = "${module.lb_handling.lb_arn_suffix}"
 }
 
+output "public_dns_address" {
+  value = "${module.lb_handling.public_dns_address}"
+}
+
 output "load_balancer_type" {
   value = "${module.lb_handling.load_balancer_type}"
 }

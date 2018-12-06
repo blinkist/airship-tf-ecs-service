@@ -6,6 +6,10 @@ output "lb_target_group_arn_suffix" {
   value = "${format("%v",local.load_balancer_type == "application" ? local.alb_target_group_arn_suffix : local.nlb_target_group_arn_suffix)}"
 }
 
+output "public_dns_address" {
+  value = "${local.route53_name}"
+}
+
 output "lb_arn_suffix" {
   value = "${join("", data.aws_lb.main.*.arn_suffix)}"
 }
