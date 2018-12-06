@@ -7,7 +7,7 @@ output "lb_target_group_arn_suffix" {
 }
 
 output "public_dns_address" {
-  value = "${local.route53_name}"
+  value = "${format("%v.%v",local.route53_name, data.aws_route53_zone.zone.name)}"
 }
 
 output "lb_arn_suffix" {
