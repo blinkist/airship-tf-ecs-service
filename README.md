@@ -276,7 +276,7 @@ module "demo_web" {
   awsvpc_subnets            = ["${module.vpc.private_subnets}"]
   awsvpc_security_group_ids = ["${module.demo_sg.this_security_group_id}"]
 
-  # load_balancing_type = "NONE"
+  # load_balancing_type = "none"
 
   container_cpu    = 256
   container_memory = 512
