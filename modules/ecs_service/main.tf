@@ -4,14 +4,7 @@
 #
 
 locals {
-  lb_attached = "${var.load_balancing_type != "NONE"}"
-}
-
-# ??
-data "null_data_source" "service_registry" {
-  inputs = {
-    service_registry_namespace_arn = "${join("",list(var.service_discovery_namespace_arn))}"
-  }
+  lb_attached = "${var.load_balancing_type != "none"}"
 }
 
 # Make an LB connected service dependent of this rule
@@ -200,7 +193,7 @@ resource "aws_ecs_service" "app_with_lb_awsvpc_with_service_registry" {
     container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
   }
 
-  depends_on = ["data.null_data_source.service_registry", "null_resource.aws_lb_listener_rules"]
+  depends_on = ["null_resource.aws_lb_listener_rules"]
 }
 
 resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
@@ -247,7 +240,7 @@ resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
     container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
   }
 
-  depends_on = ["data.null_data_source.service_registry", "null_resource.aws_lb_listener_rules"]
+  depends_on = ["null_resource.aws_lb_listener_rules"]
 }
 
 resource "aws_ecs_service" "app_with_lb_with_service_registry" {
@@ -278,7 +271,7 @@ resource "aws_ecs_service" "app_with_lb_with_service_registry" {
     container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
   }
 
-  depends_on = ["data.null_data_source.service_registry", "null_resource.aws_lb_listener_rules"]
+  depends_on = ["null_resource.aws_lb_listener_rules"]
 }
 
 resource "aws_ecs_service" "app_with_service_registry" {
@@ -303,8 +296,6 @@ resource "aws_ecs_service" "app_with_service_registry" {
   lifecycle {
     ignore_changes = ["desired_count"]
   }
-
-  depends_on = ["data.null_data_source.service_registry"]
 }
 
 resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
@@ -333,6 +324,4 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
   lifecycle {
     ignore_changes = ["desired_count"]
   }
-
-  depends_on = ["data.null_data_source.service_registry"]
 }
