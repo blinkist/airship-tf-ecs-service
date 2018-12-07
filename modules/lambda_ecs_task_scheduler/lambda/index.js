@@ -5,8 +5,10 @@ exports.handler = async (event, context, callback) => {
   const ecs_cluster = event.ecs_cluster;
   const ecs_service = event.ecs_service;
 
-  const services = await ecs.describeServices(
-      {cluster : ecs_cluster, services : [ ecs_service ]}).promise();
+  const services =
+      await ecs
+          .describeServices({cluster : ecs_cluster, services : [ ecs_service ]})
+          .promise();
 
   if (services.services.length > 1) {
     throw new Error("multiple services with name %s found in cluster %s" %
@@ -17,10 +19,11 @@ exports.handler = async (event, context, callback) => {
     throw new Error("Could not find service");
   }
 
-  const taskdef = services.services[0].taskDefinition;
+  const task_family_revision = services.services[0].taskDefinition;
 
   const taskDefinition =
-      await ecs.describeTaskDefinition({taskDefinition : taskdef}).promise();
+      await ecs.describeTaskDefinition({taskDefinition : task_family_revision})
+          .promise();
 
   if (taskDefinition.taskDefinition.containerDefinitions.length !== 1) {
     throw new Error("only a single container is supported per task definition");
@@ -32,7 +35,7 @@ exports.handler = async (event, context, callback) => {
   const launchType = services.services[0].launchType;
 
   const params = {
-    taskDefinition : taskdef,
+    taskDefinition : task_family_revision,
     networkConfiguration : networkConfiguration,
     cluster : ecs_cluster,
     count : 1,
@@ -42,10 +45,10 @@ exports.handler = async (event, context, callback) => {
   };
   try {
     const data = await ecs.runTask(params).promise();
-    console.log("Successfully started taskDefinition " + taskDefinition + "\n" +
-                JSON.stringify(data));
-    callback(null,"Successfully started taskDefinition " + taskDefinition +
-                  "\n" + JSON.stringify(data));
+    console.log("Successfully started taskDefinition " + task_family_revision +
+                "\n" + JSON.stringify(data));
+    callback(null, "Successfully started taskDefinition " +
+                       task_family_revision + "\n" + JSON.stringify(data));
   } catch (err) {
     if (err.code == "ConditionalCheckFailedException") {
       callback("duplicated execution: " + JSON.stringify(event));
@@ -54,4 +57,3 @@ exports.handler = async (event, context, callback) => {
     }
   }
 };
-
