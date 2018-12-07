@@ -6,7 +6,7 @@ exports.handler = async (event, context, callback) => {
   const ecs_service = event.ecs_service;
 
   const services = await ecs.describeServices(
-      {cluster : ecs_cluster, services : [ ecs_service ]});
+      {cluster : ecs_cluster, services : [ ecs_service ]}).promise();
 
   if (services.services.length > 1) {
     throw new Error("multiple services with name %s found in cluster %s" %
@@ -28,11 +28,11 @@ exports.handler = async (event, context, callback) => {
 
   const started_by = event.started_by;
 
-  const networkConfiguration = dsdata.services[0].networkConfiguration;
-  const launchType = dsdata.services[0].launchType;
+  const networkConfiguration = services.services[0].networkConfiguration;
+  const launchType = services.services[0].launchType;
 
   const params = {
-    taskDefinition : taskDefinition,
+    taskDefinition : taskdef,
     networkConfiguration : networkConfiguration,
     cluster : ecs_cluster,
     count : 1,
@@ -44,7 +44,7 @@ exports.handler = async (event, context, callback) => {
     const data = await ecs.runTask(params).promise();
     console.log("Successfully started taskDefinition " + taskDefinition + "\n" +
                 JSON.stringify(data));
-    callback.null("Successfully started taskDefinition " + taskDefinition +
+    callback(null,"Successfully started taskDefinition " + taskDefinition +
                   "\n" + JSON.stringify(data));
   } catch (err) {
     if (err.code == "ConditionalCheckFailedException") {
@@ -54,3 +54,4 @@ exports.handler = async (event, context, callback) => {
     }
   }
 };
+
