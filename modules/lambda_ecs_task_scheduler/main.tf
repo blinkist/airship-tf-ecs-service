@@ -82,6 +82,4 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_task_runner" {
   function_name = "${aws_lambda_function.lambda_task_runner.function_name}"
   principal     = "events.amazonaws.com"
   source_arn    = "${aws_cloudwatch_event_rule.schedule_expressions.*.arn[count.index]}"
-
-  #qualifier     = "${aws_lambda_function.lambda_task_runner.version}"
 }
