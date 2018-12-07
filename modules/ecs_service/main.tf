@@ -4,7 +4,7 @@
 #
 
 locals {
-  lb_attached = "${var.load_balancing_type != "NONE"}"
+  lb_attached = "${var.load_balancing_type != "none"}"
 }
 
 # Make an LB connected service dependent of this rule
