@@ -19,7 +19,7 @@ resource "aws_lambda_function" "lambda_task_runner" {
   tags    = "${var.tags}"
 
   lifecycle {
-    ignore_changes = ["filename", "last_modified"]
+    ignore_changes = ["filename"]
   }
 }
 
