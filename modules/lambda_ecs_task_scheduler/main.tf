@@ -15,8 +15,8 @@ resource "aws_lambda_function" "lambda_task_runner" {
   source_code_hash = "${base64sha256(file("${path.module}/ecs_task_scheduler.zip"))}"
   role             = "${var.lambda_ecs_task_scheduler_role_arn}"
 
-  #publish          = true
-  tags = "${var.tags}"
+  publish = true
+  tags    = "${var.tags}"
 
   lifecycle {
     ignore_changes = ["filename", "last_modified"]
