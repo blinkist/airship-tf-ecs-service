@@ -50,6 +50,7 @@ resource "aws_ecs_service" "app_with_lb_awsvpc" {
 
 resource "aws_ecs_service" "app_with_lb_spread" {
   count       = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy && !var.enable_service_discovery ? 1 : 0}"
+
   name        = "${var.name}"
   launch_type = "${var.launch_type}"
   cluster     = "${var.cluster_id}"

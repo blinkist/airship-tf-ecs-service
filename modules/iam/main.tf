@@ -203,6 +203,14 @@ resource "aws_iam_role_policy" "lambda_lookup_policy" {
 data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
   statement {
     actions = [
+      "iam:PassRole",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
       "ecs:RunTask",
     ]
 

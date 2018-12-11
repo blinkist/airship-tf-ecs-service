@@ -1,63 +1,58 @@
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
 const ecs = new AWS.ECS();
 
+exports.handler = async (event, context, callback) => {
+    const ecs_cluster = event.ecs_cluster;
+    const ecs_service = event.ecs_service;
 
-exports.handler = async (event, context) => {
-  function AirshipLambdaError(message) {
-    this.name = "AirshipLambdaError";
-    this.message = message;
-  }
-  AirshipLambdaError.prototype = new Error();
+    const services =
+        await ecs
+        .describeServices({
+            cluster: ecs_cluster,
+            services: [ecs_service]
+        })
+        .promise();
 
-  //
-  // ECS Cluster and Service Lookup
-  //
-  const ecs_cluster = event.ecs_cluster || 'undefined'
-  const ecs_service = event.ecs_service || 'undefined'
+    if (services.services.length > 1) {
+        throw new Error("multiple services with name %s found in cluster %s" %
+            ecs_service,
+            ecs_cluster);
+    }
+    if (services.services.length < 1) {
+        throw new Error("Could not find service");
+    }
 
-  // This throws an error in case the Cluster has not been found
-  const res = await ecs.describeServices({
-    cluster: ecs_cluster,
-    services: [ecs_service]
-  }).promise();
+    const task_family_revision = services.services[0].taskDefinition;
 
-  if (res.services.length > 1) {
-    const error = new AirshipLambdaError("multiple services with name %s found in cluster %s" % ecs_service, ecs_cluster);
-    throw error;
-  } else if (res.services.length < 1) {
-    const error = new AirshipLambdaError("Could not find service");
-    throw error;
-  }
+    const taskDefinition =
+        await ecs.describeTaskDefinition({
+            taskDefinition: task_family_revision
+        })
+        .promise();
 
-  //
-  // ECS Task definition and container definition lookup
-  //
-  const taskDefinition = res.services[0].taskDefinition;
+    if (taskDefinition.taskDefinition.containerDefinitions.length !== 1) {
+        throw new Error("only a single container is supported per task definition");
+    }
 
-  const resTask = await ecs.describeTaskDefinition({
-    taskDefinition: taskDefinition
-  }).promise();
+    const started_by = event.started_by;
 
-  if (resTask.taskDefinition.containerDefinitions.length != 1) {
-    const error = new AirshipLambdaError("only a single container is supported per task definition");
-    throw error;
-  }
+    const networkConfiguration = services.services[0].networkConfiguration;
+    const launchType = services.services[0].launchType;
 
-  const count        = event.count || 1
-  const started_by   = event.started_by
-
-  var params = {
-      taskDefinition: taskDefinition,
-      cluster: ecs_cluster,
-      count: count,
-      startedBy: started_by,
-      overrides: event.overrides
-  }
-  console.log(params)
-
-  ecs.runTask(params, function(err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else     console.log(data);           // successful response
-      context.done(err, data)
-  })
+    const params = {
+        taskDefinition: task_family_revision,
+        networkConfiguration: networkConfiguration,
+        cluster: ecs_cluster,
+        count: 1,
+        launchType: launchType,
+        startedBy: started_by,
+        overrides: event.overrides
+    };
+    try {
+        const data = await ecs.runTask(params).promise();
+        console.log("Successfully started taskDefinition " + task_family_revision + "\n" + JSON.stringify(data));
+        callback(null, "Successfully started taskDefinition " + task_family_revision + "\n" + JSON.stringify(data));
+    } catch (err) {
+        callback(err);
+    }
 };
