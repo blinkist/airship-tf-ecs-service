@@ -7,9 +7,6 @@ data "aws_lb" "main" {
 #   # Validate the record type by looking up the map with valid record types
 #   route53_record_type = "${lookup(var.allowed_record_types,local.route53_record_type, "NONE")}"
 # }
-data "aws_route53_zone" "zone" {
-  zone_id = "${local.route53_zone_id}"
-}
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record" {

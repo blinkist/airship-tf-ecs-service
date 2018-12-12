@@ -5,12 +5,46 @@ variable "create" {
   default = true
 }
 
+variable "num_docker_volumes" {
+  default = 1
+}
+
+variable "docker_volumes" {
+  type = "list"
+
+  default = [{
+    name = "NONAME"
+  }]
+
+  # {
+  # # these properties are supported as a 'flattened' version of the docker volume configuration:
+  # # https://www.terraform.io/docs/providers/aws/r/ecs_task_definition.html#docker_volume_configuration
+  #     name = "bla",
+  #     scope == "shared",
+  #     autoprovision = true,
+  #     driver = "foo"
+  # # these properties are NOT supported, as they are nested maps in the resource's configuration
+  # #   driver_opts = NA
+  # #   labels = NA
+  # }
+}
+
+variable "docker_volume_options" {
+  type    = "map"
+  default = {}
+}
+
+variable "docker_volume_labels" {
+  type    = "map"
+  default = {}
+}
+
 # ecs_cluster_id is the cluster to which the ECS Service will be added.
 variable "ecs_cluster_id" {}
 
 variable "allow_terraform_deploy" {
   description = "When true, forces task update from Terraform."
-  default     = "true"
+  default     = false
 }
 
 # Number of days for the cloudwatch logs for the containers to be retained

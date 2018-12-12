@@ -1,7 +1,11 @@
 variable "ecs_container_name" {}
 
+variable "create" {
+  default = true
+}
+
 variable "allow_terraform_deploy" {
-  default = "true"
+  default = false
 }
 
 # Reflecting the current state

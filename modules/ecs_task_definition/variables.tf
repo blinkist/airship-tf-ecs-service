@@ -6,6 +6,10 @@ variable "create" {
   default = true
 }
 
+variable "num_docker_volumes" {
+  default = 1
+}
+
 # cluster name
 variable "cluster_name" {}
 
@@ -63,6 +67,33 @@ variable "docker_volume" {
   # #   driver_opts = NA
   # #   labels = NA
   # }
+}
+
+variable "docker_volumes" {
+  type    = "list"
+  default = []
+
+  # {
+  # # these properties are supported as a 'flattened' version of the docker volume configuration:
+  # # https://www.terraform.io/docs/providers/aws/r/ecs_task_definition.html#docker_volume_configuration
+  #     name = "bla",
+  #     scope == "shared",
+  #     autoprovision = true,
+  #     driver = "foo"
+  # # these properties are NOT supported, as they are nested maps in the resource's configuration
+  # #   driver_opts = NA
+  # #   labels = NA
+  # }
+}
+
+variable "docker_volume_options" {
+  type    = "map"
+  default = {}
+}
+
+variable "docker_volume_labels" {
+  type    = "map"
+  default = {}
 }
 
 # list of host paths to add as volumes to the task

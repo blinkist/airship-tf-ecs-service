@@ -52,7 +52,7 @@ locals {
   route53_record_type = "${lookup(var.load_balancing_properties,"route53_record_type")}"
 
   # Sets the zone in which the sub-domain will be added for this service
-  route53_zone_id = "${lookup(var.load_balancing_properties,"route53_zone_id")}"
+  route53_zone_id = "${lookup(var.load_balancing_properties,"route53_zone_id", "")}"
 
   # route53_a_record_identifier sets the identifier of the weighted Alias A record
   route53_record_identifier = "${lookup(var.load_balancing_properties,"route53_record_identifier")}"

@@ -185,8 +185,10 @@ module "ecs_task_definition" {
   # region, needed for Logging.. 
   region = "${var.region}"
 
+  num_docker_volumes = "${var.num_docker_volumes}"
+
   # a Docker volume to add to the task
-  docker_volume = "${var.docker_volume}"
+  docker_volumes = "${var.docker_volumes}"
 
   # list of host paths to add as volumes to the task
   host_path_volumes = "${var.host_path_volumes}"
@@ -199,7 +201,9 @@ module "ecs_task_definition" {
 # if there isn't a difference then the current live one should be used to be deployed; this
 # way no actual deployment will happen.
 module "ecs_task_definition_selector" {
-  source                 = "./modules/ecs_task_definition_selector/"
+  source = "./modules/ecs_task_definition_selector/"
+  create = "${var.create}"
+
   ecs_container_name     = "${var.container_name}"
   allow_terraform_deploy = "${var.allow_terraform_deploy}"
 
