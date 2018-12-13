@@ -185,7 +185,8 @@ module "ecs_task_definition" {
   # region, needed for Logging.. 
   region = "${var.region}"
 
-  num_docker_volumes = "${var.num_docker_volumes}"
+  num_docker_volumes    = "${var.num_docker_volumes}"
+  docker_volume_options = "${var.docker_volume_options}"
 
   # a Docker volume to add to the task
   docker_volumes = "${var.docker_volumes}"
