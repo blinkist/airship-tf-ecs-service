@@ -18,8 +18,8 @@ resource "null_resource" "envvars_as_list_of_maps_depend" {
 }
 
 resource "null_resource" "envvars_as_list_of_maps" {
-  count  = "${length(keys(var.container_envvars))}"
-  depend = ["null_resource.envvars_as_list_of_maps_depend"]
+  count      = "${length(keys(var.container_envvars))}"
+  depends_on = ["null_resource.envvars_as_list_of_maps_depend"]
 
   triggers = "${map(
     "name", "${local.safe_search_replace_string}${element(keys(var.container_envvars), count.index)}",
