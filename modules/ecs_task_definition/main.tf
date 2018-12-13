@@ -52,7 +52,7 @@ locals {
     driver        = ""
   }
 
-  docker_volume_options = "${merge(local.base_opts_map, var.docker_volume_options)}"
+  docker_volume_options = "${merge(var.docker_volume_options,local.base_opts_map)}"
   docker_volume_labels  = "${merge(local.base_opts_map, var.docker_volume_labels)}"
 }
 
