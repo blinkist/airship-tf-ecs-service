@@ -8,8 +8,18 @@ locals {
   safe_search_replace_string = "#keep_true_a_string_hack#"
 }
 
-resource "null_resource" "envvars_as_list_of_maps" {
+resource "null_resource" "envvars_as_list_of_maps_depend" {
   count = "${length(keys(var.container_envvars))}"
+
+  triggers = "${map(
+    "name", "${local.safe_search_replace_string}${element(keys(var.container_envvars), count.index)}",
+    "value", "${local.safe_search_replace_string}${element(values(var.container_envvars), count.index)}",
+  )}"
+}
+
+resource "null_resource" "envvars_as_list_of_maps" {
+  count  = "${length(keys(var.container_envvars))}"
+  depend = ["null_resource.envvars_as_list_of_maps_depend"]
 
   triggers = "${map(
     "name", "${local.safe_search_replace_string}${element(keys(var.container_envvars), count.index)}",
