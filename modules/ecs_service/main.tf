@@ -17,6 +17,28 @@ resource "null_resource" "aws_lb_listener_rules" {
   }
 }
 
+resource "aws_service_discovery_service" "service" {
+  count = "${var.create && var.enable_service_discovery ? 1 : 0}"
+
+  name = "${var.name}"
+
+  dns_config {
+    namespace_id = "${var.service_discovery_namespace_id}"
+
+    dns_records {
+      ttl  = "${var.service_discovery_dns_ttl}"
+      type = "${var.service_discovery_dns_type}"
+    }
+
+    routing_policy = "${var.service_discovery_routing_policy}"
+  }
+
+  # Needed for private namespaces
+  health_check_custom_config {
+    failure_threshold = "${var.service_discovery_healthcheck_custom_failure_threshold}"
+  }
+}
+
 resource "aws_ecs_service" "app_with_lb_awsvpc" {
   count = "${var.create && var.awsvpc_enabled && local.lb_attached && !var.enable_service_discovery ? 1 : 0}"
 
@@ -49,7 +71,7 @@ resource "aws_ecs_service" "app_with_lb_awsvpc" {
 }
 
 resource "aws_ecs_service" "app_with_lb_spread" {
-  count       = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy && !var.enable_service_discovery ? 1 : 0}"
+  count = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy && !var.enable_service_discovery ? 1 : 0}"
 
   name        = "${var.name}"
   launch_type = "${var.launch_type}"
@@ -190,8 +212,10 @@ resource "aws_ecs_service" "app_with_lb_awsvpc_with_service_registry" {
   }
 
   service_registries {
-    registry_arn   = "${var.service_discovery_namespace_arn}"
-    container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
+    registry_arn   = "${aws_service_discovery_service.service.arn}"
+    container_name = "${var.container_name}"
+    container_port = "${var.container_port}"
+    port           = "${var.container_port}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
@@ -237,8 +261,10 @@ resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
   }
 
   service_registries {
-    registry_arn   = "${var.service_discovery_namespace_arn}"
-    container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
+    registry_arn   = "${aws_service_discovery_service.service.arn}"
+    container_name = "${var.container_name}"
+    container_port = "${var.container_port}"
+    port           = "${var.container_port}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
@@ -268,8 +294,10 @@ resource "aws_ecs_service" "app_with_lb_with_service_registry" {
   }
 
   service_registries {
-    registry_arn   = "${var.service_discovery_namespace_arn}"
-    container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
+    registry_arn   = "${aws_service_discovery_service.service.arn}"
+    container_name = "${var.container_name}"
+    container_port = "${var.container_port}"
+    port           = "${var.container_port}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
@@ -290,8 +318,10 @@ resource "aws_ecs_service" "app_with_service_registry" {
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
   service_registries {
-    registry_arn   = "${var.service_discovery_namespace_arn}"
-    container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
+    registry_arn   = "${aws_service_discovery_service.service.arn}"
+    container_name = "${var.container_name}"
+    container_port = "${var.container_port}"
+    port           = "${var.container_port}"
   }
 
   lifecycle {
@@ -318,8 +348,9 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
   }
 
   service_registries {
-    registry_arn   = "${var.service_discovery_namespace_arn}"
-    container_name = "${var.service_discovery_container_name == "" ? var.name : var.service_discovery_container_name }"
+    registry_arn   = "${aws_service_discovery_service.service.arn}"
+    container_name = "${var.container_name}"
+    container_port = "${var.container_port}"
   }
 
   lifecycle {

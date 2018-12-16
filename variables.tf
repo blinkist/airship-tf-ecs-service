@@ -276,6 +276,12 @@ variable "container_port" {
   default = ""
 }
 
+# healthcheck, describes the extra HEALTHCHECK for the container
+variable "container_healthcheck" {
+  type    = "map"
+  default = {}
+}
+
 variable "host_port" {
   default = ""
 }
@@ -438,8 +444,8 @@ variable "enable_service_discovery" {
   default = "false"
 }
 
-# The service discovery namespace arn to register the services against
-variable "service_discovery_namespace_arn" {
+# The service discovery namespace id to register the services with
+variable "service_discovery_namespace_id" {
   default = ""
 }
 

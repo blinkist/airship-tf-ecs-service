@@ -177,6 +177,8 @@ module "container_definition" {
 
   mountpoints = ["${var.mountpoints}"]
 
+  healthcheck = "${var.container_healthcheck}"
+
   log_options = {
     "awslogs-region"        = "${var.region}"
     "awslogs-group"         = "${element(concat(aws_cloudwatch_log_group.app.*.name, list("")), 0)}"
@@ -312,11 +314,8 @@ module "ecs_service" {
   # enable_service_discovery defaults to false
   enable_service_discovery = "${var.enable_service_discovery}"
 
-  # service_discovery_namespace_arn 
-  service_discovery_namespace_arn = "${var.service_discovery_namespace_arn}"
-
-  # service_discovery_container_name overrides the default container name used for the service discovery.
-  service_discovery_container_name = "${var.service_discovery_container_name}"
+  # service_discovery_namespace_id 
+  service_discovery_namespace_id = "${var.service_discovery_namespace_id}"
 
   # tags
   tags = "${var.tags}"

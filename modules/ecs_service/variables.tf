@@ -60,20 +60,6 @@ variable "load_balancing_type" {}
 # Spread tasks over ECS Cluster based on AZ, Instance-id, memory
 variable "with_placement_strategy" {}
 
-variable "enable_service_discovery" {
-  default = "false"
-}
-
-# The service discovery namespace arn to register the services against
-variable "service_discovery_namespace_arn" {
-  default = ""
-}
-
-# (Optional) The container name value, already specified in the task definition, to be used for your service discovery service
-variable "service_discovery_container_name" {
-  default = ""
-}
-
 variable "health_check_grace_period_seconds" {
   default = "300"
 }
@@ -81,4 +67,29 @@ variable "health_check_grace_period_seconds" {
 variable "tags" {
   type    = "map"
   default = {}
+}
+
+variable "enable_service_discovery" {
+  default = "false"
+}
+
+# The service discovery namespace arn to register the services against
+variable "service_discovery_namespace_id" {
+  default = ""
+}
+
+variable "service_discovery_dns_ttl" {
+  default = "10"
+}
+
+variable "service_discovery_dns_type" {
+  default = "SRV"
+}
+
+variable "service_discovery_routing_policy" {
+  default = "MULTIVALUE"
+}
+
+variable "service_discovery_healthcheck_custom_failure_threshold" {
+  default = "10"
 }
