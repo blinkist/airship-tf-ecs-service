@@ -83,7 +83,7 @@ variable "service_discovery_dns_ttl" {
 }
 
 variable "service_discovery_dns_type" {
-  default = "SRV"
+  default = "A"
 }
 
 variable "service_discovery_routing_policy" {

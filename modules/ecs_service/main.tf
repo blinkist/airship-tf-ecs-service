@@ -33,10 +33,10 @@ resource "aws_service_discovery_service" "service" {
     routing_policy = "${var.service_discovery_routing_policy}"
   }
 
-  # Needed for private namespaces
-  health_check_custom_config {
-    failure_threshold = "${var.service_discovery_healthcheck_custom_failure_threshold}"
-  }
+  #  # Needed for private namespaces
+  #  health_check_custom_config {
+  #    failure_threshold = "${var.service_discovery_healthcheck_custom_failure_threshold}"
+  #  }
 }
 
 resource "aws_ecs_service" "app_with_lb_awsvpc" {
@@ -214,8 +214,10 @@ resource "aws_ecs_service" "app_with_lb_awsvpc_with_service_registry" {
   service_registries {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-    container_port = "${var.container_port}"
-    port           = "${var.container_port}"
+
+    #    container_port = "${var.container_port}"
+
+    #port           = "${var.container_port}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
@@ -253,7 +255,8 @@ resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
-    container_port   = "${var.container_port}"
+
+    #    container_port   = "${var.container_port}"
   }
 
   lifecycle {
@@ -263,8 +266,10 @@ resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
   service_registries {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-    container_port = "${var.container_port}"
-    port           = "${var.container_port}"
+
+    #    container_port = "${var.container_port}"
+
+    #port           = "${var.container_port}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
@@ -286,7 +291,8 @@ resource "aws_ecs_service" "app_with_lb_with_service_registry" {
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
-    container_port   = "${var.container_port}"
+
+    #    container_port   = "${var.container_port}"
   }
 
   lifecycle {
@@ -296,8 +302,10 @@ resource "aws_ecs_service" "app_with_lb_with_service_registry" {
   service_registries {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-    container_port = "${var.container_port}"
-    port           = "${var.container_port}"
+
+    #    container_port = "${var.container_port}"
+
+    #port           = "${var.container_port}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
@@ -320,8 +328,10 @@ resource "aws_ecs_service" "app_with_service_registry" {
   service_registries {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-    container_port = "${var.container_port}"
-    port           = "${var.container_port}"
+
+    #    container_port = "${var.container_port}"
+
+    #port           = "${var.container_port}"
   }
 
   lifecycle {
@@ -350,7 +360,8 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
   service_registries {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-    container_port = "${var.container_port}"
+
+    #    container_port = "${var.container_port}"
   }
 
   lifecycle {
