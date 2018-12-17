@@ -135,13 +135,14 @@ resource "aws_cloudwatch_log_group" "app" {
 # This module is used to lookup the currently used ecs task definition
 #
 module "live_task_lookup" {
-  source                 = "./modules/live_task_lookup/"
-  create                 = "${var.create}"
-  ecs_cluster_id         = "${var.ecs_cluster_id}"
-  ecs_service_name       = "${var.name}"
-  container_name         = "${var.container_name}"
-  lambda_lookup_role_arn = "${module.iam.lambda_lookup_role_arn}"
-  lookup_type            = "${var.live_task_lookup_type}"
+  source                       = "./modules/live_task_lookup/"
+  create                       = "${var.create}"
+  ecs_cluster_id               = "${var.ecs_cluster_id}"
+  ecs_service_name             = "${var.name}"
+  container_name               = "${var.container_name}"
+  lambda_lookup_role_policy_id = "${module.iam.lambda_lookup_role_policy_id}"
+  lambda_lookup_role_arn       = "${module.iam.lambda_lookup_role_arn}"
+  lookup_type                  = "${var.live_task_lookup_type}"
 }
 
 #

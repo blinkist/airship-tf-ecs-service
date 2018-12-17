@@ -1,3 +1,12 @@
+# In some cases the lambda is being invoked before the lamba policies have been added
+# This null_resources forces a dependency
+#
+resource "null_resource" "force_policy_dependency" {
+  triggers {
+    listeners = "${var.lambda_lookup_role_policy_id}"
+  }
+}
+
 #
 # lookup_type lambda
 #
@@ -13,8 +22,10 @@ resource "aws_lambda_function" "lambda_lookup" {
   tags             = "${var.tags}"
 
   lifecycle {
-    ignore_changes = ["filename"]
+    ignore_changes = ["*"]
   }
+
+  depends_on = ["null_resource.force_policy_dependency"]
 }
 
 data "aws_lambda_invocation" "lambda_lookup" {
