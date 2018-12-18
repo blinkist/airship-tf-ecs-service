@@ -13,6 +13,9 @@ variable "ecs_cluster_id" {}
 # lambda_lookup_role_arn sets the role arn of the lookup_lambda
 variable "lambda_lookup_role_arn" {}
 
+# lambda_lookup_role_policy_id sets the id of the added policy to the lambda, this to force dependency
+variable "lambda_lookup_role_policy_id" {}
+
 # lookup_type sets the type of lookup, either 
 # * lambda - works during bootstrap and after bootstrap
 # * datasource - uses terraform datasources ( aws_ecs_service ) which won't work during bootstrap
