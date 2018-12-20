@@ -10,7 +10,7 @@ data "aws_lb" "main" {
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record" {
-  count      = "${var.create && var.load_balancing_enabled && local.route53_record_type == "CNAME"  ? 1 : 0 }"
+  count      = "${var.create && local.route53_zone_id != "" && var.load_balancing_enabled && local.route53_record_type == "CNAME"  ? 1 : 0 }"
   zone_id    = "${local.route53_zone_id}"
   name       = "${local.route53_name}"
   type       = "CNAME"
@@ -21,7 +21,7 @@ resource "aws_route53_record" "record" {
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record_alias_a" {
-  count   = "${var.create && var.load_balancing_enabled && local.route53_record_type == "ALIAS" ? 1 : 0 }"
+  count   = "${var.create && local.route53_zone_id != "" && var.load_balancing_enabled && local.route53_record_type == "ALIAS" ? 1 : 0 }"
   zone_id = "${local.route53_zone_id}"
   name    = "${local.route53_name}"
   type    = "A"
