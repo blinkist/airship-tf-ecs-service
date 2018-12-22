@@ -304,7 +304,7 @@ module "ecs_autoscaling" {
   desired_max_capacity = "${lookup(var.capacity_properties,"desired_max_capacity", var.default_capacity_properties_desired_max_capacity)}"
 
   # scaling_properties holds a list of maps with the scaling properties defined.
-  scaling_properties = "${var.scaling_properties}"
+  scaling_properties = ["${var.scaling_properties}"]
 
   tags = "${var.tags}"
 }
