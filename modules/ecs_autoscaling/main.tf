@@ -20,8 +20,8 @@ resource "aws_appautoscaling_policy" "policy" {
   resource_id        = "service/${var.cluster_name}/${var.ecs_service_name}"
 
   step_scaling_policy_configuration {
-    adjustment_type         = "${lookup(var.scaling_properties[count.index], "adjustment_type")}"
-    cooldown                = "${lookup(var.scaling_properties[count.index], "cooldown")}"
+    adjustment_type         = "${lookup(var.scaling_properties[count.index], "adjustment_type", "1")}"
+    cooldown                = "${lookup(var.scaling_properties[count.index], "cooldown", "300")}"
     metric_aggregation_type = "Average"
 
     step_adjustment {
