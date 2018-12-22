@@ -290,7 +290,7 @@ module "ecs_autoscaling" {
   source = "./modules/ecs_autoscaling/"
 
   # create defines if resources inside this module are being created.
-  create = "${var.create && join("",flatten(var.scaling_properties), list("")) != "" ? true : false }"
+  create = "${var.create && join("",concat(var.scaling_properties, list())) != "" ? true : false }"
 
   cluster_name = "${local.ecs_cluster_name}"
 
