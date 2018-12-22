@@ -12,7 +12,7 @@ resource "aws_appautoscaling_target" "target" {
 }
 
 resource "aws_appautoscaling_policy" "policy" {
-  count = "${(var.create ? 1 : 0 ) * length(var.scaling_properties) }"
+  count = "${var.create ? 1 * length(var.scaling_properties) : 0 }"
 
   name               = "${local.cluster_plus_service_name}-${lookup(var.scaling_properties[count.index], "type", "CPUUtilization")}-${element(var.direction[lookup(var.scaling_properties[count.index], "direction", "up")],1)}"
   scalable_dimension = "ecs:service:DesiredCount"
