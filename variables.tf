@@ -440,7 +440,7 @@ variable "ecs_cron_tasks" {
   default = []
 }
 
-variable "enable_service_discovery" {
+variable "service_discovery_enabled" {
   default = "false"
 }
 
@@ -449,9 +449,29 @@ variable "service_discovery_namespace_id" {
   default = ""
 }
 
-# (Optional) The container name value, already specified in the task definition, to be used for your service discovery service
-variable "service_discovery_container_name" {
-  default = ""
+## Defaults for the service_discovery_properties
+variable "service_discovery_properties_defaults" {
+  type = "map"
+
+  default = {
+    dns_ttl                              = "60"
+    dns_type                             = "SRV"
+    routing_policy                       = "MULTIVALUE"
+    healthcheck_custom_failure_threshold = "1"
+  }
+}
+
+## Input for the service discovery properties, overwriting the service_discovery_properties_defaults
+variable "service_discovery_properties" {
+  type = "map"
+
+  default = {}
+}
+
+locals {
+  service_discovery_properties = "${merge(
+     var.service_discovery_properties_defaults,
+     var.service_discovery_properties)}"
 }
 
 variable "tags" {

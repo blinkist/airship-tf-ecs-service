@@ -312,11 +312,18 @@ module "ecs_service" {
   aws_lb_listener_rules = "${module.alb_handling.aws_lb_listener_rules}"
 
   # https://aws.amazon.com/blogs/aws/amazon-ecs-service-discovery/
-  # enable_service_discovery defaults to false
-  enable_service_discovery = "${var.enable_service_discovery}"
+  # service_discovery_enabled defaults to false
+  service_discovery_enabled = "${var.service_discovery_enabled}"
 
-  # service_discovery_namespace_id 
-  service_discovery_namespace_id = "${var.service_discovery_namespace_id}"
+  # Should error when service_discovery_enabled is set and no namespace_id is given
+  service_discovery_namespace_id = "${var.service_discovery_enabled ? 
+                        lookup(local.service_discovery_properties,"namespace_id") : ""}"
+
+  service_discovery_dns_ttl        = "${lookup(local.service_discovery_properties,"dns_ttl")}"
+  service_discovery_dns_type       = "${lookup(local.service_discovery_properties,"dns_type")}"
+  service_discovery_routing_policy = "${lookup(local.service_discovery_properties,"routing_policy")}"
+
+  service_discovery_healthcheck_custom_failure_threshold = "${lookup(local.service_discovery_properties,"healthcheck_custom_failure_threshold")}"
 
   # tags
   tags = "${var.tags}"

@@ -17,30 +17,8 @@ resource "null_resource" "aws_lb_listener_rules" {
   }
 }
 
-resource "aws_service_discovery_service" "service" {
-  count = "${var.create && var.enable_service_discovery ? 1 : 0}"
-
-  name = "${var.name}"
-
-  dns_config {
-    namespace_id = "${var.service_discovery_namespace_id}"
-
-    dns_records {
-      ttl  = "${var.service_discovery_dns_ttl}"
-      type = "${var.service_discovery_dns_type}"
-    }
-
-    routing_policy = "${var.service_discovery_routing_policy}"
-  }
-
-  #  # Needed for private namespaces
-  #  health_check_custom_config {
-  #    failure_threshold = "${var.service_discovery_healthcheck_custom_failure_threshold}"
-  #  }
-}
-
 resource "aws_ecs_service" "app_with_lb_awsvpc" {
-  count = "${var.create && var.awsvpc_enabled && local.lb_attached && !var.enable_service_discovery ? 1 : 0}"
+  count = "${var.create && var.awsvpc_enabled && local.lb_attached && !var.service_discovery_enabled ? 1 : 0}"
 
   name    = "${var.name}"
   cluster = "${var.cluster_id}"
@@ -71,7 +49,7 @@ resource "aws_ecs_service" "app_with_lb_awsvpc" {
 }
 
 resource "aws_ecs_service" "app_with_lb_spread" {
-  count = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy && !var.enable_service_discovery ? 1 : 0}"
+  count = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy && !var.service_discovery_enabled ? 1 : 0}"
 
   name        = "${var.name}"
   launch_type = "${var.launch_type}"
@@ -114,7 +92,7 @@ resource "aws_ecs_service" "app_with_lb_spread" {
 }
 
 resource "aws_ecs_service" "app_with_lb" {
-  count           = "${var.create && !var.awsvpc_enabled && local.lb_attached && !var.with_placement_strategy && !var.enable_service_discovery ? 1 : 0}"
+  count           = "${var.create && !var.awsvpc_enabled && local.lb_attached && !var.with_placement_strategy && !var.service_discovery_enabled ? 1 : 0}"
   name            = "${var.name}"
   launch_type     = "${var.launch_type}"
   cluster         = "${var.cluster_id}"
@@ -140,7 +118,7 @@ resource "aws_ecs_service" "app_with_lb" {
 }
 
 resource "aws_ecs_service" "app" {
-  count = "${var.create && ! local.lb_attached && ! var.awsvpc_enabled && !var.enable_service_discovery ? 1 : 0 }"
+  count = "${var.create && ! local.lb_attached && ! var.awsvpc_enabled && !var.service_discovery_enabled ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
@@ -159,7 +137,7 @@ resource "aws_ecs_service" "app" {
 }
 
 resource "aws_ecs_service" "app_awsvpc" {
-  count = "${var.create && ! local.lb_attached && var.awsvpc_enabled && !var.enable_service_discovery ? 1 : 0 }"
+  count = "${var.create && ! local.lb_attached && var.awsvpc_enabled && !var.service_discovery_enabled ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
@@ -183,8 +161,38 @@ resource "aws_ecs_service" "app_awsvpc" {
 
 ### Service Registry resources
 
+locals {
+  # service_registries block does not accept a port with "A"-record-type
+  # Setting the port to false works through a local
+  service_registries_container_port = {
+    "SRV" = "${var.container_port}"
+    "A"   = false
+  }
+}
+
+resource "aws_service_discovery_service" "service" {
+  count = "${var.create && var.service_discovery_enabled ? 1 : 0}"
+
+  name = "${var.name}"
+
+  dns_config {
+    namespace_id = "${var.service_discovery_namespace_id}"
+
+    dns_records {
+      ttl  = "${var.service_discovery_dns_ttl}"
+      type = "${var.service_discovery_dns_type}"
+    }
+
+    routing_policy = "${var.service_discovery_routing_policy}"
+  }
+
+  health_check_custom_config {
+    failure_threshold = "${var.service_discovery_healthcheck_custom_failure_threshold}"
+  }
+}
+
 resource "aws_ecs_service" "app_with_lb_awsvpc_with_service_registry" {
-  count = "${var.create && var.awsvpc_enabled && local.lb_attached && var.enable_service_discovery ? 1 : 0}"
+  count = "${var.create && var.awsvpc_enabled && local.lb_attached && var.service_discovery_enabled ? 1 : 0}"
 
   name    = "${var.name}"
   cluster = "${var.cluster_id}"
@@ -211,20 +219,17 @@ resource "aws_ecs_service" "app_with_lb_awsvpc_with_service_registry" {
     security_groups = ["${var.awsvpc_security_group_ids}"]
   }
 
-  service_registries {
+  service_registries = {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-
-    #    container_port = "${var.container_port}"
-
-    #port           = "${var.container_port}"
+    container_port = "${local.service_registries_container_port[var.service_discovery_dns_type]}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
 }
 
 resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
-  count       = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy && var.enable_service_discovery ? 1 : 0}"
+  count       = "${var.create && !var.awsvpc_enabled && local.lb_attached && var.with_placement_strategy && var.service_discovery_enabled ? 1 : 0}"
   name        = "${var.name}"
   launch_type = "${var.launch_type}"
   cluster     = "${var.cluster_id}"
@@ -255,28 +260,24 @@ resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
-
-    #    container_port   = "${var.container_port}"
+    container_port   = "${var.container_port}"
   }
 
   lifecycle {
     ignore_changes = ["desired_count"]
   }
 
-  service_registries {
+  service_registries = {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-
-    #    container_port = "${var.container_port}"
-
-    #port           = "${var.container_port}"
+    container_port = "${local.service_registries_container_port[var.service_discovery_dns_type]}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
 }
 
 resource "aws_ecs_service" "app_with_lb_with_service_registry" {
-  count           = "${var.create && !var.awsvpc_enabled && local.lb_attached && !var.with_placement_strategy && var.enable_service_discovery ? 1 : 0}"
+  count           = "${var.create && !var.awsvpc_enabled && local.lb_attached && !var.with_placement_strategy && var.service_discovery_enabled ? 1 : 0}"
   name            = "${var.name}"
   launch_type     = "${var.launch_type}"
   cluster         = "${var.cluster_id}"
@@ -291,28 +292,24 @@ resource "aws_ecs_service" "app_with_lb_with_service_registry" {
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
-
-    #    container_port   = "${var.container_port}"
+    container_port   = "${var.container_port}"
   }
 
   lifecycle {
     ignore_changes = ["desired_count"]
   }
 
-  service_registries {
+  service_registries = {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-
-    #    container_port = "${var.container_port}"
-
-    #port           = "${var.container_port}"
+    container_port = "${local.service_registries_container_port[var.service_discovery_dns_type]}"
   }
 
   depends_on = ["null_resource.aws_lb_listener_rules"]
 }
 
 resource "aws_ecs_service" "app_with_service_registry" {
-  count = "${var.create && ! local.lb_attached && ! var.awsvpc_enabled && var.enable_service_discovery ? 1 : 0 }"
+  count = "${var.create && ! local.lb_attached && ! var.awsvpc_enabled && var.service_discovery_enabled ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
@@ -325,13 +322,10 @@ resource "aws_ecs_service" "app_with_service_registry" {
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
-  service_registries {
+  service_registries = {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-
-    #    container_port = "${var.container_port}"
-
-    #port           = "${var.container_port}"
+    container_port = "${local.service_registries_container_port[var.service_discovery_dns_type]}"
   }
 
   lifecycle {
@@ -340,7 +334,7 @@ resource "aws_ecs_service" "app_with_service_registry" {
 }
 
 resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
-  count = "${var.create && ! local.lb_attached && var.awsvpc_enabled && var.enable_service_discovery ? 1 : 0 }"
+  count = "${var.create && ! local.lb_attached && var.awsvpc_enabled && var.service_discovery_enabled ? 1 : 0 }"
 
   name                = "${var.name}"
   launch_type         = "${var.launch_type}"
@@ -357,11 +351,10 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
     security_groups = ["${var.awsvpc_security_group_ids}"]
   }
 
-  service_registries {
+  service_registries = {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
-
-    #    container_port = "${var.container_port}"
+    container_port = "${local.service_registries_container_port[var.service_discovery_dns_type]}"
   }
 
   lifecycle {

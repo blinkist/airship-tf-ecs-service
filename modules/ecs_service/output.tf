@@ -2,7 +2,7 @@
 # Autoscaling uses the service name, by using the service name of the resource output, we make sure that the
 # Order of creation is maintained
 output "ecs_service_name" {
-  value = "${var.enable_service_discovery ?
+  value = "${var.service_discovery_enabled ?
      (var.awsvpc_enabled ? 
                 ( local.lb_attached ? join("",aws_ecs_service.app_with_lb_awsvpc_with_service_registry.*.name) : join("",aws_ecs_service.app_awsvpc_with_service_registry.*.name) ) 
                 :

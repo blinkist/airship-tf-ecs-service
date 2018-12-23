@@ -69,7 +69,7 @@ variable "tags" {
   default = {}
 }
 
-variable "enable_service_discovery" {
+variable "service_discovery_enabled" {
   default = "false"
 }
 
@@ -78,18 +78,22 @@ variable "service_discovery_namespace_id" {
   default = ""
 }
 
+# Service Discovery DNS TTL
 variable "service_discovery_dns_ttl" {
-  default = "10"
+  default = "60"
 }
 
+# Service Discovery DNS Type
 variable "service_discovery_dns_type" {
-  default = "A"
+  default = "SRV"
 }
 
+# Service Discovery routing policy
 variable "service_discovery_routing_policy" {
   default = "MULTIVALUE"
 }
 
+# Service Discovery customer failure thresholds, needs to be set to at least 1
 variable "service_discovery_healthcheck_custom_failure_threshold" {
-  default = "10"
+  default = "1"
 }
