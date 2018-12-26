@@ -316,13 +316,18 @@ module "ecs_service" {
   service_discovery_enabled = "${var.service_discovery_enabled}"
 
   # Should error when service_discovery_enabled is set and no namespace_id is given
-  service_discovery_namespace_id = "${var.service_discovery_enabled ? 
-                        lookup(local.service_discovery_properties,"namespace_id") : ""}"
+  service_discovery_namespace_id = "${lookup(local.service_discovery_properties,"namespace_id")}"
 
-  service_discovery_dns_ttl        = "${lookup(local.service_discovery_properties,"dns_ttl")}"
-  service_discovery_dns_type       = "${lookup(local.service_discovery_properties,"dns_type")}"
+  # ttl of the service discovery records, default 60
+  service_discovery_dns_ttl = "${lookup(local.service_discovery_properties,"dns_ttl")}"
+
+  # dns_type defaults to A (AWSVPC)
+  service_discovery_dns_type = "${lookup(local.service_discovery_properties,"dns_type")}"
+
+  # routing_policy def
   service_discovery_routing_policy = "${lookup(local.service_discovery_properties,"routing_policy")}"
 
+  # healthcheck_custom_failure_threshold needed, set to 1 by default
   service_discovery_healthcheck_custom_failure_threshold = "${lookup(local.service_discovery_properties,"healthcheck_custom_failure_threshold")}"
 
   # tags

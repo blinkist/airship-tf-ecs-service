@@ -454,8 +454,9 @@ variable "service_discovery_properties_defaults" {
   type = "map"
 
   default = {
+    namespace_id                         = ""
     dns_ttl                              = "60"
-    dns_type                             = "SRV"
+    dns_type                             = "A"
     routing_policy                       = "MULTIVALUE"
     healthcheck_custom_failure_threshold = "1"
   }
