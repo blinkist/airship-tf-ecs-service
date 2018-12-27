@@ -444,11 +444,6 @@ variable "service_discovery_enabled" {
   default = "false"
 }
 
-# The service discovery namespace id to register the services with
-variable "service_discovery_namespace_id" {
-  default = ""
-}
-
 ## Defaults for the service_discovery_properties
 variable "service_discovery_properties_defaults" {
   type = "map"

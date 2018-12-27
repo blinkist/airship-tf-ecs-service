@@ -331,7 +331,7 @@ module "ecs_service" {
   service_discovery_healthcheck_custom_failure_threshold = "${lookup(local.service_discovery_properties,"healthcheck_custom_failure_threshold")}"
 
   # tags
-  tags = "${var.tags}"
+  tags = "${local.tags}"
 }
 
 #
