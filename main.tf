@@ -176,6 +176,8 @@ module "container_definition" {
 
   container_envvars = "${var.container_envvars}"
 
+  container_docker_labels = "${var.container_docker_labels}"
+
   mountpoints = ["${var.mountpoints}"]
 
   healthcheck = "${var.container_healthcheck}"
@@ -253,6 +255,7 @@ module "ecs_task_definition_selector" {
   live_aws_ecs_task_definition_memory             = "${module.live_task_lookup.memory}"
   live_aws_ecs_task_definition_memory_reservation = "${module.live_task_lookup.memory_reservation}"
   live_aws_ecs_task_definition_environment_json   = "${module.live_task_lookup.environment_json}"
+  live_aws_ecs_task_definition_docker_label_hash  = "${module.live_task_lookup.docker_label_hash}"
 }
 
 #

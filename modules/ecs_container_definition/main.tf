@@ -36,6 +36,8 @@ locals {
 
     mountPoints = ["${var.mountpoints}"]
 
+    dockerLabels = "${local.docker_labels}"
+
     portMappings = [
       {
         containerPort = "${var.container_port}"

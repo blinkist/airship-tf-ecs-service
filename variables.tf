@@ -266,6 +266,11 @@ variable "container_cpu" {}
 # container_memory  defines the hard memory limit of the container
 variable "container_memory" {}
 
+# 
+variable "container_docker_labels" {
+  default = {}
+}
+
 # container_memory_reservation defines the ECS Memory reservation for this service and Soft/limit
 variable "container_memory_reservation" {
   default = ""

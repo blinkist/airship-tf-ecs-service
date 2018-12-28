@@ -11,7 +11,8 @@ locals {
                    data.aws_ecs_container_definition.current.cpu != var.live_aws_ecs_task_definition_cpu ||
                    data.aws_ecs_container_definition.current.memory != var.live_aws_ecs_task_definition_memory ||
                    data.aws_ecs_container_definition.current.memory_reservation != var.live_aws_ecs_task_definition_memory_reservation ||
-                   jsonencode(data.aws_ecs_container_definition.current.environment) != var.live_aws_ecs_task_definition_environment_json ? true : false}"
+                   lookup(data.aws_ecs_container_definition.current.docker_labels,"_airship_dockerlabel_hash","") != var.live_aws_ecs_task_definition_docker_label_hash ||
+                   jsonencode(data.aws_ecs_container_definition.current.environment) != var.live_aws_ecs_task_definition_environment_json }"
 
   # If there is a difference, between the ( newly created) terraform state task definition and the live task definition
   # select the current task definition for deployment
