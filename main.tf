@@ -114,6 +114,10 @@ module "alb_handling" {
   # health_uri defines which health-check uri the target group needs to check on for health_check
   health_uri = "${lookup(var.load_balancing_properties,"health_uri", var.default_load_balancing_properties_health_uri)}"
 
+  # The expected HTTP status for the health check to be marked healthy
+  # You can specify multiple values (for example, "200,202") or a range of values (for example, "200-299")
+  health_matcher = "${lookup(var.load_balancing_properties,"health_matcher", var.default_load_balancing_properties_health_matcher)}"
+
   # target_type is the alb_target_group target, in case of EC2 it's instance, in case of FARGATE it's IP
   target_type = "${var.awsvpc_enabled ? "ip" : "instance"}"
 

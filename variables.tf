@@ -83,6 +83,9 @@ variable "load_balancing_properties" {
     health_uri is the health uri to be checked by the ALB 
     health_uri = "/ping"
 
+    health_matcher sets the expected HTTP status for the health check to be marked healthy
+    health_matcher = "200"
+
     unhealthy_threshold is the health uri to be checked by the ALB 
     unhealthy_threshold = "3"
 
@@ -135,6 +138,10 @@ variable "default_load_balancing_properties_route53_zone_id" {
 
 variable "default_load_balancing_properties_health_uri" {
   default = "/ping"
+}
+
+variable "default_load_balancing_properties_health_matcher" {
+  default = "200"
 }
 
 variable "default_load_balancing_properties_nlb_listener_port" {

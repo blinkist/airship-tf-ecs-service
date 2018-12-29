@@ -89,6 +89,7 @@ resource "aws_lb_target_group" "service" {
   deregistration_delay = "${var.deregistration_delay}"
 
   health_check {
+    matcher             = "${var.health_matcher}"
     path                = "${var.health_uri}"
     unhealthy_threshold = "${var.unhealthy_threshold}"
   }
