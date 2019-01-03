@@ -66,72 +66,72 @@ module "alb_handling" {
   load_balancing_type = "${var.load_balancing_type}"
 
   # lb_vpc_id sets the VPC ID of where the LB resides
-  lb_vpc_id = "${lookup(var.load_balancing_properties,"lb_vpc_id", "")}"
+  lb_vpc_id = "${lookup(local.load_balancing_properties,"lb_vpc_id")}"
 
   # lb_arn defines the arn of the LB
-  lb_arn = "${lookup(var.load_balancing_properties,"lb_arn", "")}"
+  lb_arn = "${lookup(local.load_balancing_properties,"lb_arn")}"
 
   # lb_listener_arn is the arn of the listener ( HTTP )
-  lb_listener_arn = "${lookup(var.load_balancing_properties,"lb_listener_arn", "")}"
+  lb_listener_arn = "${lookup(local.load_balancing_properties,"lb_listener_arn")}"
 
   # lb_listener_arn_https is the arn of the listener ( HTTPS )
-  lb_listener_arn_https = "${lookup(var.load_balancing_properties,"lb_listener_arn_https", "")}"
+  lb_listener_arn_https = "${lookup(local.load_balancing_properties,"lb_listener_arn_https")}"
 
   # nlb_listener_port sets the listener port of the nlb listener
-  nlb_listener_port = "${lookup(var.load_balancing_properties,"nlb_listener_port", var.default_load_balancing_properties_nlb_listener_port)}"
+  nlb_listener_port = "${lookup(local.load_balancing_properties,"nlb_listener_port")}"
 
   # target_group_port sets the port of the target group, by default 80 
-  target_group_port = "${lookup(var.load_balancing_properties,"target_group_port", var.default_load_balancing_properties_target_group_port)}"
+  target_group_port = "${lookup(local.load_balancing_properties,"target_group_port")}"
 
   # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
-  unhealthy_threshold = "${lookup(var.load_balancing_properties,"unhealthy_threshold", var.default_load_balancing_properties_unhealthy_threshold)}"
+  unhealthy_threshold = "${lookup(local.load_balancing_properties,"unhealthy_threshold")}"
 
   # if https_enabled is true, listener rules are made for the ssl listener
-  https_enabled = "${lookup(var.load_balancing_properties,"https_enabled", var.default_load_balancing_properties_https_enabled)}"
+  https_enabled = "${lookup(local.load_balancing_properties,"https_enabled")}"
 
   # Sets the deregistration_delay for the targetgroup
-  deregistration_delay = "${lookup(var.load_balancing_properties,"deregistration_delay", var.default_load_balancing_properties_deregistration_delay)}"
+  deregistration_delay = "${lookup(local.load_balancing_properties,"deregistration_delay")}"
 
   # route53_record_type sets the record type of the route53 record, can be ALIAS, CNAME or NONE,  defaults to CNAME
   # In case of NONE no record will be made
-  route53_record_type = "${lookup(var.load_balancing_properties,"route53_record_type", var.default_load_balancing_properties_route53_record_type)}"
+  route53_record_type = "${lookup(local.load_balancing_properties,"route53_record_type")}"
 
   # Sets the zone in which the sub-domain will be added for this service
-  route53_zone_id = "${lookup(var.load_balancing_properties,"route53_zone_id", "")}"
+  route53_zone_id = "${lookup(local.load_balancing_properties,"route53_zone_id", "")}"
 
   # Sets name for the sub-domain, we default to *name
   route53_name = "${var.name}"
 
   # route53_a_record_identifier sets the identifier of the weighted Alias A record
-  route53_record_identifier = "${lookup(var.load_balancing_properties,"route53_record_identifier", var.default_load_balancing_properties_route53_record_identifier)}"
+  route53_record_identifier = "${lookup(local.load_balancing_properties,"route53_record_identifier")}"
 
   # custom_listen_hosts will be added as a host route rule as aws_lb_listener_rule to the given service e.g. www.domain.com -> Service
   custom_listen_hosts = "${var.custom_listen_hosts}"
 
   # redirect_http_to_https creates lb listeners which redirect incoming http traffic to https
-  redirect_http_to_https = "${lookup(var.load_balancing_properties,"redirect_http_to_https", var.default_load_balancing_properties_redirect_http_to_https)}"
+  redirect_http_to_https = "${lookup(local.load_balancing_properties,"redirect_http_to_https")}"
 
   # health_uri defines which health-check uri the target group needs to check on for health_check
-  health_uri = "${lookup(var.load_balancing_properties,"health_uri", var.default_load_balancing_properties_health_uri)}"
+  health_uri = "${lookup(local.load_balancing_properties,"health_uri")}"
 
   # The expected HTTP status for the health check to be marked healthy
   # You can specify multiple values (for example, "200,202") or a range of values (for example, "200-299")
-  health_matcher = "${lookup(var.load_balancing_properties,"health_matcher", var.default_load_balancing_properties_health_matcher)}"
+  health_matcher = "${lookup(local.load_balancing_properties,"health_matcher")}"
 
   # target_type is the alb_target_group target, in case of EC2 it's instance, in case of FARGATE it's IP
   target_type = "${var.awsvpc_enabled ? "ip" : "instance"}"
 
   # cognito_auth_enabled is set when cognito authentication is used for the https listener
-  cognito_auth_enabled = "${lookup(var.load_balancing_properties,"cognito_auth_enabled", var.default_load_balancing_properties_cognito_auth_enabled)}"
+  cognito_auth_enabled = "${lookup(local.load_balancing_properties,"cognito_auth_enabled")}"
 
   # cognito_user_pool_arn defines the cognito user pool arn for the added cognito authentication
-  cognito_user_pool_arn = "${lookup(var.load_balancing_properties,"cognito_user_pool_arn", var.default_load_balancing_properties_cognito_user_pool_arn)}"
+  cognito_user_pool_arn = "${lookup(local.load_balancing_properties,"cognito_user_pool_arn")}"
 
   # cognito_user_pool_client_id defines the cognito_user_pool_client_id
-  cognito_user_pool_client_id = "${lookup(var.load_balancing_properties,"cognito_user_pool_client_id", var.default_load_balancing_properties_cognito_user_pool_client_id)}"
+  cognito_user_pool_client_id = "${lookup(local.load_balancing_properties,"cognito_user_pool_client_id")}"
 
   # cognito_user_pool_domain sets the domain of the cognito_user_pool
-  cognito_user_pool_domain = "${lookup(var.load_balancing_properties,"cognito_user_pool_domain", var.default_load_balancing_properties_cognito_user_pool_domain)}"
+  cognito_user_pool_domain = "${lookup(local.load_balancing_properties,"cognito_user_pool_domain")}"
 }
 
 ###### CloudWatch Logs
@@ -283,10 +283,10 @@ module "ecs_service" {
   selected_task_definition = "${module.ecs_task_definition_selector.selected_task_definition_for_deployment}"
 
   # deployment_maximum_percent sets the maximum size of the deployment in % of the normal size.
-  deployment_maximum_percent = "${lookup(var.capacity_properties,"deployment_maximum_percent", var.default_capacity_properties_deployment_maximum_percent)}"
+  deployment_maximum_percent = "${lookup(local.capacity_properties,"deployment_maximum_percent")}"
 
   # deployment_minimum_healthy_percent sets the minimum % in capacity at deployment
-  deployment_minimum_healthy_percent = "${lookup(var.capacity_properties,"deployment_minimum_healthy_percent", var.default_capacity_properties_deployment_minimum_healthy_percent)}"
+  deployment_minimum_healthy_percent = "${lookup(local.capacity_properties,"deployment_minimum_healthy_percent")}"
 
   # load_balancing_type sets the type, either "none", "application", or "network"
   load_balancing_type = "${var.load_balancing_type}"
@@ -301,7 +301,7 @@ module "ecs_service" {
   lb_target_group_arn = "${module.alb_handling.lb_target_group_arn}"
 
   # desired_capacity sets the initial capacity in task of the ECS Service, ignored when scheduling_strategy is DAEMON
-  desired_capacity = "${lookup(var.capacity_properties,"desired_capacity", var.default_capacity_properties_desired_capacity)}"
+  desired_capacity = "${lookup(local.capacity_properties,"desired_capacity")}"
 
   # scheduling_strategy
   scheduling_strategy = "${var.scheduling_strategy}"
@@ -356,10 +356,10 @@ module "ecs_autoscaling" {
   ecs_service_name = "${module.ecs_service.ecs_service_name}"
 
   # desired_min_capacity, in case of autoscaling, desired_min_capacity sets the minimum size in tasks
-  desired_min_capacity = "${lookup(var.capacity_properties,"desired_min_capacity", var.default_capacity_properties_desired_min_capacity)}"
+  desired_min_capacity = "${lookup(local.capacity_properties,"desired_min_capacity")}"
 
   # desired_max_capaity, in case of autoscaling, desired_max_capacity sets the maximum size in tasks
-  desired_max_capacity = "${lookup(var.capacity_properties,"desired_max_capacity", var.default_capacity_properties_desired_max_capacity)}"
+  desired_max_capacity = "${lookup(local.capacity_properties,"desired_max_capacity")}"
 
   # scaling_properties holds a list of maps with the scaling properties defined.
   scaling_properties = "${var.scaling_properties}"

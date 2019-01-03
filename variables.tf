@@ -56,194 +56,117 @@ variable "load_balancing_type" {
 variable "load_balancing_properties" {
   type = "map"
 
-  default = {
-    /*
-    Note that since Terraform doesn't support partial map defaults (see
-    https://github.com/hashicorp/terraform/issues/16517), the default values here
-    are set in the independent default_load_balancing_properties_* variables
+  default = {}
+}
 
-    lb_listener_arn is the ALB listener arn for HTTP
+/*
+ Note that since Terraform doesn't support partial map defaults (see
+ https://github.com/hashicorp/terraform/issues/16517), the default values here
+ are merged with var.load_balancing_properties
+ */
+
+locals {
+  load_balancing_properties_defaults {
+    # lb_arn is the arn of the LB
+    lb_arn = ""
+
+    # lb_listener_arn is the ALB listener arn for HTTP
     lb_listener_arn = ""
 
-    lb_listener_arn_https is the ALB listener arn for HTTPS
+    # lb_listener_arn_https is the ALB listener arn for HTTPS
     lb_listener_arn_https = ""
 
-    nlb_listener_port is the default port for the Network Load Balancer to listen on
+    # nlb_listener_port is the default port for the Network Load Balancer to listen on
     nlb_listener_port = "80"
 
-    target_group_port sets the port for the alb or nlb target group, this generally can stay 80 regardless of the service port
-    target_group_port  = "80"
+    # target_group_port sets the port for the alb or nlb target group, this generally can stay 80 regardless of the service port
+    target_group_port = "80"
 
-    lb_vpc_id is the vpc_id for the target_group to reside in
+    #lb_vpc_id is the vpc_id for the target_group to reside in
     lb_vpc_id = ""
 
-    route53_zone_id is the zone to add a subdomain to
+    # route53_zone_id is the zone to add a subdomain to
     route53_zone_id = ""
 
-    health_uri is the health uri to be checked by the ALB 
+    # health_uri is the health uri to be checked by the ALB 
     health_uri = "/ping"
 
-    health_matcher sets the expected HTTP status for the health check to be marked healthy
+    # health_matcher sets the expected HTTP status for the health check to be marked healthy
     health_matcher = "200"
 
-    unhealthy_threshold is the health uri to be checked by the ALB 
+    # unhealthy_threshold is the health uri to be checked by the ALB 
     unhealthy_threshold = "3"
 
-    Do we create listener rules for https
+    # Do we create listener rules for https
     https_enabled = true
 
-    Redirect http to https instead of serving http
+    # Redirect http to https instead of serving http
     redirect_http_to_https = false
 
-    Do we want to create a subdomain for the service inside the Route53 zone
+    # Do we want to create a subdomain for the service inside the Route53 zone
     create_route53_record = true
 
+    # Sets the deregistration_delay for the targetgroup
     deregistration_delay = "300"
 
-    Creates a listener rule which redirects to https
-    redirect_http_to_https = false
+    route53_record_identifier = "identifier"
 
-    cognito_auth_enabled is set when cognito authentication is used for the https listener
-    Important to have redirect_http_to_https set to true as http authentication is only added to the https listener
+    # By default we create an ALIAS to the ALB
+    route53_record_type = "CNAME"
 
+    # cognito_auth_enabled is set when cognito authentication is used for the https listener
     cognito_auth_enabled = false
 
-    cognito_user_pool_arn defines the cognito user pool arn for the added cognito authentication
+    # cognito_user_pool_arn defines the cognito user pool arn for the added cognito authentication
     cognito_user_pool_arn = ""
 
-    cognito_user_pool_client_id defines the cognito_user_pool_client_id
+    # cognito_user_pool_client_id defines the cognito_user_pool_client_id
     cognito_user_pool_client_id = ""
 
-    cognito_user_pool_domain sets the domain of the cognito_user_pool
+    # cognito_user_pool_domain sets the domain of the cognito_user_pool
     cognito_user_pool_domain = ""
-    */
   }
 }
 
-variable "default_load_balancing_properties_lb_listener_arn" {
-  default = ""
-}
-
-variable "default_load_balancing_properties_lb_listener_arn_https" {
-  default = ""
-}
-
-variable "default_load_balancing_properties_lb_vpc_id" {
-  default = ""
-}
-
-variable "default_load_balancing_properties_route53_zone_id" {
-  default = ""
-}
-
-variable "default_load_balancing_properties_health_uri" {
-  default = "/ping"
-}
-
-variable "default_load_balancing_properties_health_matcher" {
-  default = "200"
-}
-
-variable "default_load_balancing_properties_nlb_listener_port" {
-  default = "80"
-}
-
-variable "default_load_balancing_properties_target_group_port" {
-  default = "80"
-}
-
-variable "default_load_balancing_properties_unhealthy_threshold" {
-  default = "3"
-}
-
-variable "default_load_balancing_properties_deregistration_delay" {
-  default = 300
-}
-
-variable "default_load_balancing_properties_https_enabled" {
-  default = true
-}
-
-variable "default_load_balancing_properties_redirect_http_to_https" {
-  default = false
-}
-
-variable "default_load_balancing_properties_cognito_auth_enabled" {
-  default = false
-}
-
-variable "default_load_balancing_properties_cognito_user_pool_arn" {
-  default = ""
-}
-
-variable "default_load_balancing_properties_cognito_user_pool_client_id" {
-  default = ""
-}
-
-variable "default_load_balancing_properties_cognito_user_pool_domain" {
-  default = ""
-}
-
-variable "default_load_balancing_properties_route53_record_identifier" {
-  default = "identifier"
-}
-
-# By default we create a CNAME to the ALB, the moment terraform can handle CNAME to ALIAS A record changes
-# Route53 Alias A will be the default.
-# https://github.com/terraform-providers/terraform-provider-aws/issues/5280
-variable "default_load_balancing_properties_route53_record_type" {
-  default = "CNAME"
+locals {
+  load_balancing_properties = "${merge(
+     local.load_balancing_properties_defaults,
+     var.load_balancing_properties)}"
 }
 
 ## capacity_properties map defines the capacity properties of the service
 variable "capacity_properties" {
   type = "map"
 
-  default = {
-    /*
-    Note that since Terraform doesn't support partial map defaults (see
-    https://github.com/hashicorp/terraform/issues/16517), the default values here
-    are set in the independent default_capacity_properties_* variables
+  default = {}
+}
 
-    desired_capacity is the desired amount of tasks for a service, when autoscaling is used desired_capacity is only used initially
-    after that autoscaling determins the amount of tasks 
+locals {
+  capacity_properties_default {
+    # desired_capacity is the desired amount of tasks for a service, when autoscaling is used desired_capacity is only used initially 
+    #after that autoscaling determins the amount of tasks 
     desired_capacity = "2"
 
-    desired_min_capacity is used when autoscaling is used, it sets the minimum of tasks to be available for this service
+    # desired_min_capacity is used when autoscaling is used, it sets the minimum of tasks to be available for this service
     desired_min_capacity = "2"
 
-    desired_max_capacity is used when autoscaling is used, it sets the maximum of tasks to be available for this service
-    desired_max_capacity = "5"
+    # desired_max_capacity is used when autoscaling is used, it sets the maximum of tasks to be available for this service
+    desired_max_capacity = "2"
 
-    deployment_maximum_percent sets the maximum deployment size of the current capacity, 200% means double the amount of current tasks
-    will be active in case a deployment is happening
+    # deployment_maximum_percent sets the maximum deployment size of the current capacity, 200% means double the amount of current tasks
+    # will be active in case a deployment is happening
     deployment_maximum_percent = "200"
 
-    deployment_minimum_healthy_percent sets the minimum deployment size of the current capacity, 0% means no tasks need to be running at the moment of
-    a deployment switch
-    deployment_minimum_healthy_percent = "0"
-    */
+    # deployment_minimum_healthy_percent sets the minimum deployment size of the current capacity, 0% means no tasks need to be running at the moment of
+    # a deployment switch
+    deployment_minimum_healthy_percent = "100"
   }
 }
 
-variable "default_capacity_properties_desired_capacity" {
-  default = "2"
-}
-
-variable "default_capacity_properties_desired_min_capacity" {
-  default = "2"
-}
-
-variable "default_capacity_properties_desired_max_capacity" {
-  default = "2"
-}
-
-variable "default_capacity_properties_deployment_maximum_percent" {
-  default = "200"
-}
-
-variable "default_capacity_properties_deployment_minimum_healthy_percent" {
-  default = "100"
+locals {
+  capacity_properties = "${merge(
+     local.capacity_properties_default,
+     var.capacity_properties)}"
 }
 
 variable "force_bootstrap_container_image" {
@@ -457,10 +380,8 @@ variable "service_discovery_enabled" {
 }
 
 ## Defaults for the service_discovery_properties
-variable "service_discovery_properties_defaults" {
-  type = "map"
-
-  default = {
+locals {
+  service_discovery_properties_defaults {
     namespace_id                         = ""
     dns_ttl                              = "60"
     dns_type                             = "A"
@@ -478,7 +399,7 @@ variable "service_discovery_properties" {
 
 locals {
   service_discovery_properties = "${merge(
-     var.service_discovery_properties_defaults,
+     local.service_discovery_properties_defaults,
      var.service_discovery_properties)}"
 }
 
