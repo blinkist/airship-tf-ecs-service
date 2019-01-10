@@ -265,10 +265,9 @@ variable "container_envvars" {
   default = {}
 }
 
-####
-
+# The name of the project, must be unique
 variable "name" {
-  description = "The name of the project, must be unique ."
+  description = "The name of the project, must be unique"
 }
 
 # Whether to provide access to the supplied kms_keys. If no kms keys are

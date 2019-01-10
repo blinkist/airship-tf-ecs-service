@@ -110,7 +110,8 @@ variable "log_options" {
   }
 }
 
-## Input for the service discovery properties, overwriting the service_discovery_properties_defaults
+# container_docker_labels sets the DockerLabels, in case it''s set, an extra
+# label '_airship_dockerlabel_hash' is set to keep track of changes.
 variable "container_docker_labels" {
   type    = "map"
   default = {}
