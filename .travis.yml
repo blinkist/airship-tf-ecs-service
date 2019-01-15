@@ -1,18 +1,22 @@
 language: bash
 
+env:
+  global:
+    - TERRAFORM_VERSION=0.11.11
+
 sudo: required
 
 services:
   - docker
 
 before_install:
-  - docker pull hashicorp/terraform:0.10.7
+  - docker pull hashicorp/terraform:$TERRAFORM_VERSION
   - docker pull wata727/tflint:0.5.1
 
 script:
-  - docker run --rm -v $(pwd):/data --workdir=/data -t hashicorp/terraform:0.10.7 validate -check-variables=false
-  - docker run --rm -v $(pwd):/data --workdir=/data -t hashicorp/terraform:0.10.7 fmt -write=false -diff=true -check=true
-  - docker run --rm -v $(pwd):/data --workdir=/data -t hashicorp/terraform:0.10.7 get
+  - docker run --rm -v $(pwd):/data --workdir=/data -t hashicorp/terraform:$TERRAFORM_VERSION validate -check-variables=false
+  - docker run --rm -v $(pwd):/data --workdir=/data -t hashicorp/terraform:$TERRAFORM_VERSION fmt -write=false -diff=true -check=true
+  - docker run --rm -v $(pwd):/data --workdir=/data -t hashicorp/terraform:$TERRAFORM_VERSION get
     # tflint chokes when trying to check our syntax because of this issue: https://github.com/wata727/tflint/issues/204
     # specifically, it's currently unable to parse the construct we have at https://github.com/blinkist/terraform-aws-airship-ecs-service/blob/85dc02a8b0a1def86186d46167ace55d7375f13b/main.tf#L204
     # fixing it is pretty involved and the author plans to rip out the parsing in favour of terraform's anyway. so for now, just disable it.
