@@ -59,6 +59,21 @@ variable "load_balancing_properties" {
   default = {}
 }
 
+# deployment_type defines deployment controller type.
+# rolling maps to ECS by, blue_green maps to CODE_DEPLOY
+variable "deployment_type" {
+  default = "rolling"
+  description = "Type of deployment controller. Valid values: rolling, blue_green"
+}
+
+variable "deployment_controller_type" {
+  type = "map"
+  default = {
+    rolling = "ECS"
+    blue_green = "CODE_DEPLOY"
+  }
+}
+
 /*
  Note that since Terraform doesn't support partial map defaults (see
  https://github.com/hashicorp/terraform/issues/16517), the default values here

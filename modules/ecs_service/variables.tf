@@ -33,6 +33,12 @@ variable "container_port" {}
 # scheduling_strategy defaults to Replica
 variable "scheduling_strategy" {}
 
+# ECS for Rolling update -> set deployment_maximum_percent and deployment_minimum_healthy_percent.
+# CODE_DEPLOY for Blue/Green deployment through AWS CodeDeploy
+variable "deployment_controller_type" {
+  default = "ECS"
+}
+
 # deployment_maximum_percent sets the maximum size of the total capacity in tasks in % compared to the normal capacity at deployment
 variable "deployment_maximum_percent" {}
 

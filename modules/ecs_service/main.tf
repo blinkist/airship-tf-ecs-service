@@ -30,6 +30,10 @@ resource "aws_ecs_service" "app_with_lb_awsvpc" {
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
+
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
@@ -62,6 +66,10 @@ resource "aws_ecs_service" "app_with_lb_spread" {
 
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
@@ -104,6 +112,10 @@ resource "aws_ecs_service" "app_with_lb" {
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
+
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
@@ -131,6 +143,10 @@ resource "aws_ecs_service" "app" {
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
+
   lifecycle {
     ignore_changes = ["desired_count"]
   }
@@ -148,6 +164,10 @@ resource "aws_ecs_service" "app_awsvpc" {
 
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
 
   network_configuration {
     subnets         = ["${var.awsvpc_subnets}"]
@@ -204,6 +224,10 @@ resource "aws_ecs_service" "app_with_lb_awsvpc_with_service_registry" {
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
+
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
@@ -241,6 +265,10 @@ resource "aws_ecs_service" "app_with_lb_spread_with_service_registry" {
 
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
@@ -289,6 +317,10 @@ resource "aws_ecs_service" "app_with_lb_with_service_registry" {
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
+
   load_balancer {
     target_group_arn = "${var.lb_target_group_arn}"
     container_name   = "${var.container_name}"
@@ -322,6 +354,10 @@ resource "aws_ecs_service" "app_with_service_registry" {
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
 
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
+
   service_registries = {
     registry_arn   = "${aws_service_discovery_service.service.arn}"
     container_name = "${var.container_name}"
@@ -345,6 +381,10 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
 
   deployment_maximum_percent         = "${var.deployment_maximum_percent}"
   deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+
+  deployment_controller {
+    type = "${var.deployment_controller_type}"
+  }
 
   network_configuration {
     subnets         = ["${var.awsvpc_subnets}"]
