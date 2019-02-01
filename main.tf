@@ -284,7 +284,7 @@ module "ecs_service" {
 
   # deployment_controller_type sets the deployment controller
   # rolling (default) maps to ECS, blue_green maps to CODE_DEPLOY
-  deployment_controller_type = "${var.deployment_controller_type[var.deployment_type]}"
+  deployment_controller_type = "${var.deployment_controller}"
 
   # deployment_maximum_percent sets the maximum size of the deployment in % of the normal size.
   deployment_maximum_percent = "${lookup(local.capacity_properties,"deployment_maximum_percent")}"
