@@ -59,9 +59,9 @@ variable "load_balancing_properties" {
   default = {}
 }
 
-# deployment_type defines deployment controller type.
-# Valid options: ECS (Default), CODE_DEPLOY
-variable "deployment_controller" {
+# deployment_controller_type sets the deployment type
+# ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
+variable "deployment_controller_type" {
   default = "ECS"
 }
 
