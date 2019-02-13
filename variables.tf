@@ -59,6 +59,12 @@ variable "load_balancing_properties" {
   default = {}
 }
 
+# deployment_controller_type sets the deployment type
+# ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
+variable "deployment_controller_type" {
+  default = "ECS"
+}
+
 /*
  Note that since Terraform doesn't support partial map defaults (see
  https://github.com/hashicorp/terraform/issues/16517), the default values here
