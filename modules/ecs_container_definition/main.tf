@@ -44,13 +44,14 @@ locals {
     workingDirectory       = "${var.working_directory}"
     readonlyRootFilesystem = "${var.readonly_root_filesystem}"
 
-    privileged             = "${var.privileged}"
+    privileged = "${var.privileged}"
 
     hostname     = "${var.hostname}"
     environment  = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
     mountPoints  = ["${var.mountpoints}"]
     portMappings = "${local.port_mappings[local.use_port]}"
     healthCheck  = "${var.healthcheck}"
+
     logConfiguration = {
       logDriver = "${var.log_driver}"
       options   = "${var.log_options}"

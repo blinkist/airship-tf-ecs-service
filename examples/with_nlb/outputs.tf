@@ -15,7 +15,7 @@ output "task_execution_role_arn" {
 }
 
 output "aws_ecs_task_definition_arn" {
-value = "${module.nlb_service.aws_ecs_task_definition_arn}"
+  value = "${module.nlb_service.aws_ecs_task_definition_arn}"
 }
 
 output "aws_ecs_task_definition_family" {

@@ -146,6 +146,7 @@ data "aws_iam_policy_document" "lambda_trust_policy" {
 # Policy for the ecs lookup lambda
 data "aws_iam_policy_document" "lambda_lookup_policy" {
   count = "${var.create ? 1 : 0 }"
+
   statement {
     effect = "Allow"
 
@@ -202,7 +203,8 @@ resource "aws_iam_role_policy" "lambda_lookup_policy" {
 
 # Policy for the Lambda Logging & ECS
 data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
-  count  = "${var.create ? 1 : 0 }"
+  count = "${var.create ? 1 : 0 }"
+
   statement {
     actions = [
       "iam:PassRole",

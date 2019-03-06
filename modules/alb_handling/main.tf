@@ -1,9 +1,9 @@
 resource "null_resource" "dependencies" {
   triggers {
     lb_listener_arn_https = "${var.lb_listener_arn_https}"
-    cognito_auth_enabled = "${var.cognito_auth_enabled}"
-    lb_arn = "${var.lb_arn}"
-    route53_record_type = "${var.route53_record_type}"
+    cognito_auth_enabled  = "${var.cognito_auth_enabled}"
+    lb_arn                = "${var.lb_arn}"
+    route53_record_type   = "${var.route53_record_type}"
   }
 }
 
@@ -26,7 +26,7 @@ locals {
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record" {
-  count      = "${(var.create && var.route53_record_type == "CNAME" ) ? 1 : 0 }"
+  count = "${(var.create && var.route53_record_type == "CNAME" ) ? 1 : 0 }"
 
   zone_id    = "${var.route53_zone_id}"
   name       = "${var.route53_name}cname"
@@ -141,7 +141,6 @@ resource "aws_lb_listener_rule" "host_based_routing" {
 
   depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
-
 
 ## aws_lb_listener_rule which redirects http to https
 resource "aws_lb_listener_rule" "host_based_routing_redirect_to_https" {
@@ -311,7 +310,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host_cognito_auth" {
   # count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0 }"
-count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0}"
+  count        = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0}"
   listener_arn = "${var.lb_listener_arn_https}"
 
   action {

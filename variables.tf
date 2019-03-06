@@ -72,22 +72,23 @@ variable "deployment_controller_type" {
  */
 variable "lb_arn" {
   description = "The arn of the ALB or NLB being used"
-  default = ""
+  default     = ""
 }
+
 variable "cognito_auth_enabled" {
   description = "Set to true when cognito authentication is used for the https listener"
-  default = false
+  default     = false
 }
+
 variable "route53_record_type" {
   description = "By default we create an ALIAS to the ALB, this can be set to CNAME, or NONE to not create any records"
-  default = "ALIAS"
+  default     = "ALIAS"
 }
 
 variable "redirect_http_to_https" {
   description = "Redirect http to https instead of serving http"
-  default = false
+  default     = false
 }
-
 
 locals {
   load_balancing_properties_defaults {
@@ -117,12 +118,12 @@ locals {
 
     # unhealthy_threshold is the health uri to be checked by the ALB 
     unhealthy_threshold = "3"
+
     # healthy_threshold is the health uri to be checked by the ALB 
     healthy_threshold = "3"
 
     # Do we create listener rules for https
     https_enabled = true
-
 
     # Do we want to create a subdomain for the service inside the Route53 zone
     create_route53_record = true

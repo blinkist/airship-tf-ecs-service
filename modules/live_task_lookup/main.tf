@@ -41,7 +41,7 @@ data "aws_lambda_invocation" "lambda_lookup" {
 }
 JSON
 
-depends_on = ["null_resource.force_policy_dependency", "aws_lambda_function.lambda_lookup"]
+  depends_on = ["null_resource.force_policy_dependency", "aws_lambda_function.lambda_lookup"]
 }
 
 #

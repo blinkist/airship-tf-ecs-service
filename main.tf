@@ -85,7 +85,7 @@ module "alb_handling" {
 
   # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
   unhealthy_threshold = "${lookup(local.load_balancing_properties,"unhealthy_threshold")}"
-  healthy_threshold = "${lookup(local.load_balancing_properties,"healthy_threshold")}"
+  healthy_threshold   = "${lookup(local.load_balancing_properties,"healthy_threshold")}"
 
   # if https_enabled is true, listener rules are made for the ssl listener
   https_enabled = "${lookup(local.load_balancing_properties,"https_enabled")}"
@@ -107,7 +107,7 @@ module "alb_handling" {
   route53_record_identifier = "${lookup(local.load_balancing_properties,"route53_record_identifier")}"
 
   # custom_listen_hosts will be added as a host route rule as aws_lb_listener_rule to the given service e.g. www.domain.com -> Service
-  custom_listen_hosts = "${var.custom_listen_hosts}"
+  custom_listen_hosts       = "${var.custom_listen_hosts}"
   custom_listen_hosts_count = "${length(var.custom_listen_hosts)}"
 
   # redirect_http_to_https creates lb listeners which redirect incoming http traffic to https
@@ -247,10 +247,11 @@ module "ecs_task_definition" {
 # if there isn't a difference then the current live one should be used to be deployed; this
 # way no actual deployment will happen.
 module "ecs_task_definition_selector" {
-  source             = "./modules/ecs_task_definition_selector/"
+  source = "./modules/ecs_task_definition_selector/"
+
   # Create defines if we need to create resources inside this module
   create = "${var.create}"
-  
+
   ecs_container_name = "${var.container_name}"
 
   # Terraform state task definition

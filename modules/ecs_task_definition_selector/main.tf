@@ -1,6 +1,6 @@
 # This is the terraform task definition
 data "aws_ecs_container_definition" "current" {
-  count = "${var.create ? 1 : 0 }"
+  count           = "${var.create ? 1 : 0 }"
   task_definition = "${var.aws_ecs_task_definition_family}:${var.aws_ecs_task_definition_revision}"
   container_name  = "${var.ecs_container_name}"
 }
@@ -9,11 +9,12 @@ locals {
   # Calculate if there is an actual change between the current terraform task definition in the state
   # and the current live one
   image = "${concat(list(),data.aws_ecs_container_definition.current.*.image, list(""))}"
-  cpu = "${concat(list(),data.aws_ecs_container_definition.current.*.cpu, list(""))}"
-  memory = "${concat(list(),data.aws_ecs_container_definition.current.*.memory, list(""))}"
+
+  cpu                = "${concat(list(),data.aws_ecs_container_definition.current.*.cpu, list(""))}"
+  memory             = "${concat(list(),data.aws_ecs_container_definition.current.*.memory, list(""))}"
   memory_reservation = "${concat(list(),data.aws_ecs_container_definition.current.*.memory_reservation, list(""))}"
-  docker_labels = "${concat(list(),data.aws_ecs_container_definition.current.*.docker_labels, list(map()))}"
-  environment = "${concat(data.aws_ecs_container_definition.current.*.environment, list(map()))}"
+  docker_labels      = "${concat(list(),data.aws_ecs_container_definition.current.*.docker_labels, list(map()))}"
+  environment        = "${concat(data.aws_ecs_container_definition.current.*.environment, list(map()))}"
 
   has_changed = "${ local.image[0] != var.live_aws_ecs_task_definition_image ||
                    local.cpu[0] != var.live_aws_ecs_task_definition_cpu ||

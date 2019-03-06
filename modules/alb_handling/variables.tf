@@ -15,6 +15,7 @@ variable "deregistration_delay" {}
 
 # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
 variable "unhealthy_threshold" {}
+
 variable "healthy_threshold" {}
 
 variable "cluster_name" {

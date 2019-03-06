@@ -401,5 +401,3 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
     ignore_changes = ["desired_count"]
   }
 }
-
-
