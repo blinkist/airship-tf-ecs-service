@@ -22,13 +22,13 @@ data "aws_iam_policy_document" "ecs_task_assume_role" {
 resource "aws_iam_role" "ecs_task_execution_role" {
   count              = "${(var.create && var.fargate_enabled ) ? 1 : 0 }"
   name               = "${var.name}-ecs-task-execution_role"
-  assume_role_policy = "${data.aws_iam_policy_document.ecs_task_assume_role.json}"
+  assume_role_policy = "${join(data.aws_iam_policy_document.ecs_task_assume_role.*.json)}"
 }
 
 # We need this for FARGATE
 resource "aws_iam_role_policy_attachment" "ecs_tasks_execution_role" {
   count      = "${(var.create && var.fargate_enabled ) ? 1 : 0 }"
-  role       = "${aws_iam_role.ecs_task_execution_role.id}"
+  role       = "${join("",aws_iam_role.ecs_task_execution_role.*.id)}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -36,12 +36,12 @@ resource "aws_iam_role_policy_attachment" "ecs_tasks_execution_role" {
 resource "aws_iam_role" "ecs_tasks_role" {
   count              = "${var.create ? 1 : 0 }"
   name               = "${var.name}-task-role"
-  assume_role_policy = "${data.aws_iam_policy_document.ecs_task_assume_role.json}"
+  assume_role_policy = "${join("",data.aws_iam_policy_document.ecs_task_assume_role.*.json)}"
 }
 
 # Policy Document to allow KMS Decryption with given keys
 data "aws_iam_policy_document" "kms_permissions" {
-  count = "${var.create ? 1 : 0 }"
+  count = "${var.create && var.kms_enabled? 1 : 0 }"
 
   statement {
     effect    = "Allow"
@@ -53,14 +53,14 @@ data "aws_iam_policy_document" "kms_permissions" {
 # Allow KMS-Decrypt permissions for the ECS Task Role
 resource "aws_iam_role_policy" "kms_permissions" {
   count  = "${(var.create && var.kms_enabled) ? 1 : 0 }"
-  name   = "kms-permissions"
+  name   = "${var.name}-kms-permissions"
   role   = "${aws_iam_role.ecs_tasks_role.id}"
   policy = "${data.aws_iam_policy_document.kms_permissions.json}"
 }
 
 # Policy Document to allow access to SSM Parameter Store paths
 data "aws_iam_policy_document" "ssm_permissions" {
-  count = "${var.create ? 1 : 0 }"
+  count = "${var.create && var.ssm_enabled ? 1 : 0 }"
 
   statement {
     effect    = "Allow"
@@ -72,9 +72,9 @@ data "aws_iam_policy_document" "ssm_permissions" {
 # Add the SSM policy to the task role
 resource "aws_iam_role_policy" "ssm_permissions" {
   count  = "${(var.create && var.ssm_enabled) ? 1 : 0 }"
-  name   = "ssm-permissions"
-  role   = "${aws_iam_role.ecs_tasks_role.id}"
-  policy = "${data.aws_iam_policy_document.ssm_permissions.json}"
+  name   = "${var.name}-ssm-permissions"
+  role   = "${join("",aws_iam_role.ecs_tasks_role.*.id)}"
+  policy = "${join("",data.aws_iam_policy_document.ssm_permissions.*.json)}"
 }
 
 # Policy Document to allow S3 Read-Write Access to given paths
@@ -145,6 +145,7 @@ data "aws_iam_policy_document" "lambda_trust_policy" {
 
 # Policy for the ecs lookup lambda
 data "aws_iam_policy_document" "lambda_lookup_policy" {
+  count = "${var.create ? 1 : 0 }"
   statement {
     effect = "Allow"
 
@@ -168,7 +169,7 @@ data "aws_iam_policy_document" "lambda_lookup_policy" {
     ]
 
     resources = [
-      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*",var.region, join("",data.aws_caller_identity.current.*.account_id), var.name)}",
     ]
 
     effect = "Allow"
@@ -178,7 +179,7 @@ data "aws_iam_policy_document" "lambda_lookup_policy" {
     actions = ["logs:PutLogEvents"]
 
     resources = [
-      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*.*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-lambda-lookup:*.*",var.region, join("",data.aws_caller_identity.current.*.account_id), var.name)}",
     ]
 
     effect = "Allow"
@@ -190,17 +191,18 @@ resource "aws_iam_role" "lambda_lookup" {
   count              = "${var.create ? 1 : 0 }"
   name               = "ecs-lambda-lookup-${var.name}"
   description        = "Role permitting Lambda functions to be invoked from Lambda"
-  assume_role_policy = "${data.aws_iam_policy_document.lambda_trust_policy.json}"
+  assume_role_policy = "${data.aws_iam_policy_document.lambda_trust_policy.0.json}"
 }
 
 resource "aws_iam_role_policy" "lambda_lookup_policy" {
   count  = "${var.create ? 1 : 0 }"
   role   = "${aws_iam_role.lambda_lookup.name}"
-  policy = "${data.aws_iam_policy_document.lambda_lookup_policy.json}"
+  policy = "${data.aws_iam_policy_document.lambda_lookup_policy.0.json}"
 }
 
 # Policy for the Lambda Logging & ECS
 data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
+  count  = "${var.create ? 1 : 0 }"
   statement {
     actions = [
       "iam:PassRole",
@@ -246,7 +248,7 @@ data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
     ]
 
     resources = [
-      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-task-scheduler:*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-task-scheduler:*",var.region, join("",data.aws_caller_identity.current.*.account_id), var.name)}",
     ]
 
     effect = "Allow"
@@ -256,7 +258,7 @@ data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
     actions = ["logs:PutLogEvents"]
 
     resources = [
-      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-task-scheduler:*.*",var.region, data.aws_caller_identity.current.account_id, var.name)}",
+      "${format("arn:aws:logs:%s:%s:log-group:/aws/lambda/%s-task-scheduler:*.*",var.region, join("",data.aws_caller_identity.current.*.account_id), var.name)}",
     ]
 
     effect = "Allow"
@@ -267,11 +269,11 @@ data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
 resource "aws_iam_role" "lambda_ecs_task_scheduler" {
   count              = "${var.create ? 1 : 0}"
   name               = "ecs-lambda-task-scheduler-${var.name}"
-  assume_role_policy = "${data.aws_iam_policy_document.lambda_trust_policy.json}"
+  assume_role_policy = "${data.aws_iam_policy_document.lambda_trust_policy.0.json}"
 }
 
 resource "aws_iam_role_policy" "lambda_ecs_task_scheduler_policy" {
   count  = "${var.create ? 1 : 0 }"
   role   = "${aws_iam_role.lambda_ecs_task_scheduler.name}"
-  policy = "${data.aws_iam_policy_document.lambda_ecs_task_scheduler_policy.json}"
+  policy = "${data.aws_iam_policy_document.lambda_ecs_task_scheduler_policy.0.json}"
 }

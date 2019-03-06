@@ -1,3 +1,7 @@
+variable "create" {
+  default = true
+}
+
 variable "ecs_container_name" {}
 
 # Reflecting the current state

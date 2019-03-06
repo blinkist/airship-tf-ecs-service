@@ -16,7 +16,7 @@ data "aws_security_group" "selected" {
 }
 
 module "ecs_cluster" {
-  source = "git::git@github.com:blinkist/terraform-aws-airship-ecs-cluster.git?ref=add_owner_attribute_to_ecs_ami"
+  source = "git::git@github.com:blinkist/terraform-aws-airship-ecs-cluster.git?ref=master"
 
   name = "${terraform.workspace}-cluster"
 

@@ -60,7 +60,7 @@ module "alb_handling" {
   cluster_name = "${local.ecs_cluster_name}"
 
   # Create defines if we need to create resources inside this module
-  create = "${var.create && var.load_balancing_type != "none"}"
+  create = "${var.create}"
 
   # load_balancing_type sets the type, either "none", "application", or "network"
   load_balancing_type = "${var.load_balancing_type}"
@@ -69,7 +69,7 @@ module "alb_handling" {
   lb_vpc_id = "${lookup(local.load_balancing_properties,"lb_vpc_id")}"
 
   # lb_arn defines the arn of the LB
-  lb_arn = "${lookup(local.load_balancing_properties,"lb_arn")}"
+  lb_arn = "${var.lb_arn}"
 
   # lb_listener_arn is the arn of the listener ( HTTP )
   lb_listener_arn = "${lookup(local.load_balancing_properties,"lb_listener_arn")}"
@@ -85,6 +85,7 @@ module "alb_handling" {
 
   # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
   unhealthy_threshold = "${lookup(local.load_balancing_properties,"unhealthy_threshold")}"
+  healthy_threshold = "${lookup(local.load_balancing_properties,"healthy_threshold")}"
 
   # if https_enabled is true, listener rules are made for the ssl listener
   https_enabled = "${lookup(local.load_balancing_properties,"https_enabled")}"
@@ -92,24 +93,25 @@ module "alb_handling" {
   # Sets the deregistration_delay for the targetgroup
   deregistration_delay = "${lookup(local.load_balancing_properties,"deregistration_delay")}"
 
-  # route53_record_type sets the record type of the route53 record, can be ALIAS, CNAME or NONE,  defaults to CNAME
+  # route53_record_type sets the record type of the route53 record, can be ALIAS, CNAME or NONE,  defaults to ALIAS
   # In case of NONE no record will be made
-  route53_record_type = "${lookup(local.load_balancing_properties,"route53_record_type")}"
+  route53_record_type = "${var.route53_record_type}"
 
   # Sets the zone in which the sub-domain will be added for this service
   route53_zone_id = "${lookup(local.load_balancing_properties,"route53_zone_id", "")}"
 
   # Sets name for the sub-domain, we default to *name
-  route53_name = "${var.name}"
+  route53_name = "${lookup(local.load_balancing_properties,"route53_name", "") == "" ? var.name : lookup(local.load_balancing_properties,"route53_name")}"
 
   # route53_a_record_identifier sets the identifier of the weighted Alias A record
   route53_record_identifier = "${lookup(local.load_balancing_properties,"route53_record_identifier")}"
 
   # custom_listen_hosts will be added as a host route rule as aws_lb_listener_rule to the given service e.g. www.domain.com -> Service
   custom_listen_hosts = "${var.custom_listen_hosts}"
+  custom_listen_hosts_count = "${length(var.custom_listen_hosts)}"
 
   # redirect_http_to_https creates lb listeners which redirect incoming http traffic to https
-  redirect_http_to_https = "${lookup(local.load_balancing_properties,"redirect_http_to_https")}"
+  redirect_http_to_https = "${var.redirect_http_to_https}"
 
   # health_uri defines which health-check uri the target group needs to check on for health_check
   health_uri = "${lookup(local.load_balancing_properties,"health_uri")}"
@@ -122,7 +124,7 @@ module "alb_handling" {
   target_type = "${var.awsvpc_enabled ? "ip" : "instance"}"
 
   # cognito_auth_enabled is set when cognito authentication is used for the https listener
-  cognito_auth_enabled = "${lookup(local.load_balancing_properties,"cognito_auth_enabled")}"
+  cognito_auth_enabled = "${var.cognito_auth_enabled}"
 
   # cognito_user_pool_arn defines the cognito user pool arn for the added cognito authentication
   cognito_user_pool_arn = "${lookup(local.load_balancing_properties,"cognito_user_pool_arn")}"
@@ -246,6 +248,9 @@ module "ecs_task_definition" {
 # way no actual deployment will happen.
 module "ecs_task_definition_selector" {
   source             = "./modules/ecs_task_definition_selector/"
+  # Create defines if we need to create resources inside this module
+  create = "${var.create}"
+  
   ecs_container_name = "${var.container_name}"
 
   # Terraform state task definition

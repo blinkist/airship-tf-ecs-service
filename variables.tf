@@ -70,12 +70,27 @@ variable "deployment_controller_type" {
  https://github.com/hashicorp/terraform/issues/16517), the default values here
  are merged with var.load_balancing_properties
  */
+variable "lb_arn" {
+  description = "The arn of the ALB or NLB being used"
+  default = ""
+}
+variable "cognito_auth_enabled" {
+  description = "Set to true when cognito authentication is used for the https listener"
+  default = false
+}
+variable "route53_record_type" {
+  description = "By default we create an ALIAS to the ALB, this can be set to CNAME, or NONE to not create any records"
+  default = "ALIAS"
+}
+
+variable "redirect_http_to_https" {
+  description = "Redirect http to https instead of serving http"
+  default = false
+}
+
 
 locals {
   load_balancing_properties_defaults {
-    # lb_arn is the arn of the LB
-    lb_arn = ""
-
     # lb_listener_arn is the ALB listener arn for HTTP
     lb_listener_arn = ""
 
@@ -102,12 +117,12 @@ locals {
 
     # unhealthy_threshold is the health uri to be checked by the ALB 
     unhealthy_threshold = "3"
+    # healthy_threshold is the health uri to be checked by the ALB 
+    healthy_threshold = "3"
 
     # Do we create listener rules for https
     https_enabled = true
 
-    # Redirect http to https instead of serving http
-    redirect_http_to_https = false
 
     # Do we want to create a subdomain for the service inside the Route53 zone
     create_route53_record = true
@@ -116,12 +131,6 @@ locals {
     deregistration_delay = "300"
 
     route53_record_identifier = "identifier"
-
-    # By default we create an ALIAS to the ALB
-    route53_record_type = "CNAME"
-
-    # cognito_auth_enabled is set when cognito authentication is used for the https listener
-    cognito_auth_enabled = false
 
     # cognito_user_pool_arn defines the cognito user pool arn for the added cognito authentication
     cognito_user_pool_arn = ""
@@ -279,7 +288,7 @@ variable "name" {
 # Whether to provide access to the supplied kms_keys. If no kms keys are
 # passed, set this to false.
 variable "kms_enabled" {
-  default = true
+  default = false
 }
 
 # List of KMS keys the task has access to
@@ -290,7 +299,7 @@ variable "kms_keys" {
 # Whether to provide access to the supplied ssm_paths. If no ssm paths are
 # passed, set this to false.
 variable "ssm_enabled" {
-  default = true
+  default = false
 }
 
 # List of SSM Paths the task has access to

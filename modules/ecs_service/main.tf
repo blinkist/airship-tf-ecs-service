@@ -4,7 +4,7 @@
 #
 
 locals {
-  lb_attached = "${var.load_balancing_type != "none"}"
+  lb_attached = "${lower(var.load_balancing_type) != "none"}"
 }
 
 # Make an LB connected service dependent of this rule
@@ -401,3 +401,5 @@ resource "aws_ecs_service" "app_awsvpc_with_service_registry" {
     ignore_changes = ["desired_count"]
   }
 }
+
+
