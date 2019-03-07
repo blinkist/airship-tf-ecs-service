@@ -225,7 +225,7 @@ variable "container_healthcheck" {
 
 variable "command" {
   type    = "list"
-  default = []
+  default = [""]
 }
 
 variable "host_port" {
