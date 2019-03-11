@@ -379,7 +379,6 @@ module "lambda_ecs_task_scheduler" {
   create = "${var.create && length(var.ecs_cron_tasks) > 0 ? true : false }"
 
   ecs_cluster_id = "${var.ecs_cluster_id}"
-
   container_name = "${var.container_name}"
 
   # ecs_service_name is derived from the actual ecs_service, this to force dependency at creation.
@@ -390,4 +389,20 @@ module "lambda_ecs_task_scheduler" {
 
   # lambda_ecs_task_scheduler_role_arn sets the role arn of the task scheduling lambda
   lambda_ecs_task_scheduler_role_arn = "${module.iam.lambda_ecs_task_scheduler_role_arn}"
+}
+
+# Module for task scheduling using cron or at expressions.
+module "ecs_scheduled_tasks" {
+  source = "./modules/ecs_scheduled_tasks"
+
+  cluster_name         = "${local.ecs_cluster_name}"
+  desired_max_capacity = "${lookup(local.capacity_properties,"desired_max_capacity")}"
+  desired_min_capacity = "${lookup(local.capacity_properties,"desired_min_capacity")}"
+  ecs_service_name     = "${module.ecs_service.ecs_service_name}"
+  resource_id          = "${length(var.scaling_properties) > 0 ? module.ecs_autoscaling.aws_appautoscaling_target_resource_id : ""}"
+  scalable_dimension   = "${length(var.scaling_properties) > 0 ? module.ecs_autoscaling.aws_appautoscaling_target_scalable_dimension : ""}"
+  service_namespace    = "${length(var.scaling_properties) > 0 ? module.ecs_autoscaling.aws_appautoscaling_target_service_namespace : ""}"
+  scaling_properties   = "${var.scaling_properties}"
+  schedule_scale_down  = "${var.schedule_scale_down != "" ? var.schedule_scale_down : ""}"
+  schedule_scale_up    = "${var.schedule_scale_up != "" ? var.schedule_scale_up : ""}"
 }
