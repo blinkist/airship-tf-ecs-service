@@ -29,7 +29,7 @@ resource "aws_route53_record" "record" {
   count = "${(var.create && var.route53_record_type == "CNAME" ) ? 1 : 0 }"
 
   zone_id    = "${var.route53_zone_id}"
-  name       = "${var.route53_name}cname"
+  name       = "${var.route53_name}"
   type       = "CNAME"
   ttl        = "300"
   records    = ["${data.aws_lb.main.dns_name}"]
