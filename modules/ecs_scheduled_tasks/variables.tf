@@ -5,13 +5,13 @@ variable "cluster_name" {
 
 variable "schedule_scale_up" {
   type        = "string"
-  description = "Set the schedule with the at or the cron notation e.g. cron(* * ? * SAT-SUN *)"
+  description = "Set the schedule with the at, cron or rate expression e.g. cron(* * ? * SAT-SUN *)"
   default     = ""
 }
 
 variable "schedule_scale_down" {
   type        = "string"
-  description = "Set the schedule with the at or the cron notation e.g. cron(* * ? * SAT-SUN *)"
+  description = "Set the schedule with the at, cron or rate expression e.g. cron(* * ? * SAT-SUN *)"
   default     = ""
 }
 
