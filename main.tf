@@ -164,6 +164,7 @@ module "live_task_lookup" {
 module "container_definition" {
   source         = "./modules/ecs_container_definition/"
   container_name = "${var.container_name}"
+  command        = ["${var.command}"]
 
   # if var.force_bootstrap_container_image is enabled, we always take the terraform param as container_image
   # otherwise we take the image from the datasource lookup
