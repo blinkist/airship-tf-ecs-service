@@ -22,13 +22,13 @@ data "aws_iam_policy_document" "ecs_task_assume_role" {
 resource "aws_iam_role" "ecs_task_execution_role" {
   count              = "${(var.create && var.fargate_enabled ) ? 1 : 0 }"
   name               = "${var.name}-ecs-task-execution_role"
-  assume_role_policy = "${join(data.aws_iam_policy_document.ecs_task_assume_role.*.json)}"
+  assume_role_policy = "${data.aws_iam_policy_document.ecs_task_assume_role.json}"
 }
 
 # We need this for FARGATE
 resource "aws_iam_role_policy_attachment" "ecs_tasks_execution_role" {
   count      = "${(var.create && var.fargate_enabled ) ? 1 : 0 }"
-  role       = "${join("",aws_iam_role.ecs_task_execution_role.*.id)}"
+  role       = "${aws_iam_role.ecs_task_execution_role.id}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -36,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "ecs_tasks_execution_role" {
 resource "aws_iam_role" "ecs_tasks_role" {
   count              = "${var.create ? 1 : 0 }"
   name               = "${var.name}-task-role"
-  assume_role_policy = "${join("",data.aws_iam_policy_document.ecs_task_assume_role.*.json)}"
+  assume_role_policy = "${data.aws_iam_policy_document.ecs_task_assume_role.json}"
 }
 
 # Policy Document to allow KMS Decryption with given keys
@@ -73,8 +73,8 @@ data "aws_iam_policy_document" "ssm_permissions" {
 resource "aws_iam_role_policy" "ssm_permissions" {
   count  = "${(var.create && var.ssm_enabled) ? 1 : 0 }"
   name   = "${var.name}-ssm-permissions"
-  role   = "${join("",aws_iam_role.ecs_tasks_role.*.id)}"
-  policy = "${join("",data.aws_iam_policy_document.ssm_permissions.*.json)}"
+  role   = "${aws_iam_role.ecs_tasks_role.id)}"
+  policy = "${data.aws_iam_policy_document.ssm_permissions.json}"
 }
 
 # Policy Document to allow S3 Read-Write Access to given paths

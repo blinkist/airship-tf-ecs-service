@@ -41,10 +41,15 @@ variable "with_placement_strategy" {
   default = false
 }
 
-# Extra hosts the ALB needs to make listener_rules for to the ECS target group
-variable "custom_listen_hosts" {
-  default = []
-  type    = "list"
+# deployment_controller_type sets the deployment type
+# ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
+variable "deployment_controller_type" {
+  default = "ECS"
+}
+
+variable "load_balancing_properties_lb_arn" {
+  description = "The arn of the ALB or NLB being used"
+  default     = ""
 }
 
 # load_balancing_type is either "none", "network","application"
@@ -52,137 +57,140 @@ variable "load_balancing_type" {
   default = "none"
 }
 
-## load_balancing_properties map defines the map for services hooked to a load balancer
-variable "load_balancing_properties" {
-  type = "map"
-
-  default = {}
-}
-
-# deployment_controller_type sets the deployment type
-# ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
-variable "deployment_controller_type" {
-  default = "ECS"
-}
-
-/*
- Note that since Terraform doesn't support partial map defaults (see
- https://github.com/hashicorp/terraform/issues/16517), the default values here
- are merged with var.load_balancing_properties
- */
-variable "lb_arn" {
-  description = "The arn of the ALB or NLB being used"
-  default     = ""
-}
-
-variable "cognito_auth_enabled" {
-  description = "Set to true when cognito authentication is used for the https listener"
-  default     = false
-}
-
-variable "route53_record_type" {
+variable "load_balancing_properties_route53_record_type" {
   description = "By default we create an ALIAS to the ALB, this can be set to CNAME, or NONE to not create any records"
   default     = "ALIAS"
 }
 
-variable "redirect_http_to_https" {
+variable "load_balancing_properties_route53_custom_name" {
+  description = "By default we create a subdomain with using var.name, override with load_balancing_properties_route53_custom_name"
+  default     = ""
+}
+
+# Extra hosts the ALB needs to make listener_rules for to the ECS target group
+variable "load_balancing_properties_custom_listen_hosts" {
+  default = []
+  type    = "list"
+}
+
+# necessary count for the load_balancing_properties_custom_listen_hosts
+variable "load_balancing_properties_custom_listen_hosts_count" {
+  default = 0
+}
+
+variable "load_balancing_properties_redirect_http_to_https" {
   description = "Redirect http to https instead of serving http"
   default     = false
 }
 
-locals {
-  load_balancing_properties_defaults {
-    # lb_listener_arn is the ALB listener arn for HTTP
-    lb_listener_arn = ""
-
-    # lb_listener_arn_https is the ALB listener arn for HTTPS
-    lb_listener_arn_https = ""
-
-    # nlb_listener_port is the default port for the Network Load Balancer to listen on
-    nlb_listener_port = "80"
-
-    # target_group_port sets the port for the alb or nlb target group, this generally can stay 80 regardless of the service port
-    target_group_port = "80"
-
-    #lb_vpc_id is the vpc_id for the target_group to reside in
-    lb_vpc_id = ""
-
-    # route53_zone_id is the zone to add a subdomain to
-    route53_zone_id = ""
-
-    # health_uri is the health uri to be checked by the ALB 
-    health_uri = "/ping"
-
-    # health_matcher sets the expected HTTP status for the health check to be marked healthy
-    health_matcher = "200"
-
-    # unhealthy_threshold is the health uri to be checked by the ALB 
-    unhealthy_threshold = "3"
-
-    # healthy_threshold is the health uri to be checked by the ALB 
-    healthy_threshold = "3"
-
-    # Do we create listener rules for https
-    https_enabled = true
-
-    # Do we want to create a subdomain for the service inside the Route53 zone
-    create_route53_record = true
-
-    # Sets the deregistration_delay for the targetgroup
-    deregistration_delay = "300"
-
-    route53_record_identifier = "identifier"
-
-    # cognito_user_pool_arn defines the cognito user pool arn for the added cognito authentication
-    cognito_user_pool_arn = ""
-
-    # cognito_user_pool_client_id defines the cognito_user_pool_client_id
-    cognito_user_pool_client_id = ""
-
-    # cognito_user_pool_domain sets the domain of the cognito_user_pool
-    cognito_user_pool_domain = ""
-  }
+variable "load_balancing_properties_lb_listener_arn" {
+  description = "lb_listener_arn is the ALB listener arn for HTTP"
+  default     = ""
 }
 
-locals {
-  load_balancing_properties = "${merge(
-     local.load_balancing_properties_defaults,
-     var.load_balancing_properties)}"
+variable "load_balancing_properties_lb_listener_arn_https" {
+  description = "lb_listener_arn_https is the ALB listener arn for HTTPS"
+  default     = ""
 }
 
-## capacity_properties map defines the capacity properties of the service
-variable "capacity_properties" {
-  type = "map"
-
-  default = {}
+variable "load_balancing_properties_nlb_listener_port" {
+  description = "nlb_listener_port is the default port for the Network Load Balancer to listen on"
+  default     = "80"
 }
 
-locals {
-  capacity_properties_default {
-    # desired_capacity is the desired amount of tasks for a service, when autoscaling is used desired_capacity is only used initially 
-    #after that autoscaling determins the amount of tasks 
-    desired_capacity = "2"
-
-    # desired_min_capacity is used when autoscaling is used, it sets the minimum of tasks to be available for this service
-    desired_min_capacity = "2"
-
-    # desired_max_capacity is used when autoscaling is used, it sets the maximum of tasks to be available for this service
-    desired_max_capacity = "2"
-
-    # deployment_maximum_percent sets the maximum deployment size of the current capacity, 200% means double the amount of current tasks
-    # will be active in case a deployment is happening
-    deployment_maximum_percent = "200"
-
-    # deployment_minimum_healthy_percent sets the minimum deployment size of the current capacity, 0% means no tasks need to be running at the moment of
-    # a deployment switch
-    deployment_minimum_healthy_percent = "100"
-  }
+variable "load_balancing_properties_target_group_port" {
+  description = "target_group_port sets the port for the alb or nlb target group, this generally can stay 80 regardless of the service port"
+  default     = "80"
 }
 
-locals {
-  capacity_properties = "${merge(
-     local.capacity_properties_default,
-     var.capacity_properties)}"
+variable "load_balancing_properties_lb_vpc_id" {
+  description = "lb_vpc_id is the vpc_id for the target_group to reside in"
+  default     = ""
+}
+
+variable "load_balancing_properties_route53_zone_id" {
+  description = "route53_zone_id is the zone to add a subdomain to"
+  default     = ""
+}
+
+variable "load_balancing_properties_health_uri" {
+  description = "health_uri is the health uri to be checked by the ALB"
+  default     = "/ping"
+}
+
+variable "load_balancing_properties_health_matcher" {
+  description = "health_matcher sets the expected HTTP status for the health check to be marked healthy"
+  default     = "200"
+}
+
+variable "load_balancing_properties_unhealthy_threshold" {
+  description = "The number of consecutive successful health checks required before considering an healthy target unhealthy"
+  default     = "3"
+}
+
+variable "load_balancing_properties_healthy_threshold" {
+  description = "The number of consecutive successful health checks required before considering an unhealthy target healthy"
+  default     = "3"
+}
+
+variable "load_balancing_properties_https_enabled" {
+  description = "load_balancing_properties_https_enabled enables listener rules creation for https"
+  default     = true
+}
+
+variable "load_balancing_properties_deregistration_delay" {
+  description = "load_balancing_properties_deregistration_delay sets the deregistration_delay for the targetgroup"
+  default     = true
+}
+
+variable "load_balancing_properties_route53_record_identifier" {
+  description = "route53_record_identifier sets the A ALIAS record identifier"
+  default     = "identifier"
+}
+
+variable "load_balancing_properties_cognito_auth_enabled" {
+  description = "Set to true when cognito authentication is used for the https listener"
+  default     = false
+}
+
+variable "load_balancing_properties_cognito_user_pool_arn" {
+  description = "load_balancing_properties_cognito_user_pool_arn defines the cognito user pool arn for the added cognito authentication"
+  default     = ""
+}
+
+variable "load_balancing_properties_cognito_user_pool_client_id" {
+  description = "load_balancing_properties_cognito_user_pool_client_id defines the cognito_user_pool_client_id"
+  default     = ""
+}
+
+variable "load_balancing_properties_cognito_user_pool_domain" {
+  description = "load_balancing_properties_cognito_user_pool_domain defines the cognito_user_pool_domain"
+  default     = ""
+}
+
+variable "capacity_properties_desired_capacity" {
+  description = "capacity_properties_desired_capacity is the desired amount of tasks for a service, when autoscaling is used desired_capacity is only used initially"
+  default     = "2"
+}
+
+variable "capacity_properties_desired_min_capacity" {
+  description = "capacity_properties_desired_min_capacity is used when autoscaling is activated, it sets the minimum of tasks to be available for this service"
+  default     = "2"
+}
+
+variable "capacity_properties_desired_max_capacity" {
+  description = "capacity_properties_desired_max_capacity is used when autoscaling is activated, it sets the maximum of tasks to be available for this service"
+  default     = "2"
+}
+
+variable "capacity_properties_deployment_maximum_percent" {
+  description = "capacity_properties_deployment_maximum_percent sets the maximum deployment size of the current capacity, 200% means double the amount of current tasks"
+  default     = "200"
+}
+
+variable "capacity_properties_deployment_minimum_healthy_percent" {
+  description = "capacity_properties_deployment_maximum_percent sets the minimum deployment size of the current capacity, 0% means no tasks need to be running at the moment of"
+  default     = "100"
 }
 
 variable "force_bootstrap_container_image" {
@@ -394,28 +402,24 @@ variable "service_discovery_enabled" {
   default = "false"
 }
 
-## Defaults for the service_discovery_properties
-locals {
-  service_discovery_properties_defaults {
-    namespace_id                         = ""
-    dns_ttl                              = "60"
-    dns_type                             = "A"
-    routing_policy                       = "MULTIVALUE"
-    healthcheck_custom_failure_threshold = "1"
-  }
+variable "service_discovery_properties_namespace_id" {
+  default = ""
 }
 
-## Input for the service discovery properties, overwriting the service_discovery_properties_defaults
-variable "service_discovery_properties" {
-  type = "map"
-
-  default = {}
+variable "service_discovery_properties_dns_ttl" {
+  default = "60"
 }
 
-locals {
-  service_discovery_properties = "${merge(
-     local.service_discovery_properties_defaults,
-     var.service_discovery_properties)}"
+variable "service_discovery_properties_dns_type" {
+  default = "A"
+}
+
+variable "service_discovery_properties_routing_policy" {
+  default = "MULTIVALUE"
+}
+
+variable "service_discovery_properties_healthcheck_custom_failure_threshold" {
+  default = "1"
 }
 
 variable "tags" {
