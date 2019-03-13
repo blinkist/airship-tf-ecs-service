@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "ssm_permissions" {
 resource "aws_iam_role_policy" "ssm_permissions" {
   count  = "${(var.create && var.ssm_enabled) ? 1 : 0 }"
   name   = "${var.name}-ssm-permissions"
-  role   = "${aws_iam_role.ecs_tasks_role.id)}"
+  role   = "${aws_iam_role.ecs_tasks_role.id}"
   policy = "${data.aws_iam_policy_document.ssm_permissions.json}"
 }
 

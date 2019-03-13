@@ -40,8 +40,6 @@ data "aws_lambda_invocation" "lambda_lookup" {
   "ecs_task_container_name": "${var.container_name}"
 }
 JSON
-
-  depends_on = ["null_resource.force_policy_dependency", "aws_lambda_function.lambda_lookup"]
 }
 
 #
