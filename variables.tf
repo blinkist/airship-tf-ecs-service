@@ -223,6 +223,11 @@ variable "container_healthcheck" {
   default = {}
 }
 
+variable "command" {
+  type    = "list"
+  default = [""]
+}
+
 variable "host_port" {
   default = ""
 }
