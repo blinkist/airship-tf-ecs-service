@@ -1,16 +1,6 @@
-resource "null_resource" "dependencies" {
-  triggers {
-    lb_listener_arn_https = "${var.lb_listener_arn_https}"
-    cognito_auth_enabled  = "${var.cognito_auth_enabled}"
-    lb_arn                = "${var.lb_arn}"
-    route53_record_type   = "${var.route53_record_type}"
-  }
-}
-
 data "aws_lb" "main" {
-  count      = "${var.create ? 1 : 0}"
-  arn        = "${var.lb_arn}"
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
+  count = "${var.create ? 1 : 0}"
+  arn   = "${var.lb_arn}"
 }
 
 locals {
@@ -28,12 +18,11 @@ locals {
 resource "aws_route53_record" "record" {
   count = "${(var.create && var.route53_record_type == "CNAME" ) ? 1 : 0 }"
 
-  zone_id    = "${var.route53_zone_id}"
-  name       = "${var.route53_name}"
-  type       = "CNAME"
-  ttl        = "300"
-  records    = ["${data.aws_lb.main.dns_name}"]
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
+  zone_id = "${var.route53_zone_id}"
+  name    = "${var.route53_name}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["${data.aws_lb.main.dns_name}"]
 }
 
 ## Route53 DNS Record
@@ -56,7 +45,6 @@ resource "aws_route53_record" "record_alias_a" {
   }
 
   set_identifier = "${var.route53_record_identifier}"
-  depends_on     = ["null_resource.dependencies"]
 }
 
 # Network service load_balancer_type
@@ -77,8 +65,7 @@ resource "aws_lb_target_group" "service_nlb" {
     unhealthy_threshold = "${max(var.healthy_threshold,var.unhealthy_threshold)}"
   }
 
-  tags       = "${local.tags}"
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
+  tags = "${local.tags}"
 }
 
 resource "aws_lb_listener" "nlb_listener" {
@@ -91,8 +78,6 @@ resource "aws_lb_listener" "nlb_listener" {
     target_group_arn = "${aws_lb_target_group.service_nlb.arn}"
     type             = "forward"
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service_nlb"]
 }
 
 ##
@@ -113,8 +98,6 @@ resource "aws_lb_target_group" "service" {
     unhealthy_threshold = "${var.unhealthy_threshold}"
     healthy_threshold   = "${var.healthy_threshold}"
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 ##
@@ -138,8 +121,6 @@ resource "aws_lb_listener_rule" "host_based_routing" {
        join("",aws_route53_record.record_alias_a.*.fqdn)
        }"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 ## aws_lb_listener_rule which redirects http to https
@@ -167,8 +148,6 @@ resource "aws_lb_listener_rule" "host_based_routing_redirect_to_https" {
        join("",aws_route53_record.record_alias_a.*.fqdn)
        }"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 ##
@@ -192,8 +171,6 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
        join("",aws_route53_record.record_alias_a.*.fqdn)
        }"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 ##
@@ -227,8 +204,6 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_cognito_auth" {
        join("",aws_route53_record.record_alias_a.*.fqdn)
        }"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 data "template_file" "custom_listen_host" {
@@ -257,8 +232,6 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
     field  = "host-header"
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 ##
@@ -282,8 +255,6 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host_redirect_
     field  = "host-header"
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 ##
@@ -302,8 +273,6 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
     field  = "host-header"
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }
 
 ##
@@ -332,6 +301,4 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host_cogni
     field  = "host-header"
     values = ["${data.template_file.custom_listen_host.*.rendered[count.index]}"]
   }
-
-  depends_on = ["null_resource.dependencies", "aws_lb_target_group.service"]
 }

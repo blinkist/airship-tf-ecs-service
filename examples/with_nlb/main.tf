@@ -165,21 +165,18 @@ module "nlb_service" {
   route53_record_type  = "ALIAS"
 
   ## load_balancing_properties map defines the map for services hooked to a load balancer
-  load_balancing_properties = {
-    route53_zone_id      = "${aws_route53_zone.this.zone_id}"
-    route53_name         = "service-web"
-    lb_vpc_id            = "${data.aws_vpc.selected.id}"
-    target_group_port    = "${var.echo_port}"
-    nlb_listener_port    = "${var.echo_port}"
-    deregistration_delay = 0
-  }
+  load_balancing_properties_route53_zone_id      = "${aws_route53_zone.this.zone_id}"
+  load_balancing_properties_route53_name         = "service-web"
+  load_balancing_properties_lb_vpc_id            = "${data.aws_vpc.selected.id}"
+  load_balancing_properties_target_group_port    = "${var.echo_port}"
+  load_balancing_properties_nlb_listener_port    = "${var.echo_port}"
+  load_balancing_properties_deregistration_delay = 0
 
   # deployment_controller_type sets the deployment type
   # ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
   deployment_controller_type = "ECS"
 
   ## capacity_properties map defines the capacity properties of the service
-  capacity_properties             = {}
   force_bootstrap_container_image = "false"
 
   # Whether to provide access to the supplied kms_keys. If no kms keys are
