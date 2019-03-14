@@ -62,10 +62,25 @@ resource "aws_iam_role_policy" "kms_permissions" {
 data "aws_iam_policy_document" "ssm_permissions" {
   count = "${var.create && var.ssm_enabled ? 1 : 0 }"
 
+  ## Add Describe Parameters as per https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html
   statement {
     effect    = "Allow"
-    actions   = ["ssm:GetParameter", "ssm:GetParametersByPath"]
+    actions   = "ssm:DescribeParameters"
+    resources = ["*"]
+  }
+
+  ## With the custom application prefix for ssm
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter", "ssm:GetParametersByPath", "ssm:GetParameters"]
     resources = ["${formatlist("arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/application/%s/*",var.ssm_paths)}"]
+  }
+
+  ## And also without the application prefix
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter", "ssm:GetParametersByPath", "ssm:GetParameters"]
+    resources = ["${formatlist("arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/%s/*",var.ssm_paths)}"]
   }
 }
 

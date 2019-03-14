@@ -120,6 +120,7 @@ variable "echo_port" {
   default = "1025"
 }
 
+# Test that create true works
 module "nlb_service" {
   source = "../../"
 
@@ -176,6 +177,76 @@ module "nlb_service" {
   deployment_controller_type = "ECS"
 
   ## capacity_properties map defines the capacity properties of the service
+  force_bootstrap_container_image = "false"
+
+  # Whether to provide access to the supplied kms_keys. If no kms keys are
+  # passed, set this to false.
+
+  tags = {
+    Environment = "${terraform.workspace}"
+  }
+}
+
+# Test that create false works
+module "nlb_service" {
+  source = "../../"
+
+  create = false
+
+  # The name of the project, must be unique
+  name = "${terraform.workspace}-not-created-service"
+
+  # ecs_cluster_id is the cluster to which the ECS Service will be added.
+  ecs_cluster_id = "${module.ecs_cluster.cluster_id}"
+
+  # Region of the ECS Cluster
+  region = "${var.region}"
+
+  # image_url defines the docker image location
+  bootstrap_container_image = "cjimti/go-echo"
+
+  # Container name 
+  container_name = "go-echo"
+
+  # cpu defines the needed cpu for the container
+  container_cpu = "256"
+
+  # container_memory  defines the hard memory limit of the container
+  container_memory = "128"
+
+  # port defines the needed port of the container
+  container_port = "${var.echo_port}"
+
+  # scheduling_strategy defaults to REPLICA
+  scheduling_strategy = "REPLICA"
+
+  # Spread tasks over ECS Cluster based on AZ, Instance-id, memory
+  with_placement_strategy = false
+
+  # load_balancing_type is either "none", "network","application"
+  load_balancing_type = "network"
+
+  lb_arn = "${aws_lb.this.arn}"
+
+  cognito_auth_enabled = false
+  route53_record_type  = "ALIAS"
+
+  ## load_balancing_properties map defines the map for services hooked to a load balancer
+  load_balancing_properties = {
+    route53_zone_id      = "${aws_route53_zone.this.zone_id}"
+    route53_name         = "service-web"
+    lb_vpc_id            = "${data.aws_vpc.selected.id}"
+    target_group_port    = "${var.echo_port}"
+    nlb_listener_port    = "${var.echo_port}"
+    deregistration_delay = 0
+  }
+
+  # deployment_controller_type sets the deployment type
+  # ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
+  deployment_controller_type = "ECS"
+
+  ## capacity_properties map defines the capacity properties of the service
+  capacity_properties             = {}
   force_bootstrap_container_image = "false"
 
   # Whether to provide access to the supplied kms_keys. If no kms keys are
