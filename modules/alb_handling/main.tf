@@ -16,7 +16,8 @@ locals {
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record" {
-  count   = "${(var.create && local.route53_record_type == "CNAME" ) ? 1 : 0 }"
+  count = "${(var.create && var.route53_record_type == "CNAME" ) ? 1 : 0 }"
+
   zone_id = "${var.route53_zone_id}"
   name    = "${var.route53_name}"
   type    = "CNAME"
@@ -26,7 +27,7 @@ resource "aws_route53_record" "record" {
 
 ## Route53 DNS Record
 resource "aws_route53_record" "record_alias_a" {
-  count   = "${(var.create && local.route53_record_type == "ALIAS") ? 1 : 0 }"
+  count   = "${(var.create && var.route53_record_type == "ALIAS") ? 1 : 0 }"
   zone_id = "${var.route53_zone_id}"
   name    = "${var.route53_name}"
   type    = "A"
@@ -57,8 +58,11 @@ resource "aws_lb_target_group" "service_nlb" {
   deregistration_delay = "${var.deregistration_delay}"
 
   health_check {
-    protocol            = "TCP"
-    unhealthy_threshold = "${var.unhealthy_threshold}"
+    protocol = "TCP"
+
+    ## health_check.healthy_threshold 3 and health_check.unhealthy_threshold 0 must be the same for target_groups with TCP protocol
+    healthy_threshold   = "${max(var.healthy_threshold,var.unhealthy_threshold)}"
+    unhealthy_threshold = "${max(var.healthy_threshold,var.unhealthy_threshold)}"
   }
 
   tags = "${local.tags}"
@@ -92,6 +96,7 @@ resource "aws_lb_target_group" "service" {
     matcher             = "${var.health_matcher}"
     path                = "${var.health_uri}"
     unhealthy_threshold = "${var.unhealthy_threshold}"
+    healthy_threshold   = "${var.healthy_threshold}"
   }
 }
 
@@ -118,7 +123,6 @@ resource "aws_lb_listener_rule" "host_based_routing" {
   }
 }
 
-##
 ## aws_lb_listener_rule which redirects http to https
 resource "aws_lb_listener_rule" "host_based_routing_redirect_to_https" {
   count = "${var.create && var.load_balancing_type == "application" && var.redirect_http_to_https && local.route53_record_type != "NONE" ? 1 : 0 }"
@@ -203,7 +207,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_cognito_auth" {
 }
 
 data "template_file" "custom_listen_host" {
-  count = "${length(var.custom_listen_hosts)}"
+  count = "${var.custom_listen_hosts_count}"
 
   template = "$${listen_host}"
 
@@ -215,7 +219,7 @@ data "template_file" "custom_listen_host" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
-  count = "${var.create && var.load_balancing_type == "application" && ! var.redirect_http_to_https ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && ! var.redirect_http_to_https ? var.custom_listen_hosts_count : 0 }"
 
   listener_arn = "${var.lb_listener_arn}"
 
@@ -233,7 +237,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host" {
 ##
 ## aws_lb_listener_rule which redirects http to https for the custom listen hosts
 resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host_redirect_to_https" {
-  count = "${var.create && var.load_balancing_type == "application" && var.redirect_http_to_https ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && !var.cognito_auth_enabled && var.redirect_http_to_https ? var.custom_listen_hosts_count : 0 }"
 
   listener_arn = "${var.lb_listener_arn}"
 
@@ -256,7 +260,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host_redirect_
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
-  count = "${var.create && var.load_balancing_type == "application" && ! var.cognito_auth_enabled ? length(var.custom_listen_hosts) : 0 }"
+  count = "${var.create && var.load_balancing_type == "application" && !var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
@@ -274,8 +278,8 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host_cognito_auth" {
-  count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? length(var.custom_listen_hosts) : 0 }"
-
+  # count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0 }"
+  count        = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0}"
   listener_arn = "${var.lb_listener_arn_https}"
 
   action {

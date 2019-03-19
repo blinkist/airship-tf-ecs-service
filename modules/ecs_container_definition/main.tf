@@ -18,6 +18,20 @@ resource "null_resource" "envvars_as_list_of_maps" {
 }
 
 locals {
+  port_mappings = {
+    with_port = [
+      {
+        containerPort = "${var.container_port}"
+        hostPort      = "${var.host_port}"
+        protocol      = "${var.protocol}"
+      },
+    ]
+
+    without_port = []
+  }
+
+  use_port = "${var.container_port == "" ? "without_port" : "with_port" }"
+
   container_definitions = [{
     name                   = "${var.container_name}"
     image                  = "${var.container_image}"
@@ -30,23 +44,13 @@ locals {
     workingDirectory       = "${var.working_directory}"
     readonlyRootFilesystem = "${var.readonly_root_filesystem}"
 
-    hostname = "${var.hostname}"
+    privileged = "${var.privileged}"
 
-    environment = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
-
-    mountPoints = ["${var.mountpoints}"]
-
-    dockerLabels = "${local.docker_labels}"
-
-    portMappings = [
-      {
-        containerPort = "${var.container_port}"
-        hostPort      = "${var.host_port}"
-        protocol      = "${var.protocol}"
-      },
-    ]
-
-    healthCheck = "${var.healthcheck}"
+    hostname     = "${var.hostname}"
+    environment  = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
+    mountPoints  = ["${var.mountpoints}"]
+    portMappings = "${local.port_mappings[local.use_port]}"
+    healthCheck  = "${var.healthcheck}"
 
     logConfiguration = {
       logDriver = "${var.log_driver}"

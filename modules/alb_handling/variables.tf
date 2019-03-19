@@ -16,6 +16,8 @@ variable "deregistration_delay" {}
 # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
 variable "unhealthy_threshold" {}
 
+variable "healthy_threshold" {}
+
 variable "cluster_name" {
   default = ""
 }
@@ -114,6 +116,10 @@ variable "route53_record_type" {}
 variable "custom_listen_hosts" {
   type    = "list"
   default = []
+}
+
+variable "custom_listen_hosts_count" {
+  default = "0"
 }
 
 # When https is enabled we create https listener_rules

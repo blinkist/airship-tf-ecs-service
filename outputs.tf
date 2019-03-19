@@ -21,3 +21,7 @@ output "aws_ecs_task_definition_arn" {
 output "aws_ecs_task_definition_family" {
   value = "${module.ecs_task_definition.aws_ecs_task_definition_family}"
 }
+
+output "has_changed" {
+  value = "${module.ecs_task_definition_selector.has_changed}"
+}
