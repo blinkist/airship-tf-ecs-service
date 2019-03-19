@@ -1,0 +1,3 @@
+# NLB ECS Service Example
+
+This creates an EC2 cluster in ap-southeast-2, with a task that runs the go-echo container that listens on port 1025, the task is added to a ECS service that starts two containers behind it, and that service is added to a Target Group that listens on port 1025, this Target Group is added to a Network Load Balancer that is published publicly to the IP address of the computer that ran the terraform apply.

@@ -36,6 +36,11 @@ variable "protocol" {
   default     = "tcp"
 }
 
+variable "privileged" {
+  description = "Bool. Run the container with elevated privilege."
+  default     = "false"
+}
+
 variable "healthcheck" {
   description = "A map containing command (string), interval (duration in seconds), retries (1-10, number of times to retry before marking container unhealthy, and startPeriod (0-300, optional grace period to wait, in seconds, before failed healthchecks count toward retries)"
   default     = {}
