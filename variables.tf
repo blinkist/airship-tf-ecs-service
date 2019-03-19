@@ -5,45 +5,49 @@ variable "create" {
   default = true
 }
 
-# ecs_cluster_id is the cluster to which the ECS Service will be added.
-variable "ecs_cluster_id" {}
+variable "ecs_cluster_id" {
+  description = "The cluster to which the ECS Service will be added"
+}
 
-# Region of the ECS Cluster
-variable "region" {}
+variable "region" {
+  description = "Region of the ECS Cluster"
+}
 
-# With fargate_enabled the launchtype of the service will be FARGATE, otherwise EC2 ( default is false)
 variable "fargate_enabled" {
+  description = "With fargate_enabled the launchtype of the service will be FARGATE, otherwise EC2 ( default is false)"
   default = false
 }
 
-# With awsvpc_enabled the network_mode for the ECS task definition will be awsvpc, defaults to bridge 
 variable "awsvpc_enabled" {
   default = false
+  description = "With awsvpc_enabled the network_mode for the ECS task definition will be awsvpc, defaults to bridge"
 }
 
-# Number of days for the cloudwatch logs for the containers to be retained
 variable "log_retention_in_days" {
   default = "14"
+  description = "Number of days for the cloudwatch logs for the containers to be retained"
 }
 
-# kms_key for the cloudwatch logs
 variable "cloudwatch_kms_key" {
   default = ""
+  description = "kms_key for the cloudwatch logs"
 }
 
-# scheduling_strategy defaults to REPLICA
 variable "scheduling_strategy" {
   default = "REPLICA"
+  description = "scheduling_strategy defaults to REPLICA"
 }
 
-# Spread tasks over ECS Cluster based on AZ, Instance-id, memory
 variable "with_placement_strategy" {
   default = false
+  description = "Spread tasks over ECS Cluster based on AZ, Instance-id, memory"
 }
 
-# deployment_controller_type sets the deployment type
-# ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
 variable "deployment_controller_type" {
+  description = <<EOF
+deployment_controller_type sets the deployment type
+ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
+EOF
   default = "ECS"
 }
 
@@ -52,9 +56,9 @@ variable "load_balancing_properties_lb_arn" {
   default     = ""
 }
 
-# load_balancing_type is either "none", "network","application"
 variable "load_balancing_type" {
   default = "none"
+  description = "load_balancing_type is either \"none\", \"network\",\"application\""
 }
 
 variable "load_balancing_properties_route53_record_type" {
@@ -67,14 +71,14 @@ variable "load_balancing_properties_route53_custom_name" {
   default     = ""
 }
 
-# Extra hosts the ALB needs to make listener_rules for to the ECS target group
 variable "load_balancing_properties_custom_listen_hosts" {
+  description = "Extra hosts the ALB needs to make listener_rules for to the ECS target group"
   default = []
   type    = "list"
 }
 
-# necessary count for the load_balancing_properties_custom_listen_hosts
 variable "load_balancing_properties_custom_listen_hosts_count" {
+  description = "necessary count for the load_balancing_properties_custom_listen_hosts"
   default = 0
 }
 
@@ -197,48 +201,52 @@ variable "force_bootstrap_container_image" {
   default = "false"
 }
 
-# live_task_lookup_type
-# This module is capable of working around the state drift when external CICD deploys to ECS
-# By default a Lambda takes care of looking up the current container information, when the type is set to `lambda`
-# When the type is set to `datasource` regular terraform datasources are used to look-up the current container
-# Downside of datasource is that it cannot be used for bootstrapping
 variable "live_task_lookup_type" {
+  description = <<EOF
+This module is capable of working around the state drift when external CICD deploys to ECS.
+By default a Lambda takes care of looking up the current container information, when the type is set to `lambda`.
+When the type is set to `datasource` regular terraform datasources are used to look-up the current container.
+Downside of datasource is that it cannot be used for bootstrapping.
+EOF
+
   default = "lambda"
 }
 
-# image_url defines the docker image location
-variable "bootstrap_container_image" {}
-
-# Container name 
-variable "container_name" {
-  default = "app"
+variable "bootstrap_container_image" {
+  description = "The docker image location"
 }
 
-# cpu defines the needed cpu for the container
-variable "container_cpu" {}
+variable "container_name" {
+  description = "Container name"
+  default     = "app"
+}
 
-# container_memory  defines the hard memory limit of the container
-variable "container_memory" {}
+variable "container_cpu" {
+  description = "cpu defines the needed cpu for the container"
+}
 
-# 
+variable "container_memory" {
+  description = "container_memory  defines the hard memory limit of the container"
+}
+
 variable "container_docker_labels" {
   default = {}
 }
 
-# container_memory_reservation defines the ECS Memory reservation for this service and Soft/limit
 variable "container_memory_reservation" {
   default = ""
+  description = "container_memory_reservation defines the ECS Memory reservation for this service and Soft/limit"
 }
 
-# port defines the needed port of the container
 variable "container_port" {
   default = ""
+  description = "port defines the needed port of the container"
 }
 
-# healthcheck, describes the extra HEALTHCHECK for the container
 variable "container_healthcheck" {
   type    = "map"
   default = {}
+  description = "healthcheck, describes the extra HEALTHCHECK for the container"
 }
 
 variable "command" {
@@ -250,101 +258,101 @@ variable "host_port" {
   default = ""
 }
 
-# Scaling properties holds a map of multiple maps defining scaling policies and alarms
-#
-#
-#  [{
-#     # type is the metric the metric being used for the service
-#     type               = "CPUUtilization"
-#     
-#     # direction defines the direction of the scaling, up means more tasks, down is less tasks
-#     direction          = "up"
-#
-#     # evaluation_periods how many observation points are needed for a scaling decision
-#     evaluation_periods = "2"
-#
-#     
-#     # observation_period is the number of seconds one statistic is measured
-#     observation_period = "300"
-#
-#     # statistic defines the type of statistic for measuring SampleCount, Average, Sum, Minimum, Maximum
-#     statistic          = "Average"
-#
-#     # threshold defines the value which is needed to surpass, given the direction
-#     threshold          = "89"
-#
-#     # Cooldown defines the amount of seconds in which another scaling is disabled after a succesful scaling action
-#     cooldown           = "900"
-#
-#     # Adjustment_type defines the type of adjustment, can either be absolute or relative : ChangeInCapacity, ExactCapacity, and PercentChangeInCapacity.
-#     adjustment_type    = "ChangeInCapacity"
-# 
-#     # scaling_adjustment defines the amount to scale, can be a postive or negative number or percentage
-#     scaling_adjustment = "1"
-#   },]
-
 variable "scaling_properties" {
+  description = <<EOF
+Scaling properties holds a map of multiple maps defining scaling policies and alarms
+
+ [{
+    # type is the metric the metric being used for the service
+    type               = "CPUUtilization"
+    
+    # direction defines the direction of the scaling, up means more tasks, down is less tasks
+    direction          = "up"
+
+    # evaluation_periods how many observation points are needed for a scaling decision
+    evaluation_periods = "2"
+
+    
+    # observation_period is the number of seconds one statistic is measured
+    observation_period = "300"
+
+    # statistic defines the type of statistic for measuring SampleCount, Average, Sum, Minimum, Maximum
+    statistic          = "Average"
+
+    # threshold defines the value which is needed to surpass, given the direction
+    threshold          = "89"
+
+    # Cooldown defines the amount of seconds in which another scaling is disabled after a succesful scaling action
+    cooldown           = "900"
+
+    # Adjustment_type defines the type of adjustment, can either be absolute or relative : ChangeInCapacity, ExactCapacity, and PercentChangeInCapacity.
+    adjustment_type    = "ChangeInCapacity"
+
+    # scaling_adjustment defines the amount to scale, can be a postive or negative number or percentage
+    scaling_adjustment = "1"
+  },]
+  EOF
+
   default = []
 }
 
-# container_envvars defines extra container env vars, list of maps
-# { key = val,key2= val2}
-
 variable "container_envvars" {
+  description = <<EOF
+container_envvars defines extra container env vars, list of maps:
+{ key = val,key2= val2}
+  EOF
+
   default = {}
 }
 
-# The name of the project, must be unique
 variable "name" {
   description = "The name of the project, must be unique"
 }
 
-# Whether to provide access to the supplied kms_keys. If no kms keys are
-# passed, set this to false.
 variable "kms_enabled" {
   default = false
+  description = "Whether to provide access to the supplied kms_keys. If no kms keys are passed, set this to false."
 }
 
-# List of KMS keys the task has access to
 variable "kms_keys" {
   default = []
+  description = "List of KMS keys the task has access to"
 }
 
-# Whether to provide access to the supplied ssm_paths. If no ssm paths are
-# passed, set this to false.
 variable "ssm_enabled" {
   default = false
+  description = "Whether to provide access to the supplied ssm_paths. If no ssm paths are passed, set this to false"
 }
 
-# List of SSM Paths the task has access to
 variable "ssm_paths" {
   default = []
+  description = "List of SSM Paths the task has access to"
 }
 
-# AWSVPC ( FARGATE ) need subnets to reside in
 variable "awsvpc_subnets" {
   default = []
+  description = "AWSVPC ( FARGATE ) need subnets to reside in"
 }
 
-# AWSVPC ( FARGATE ) need awsvpc_security_group_ids attached to the task
 variable "awsvpc_security_group_ids" {
   default = []
+  description = "AWSVPC ( FARGATE ) need awsvpc_security_group_ids attached to the task"
 }
 
-# S3 Read-only paths the Task has access to
 variable "s3_ro_paths" {
   default = []
+  description = "S3 Read-only paths the Task has access to"
 }
 
-# S3 Read-write paths the Task has access to
 variable "s3_rw_paths" {
   default = []
+  description = "S3 Read-write paths the Task has access to"
 }
 
-# A Docker volume to add to the task
 variable "docker_volume" {
   type    = "map"
   default = {}
+  description = "A Docker volume to add to the task"
 
   # {
   # # these properties are supported as a 'flattened' version of the docker volume configuration:
@@ -359,10 +367,10 @@ variable "docker_volume" {
   # }
 }
 
-# list of host paths to add as volumes to the task
 variable "host_path_volumes" {
   type    = "list"
   default = []
+  description = "list of host paths to add as volumes to the task"
 
   # {
   #     name = "service-storage",
@@ -370,10 +378,10 @@ variable "host_path_volumes" {
   # },
 }
 
-# list of mount points to add to every container in the task
 variable "mountpoints" {
   type    = "list"
   default = []
+  description = "list of mount points to add to every container in the task"
 
   # {
   #     source_volume = "service-storage",
@@ -382,23 +390,24 @@ variable "mountpoints" {
   # },
 }
 
-# ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to run
-#
-#
-#  [{
-#     # name of the scheduled task
-#     job_name  = "vacuum_db"
-#     
-#     # expression defined in 
-#     # http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
-#     schedule_expression  = "cron(0 12 * * ? *)"
-#
-#     # command defines the command which needs to run inside the docker container
-#     command = "python vacuum_db.py"
-#
-#   },]
-
 variable "ecs_cron_tasks" {
+  description = <<EOF
+ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to run
+
+ [{
+    # name of the scheduled task
+    job_name  = "vacuum_db"
+    
+    # expression defined in 
+    # http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
+    schedule_expression  = "cron(0 12 * * ? *)"
+
+    # command defines the command which needs to run inside the docker container
+    command = "python vacuum_db.py"
+
+  },]
+  EOF
+
   type    = "list"
   default = []
 }
