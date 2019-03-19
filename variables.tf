@@ -372,10 +372,15 @@ variable "host_path_volumes" {
   default = []
   description = "list of host paths to add as volumes to the task"
 
-  # {
-  #     name = "service-storage",
-  #     host_path = "/foo"
+  ## Example:
+  # host_path_volumes = [{
+  #   name = "foo",
+  #   host_path = "/tmp/foo"
   # },
+  # {
+  #   name = "bar",
+  #   host_path = "/tmp/bar"
+  # },]
 }
 
 variable "mountpoints" {
@@ -383,11 +388,17 @@ variable "mountpoints" {
   default = []
   description = "list of mount points to add to every container in the task"
 
-  # {
-  #     source_volume = "service-storage",
-  #     container_path = "/foo",
-  #     read_only = "false"
+  ## Example 
+  # mountpoints = [{
+  #   sourceVolume = "foo",
+  #   containerPath = "/foo",
+  #   readOnly = "false"
   # },
+  # {
+  #   sourceVolume = "bar",
+  #   containerPath = "/bar",
+  #   readOnly = "false"
+  # },]
 }
 
 variable "ecs_cron_tasks" {
@@ -410,6 +421,22 @@ ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to ru
 
   type    = "list"
   default = []
+
+  ## ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to run
+  ## Example
+
+  #  ecs_cron_tasks = [{
+  #     # name of the scheduled task
+  #     job_name  = "vacuum_db"
+  #     
+  #     # expression defined in 
+  #     # http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
+  #     schedule_expression  = "cron(0 12 * * ? *)"
+  #
+  #     # command defines the command which needs to run inside the docker container
+  #     command = "python vacuum_db.py"
+  #
+  #   },]
 }
 
 variable "service_discovery_enabled" {
