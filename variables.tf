@@ -15,31 +15,31 @@ variable "region" {
 
 variable "fargate_enabled" {
   description = "With fargate_enabled the launchtype of the service will be FARGATE, otherwise EC2 ( default is false)"
-  default = false
+  default     = false
 }
 
 variable "awsvpc_enabled" {
-  default = false
+  default     = false
   description = "With awsvpc_enabled the network_mode for the ECS task definition will be awsvpc, defaults to bridge"
 }
 
 variable "log_retention_in_days" {
-  default = "14"
+  default     = "14"
   description = "Number of days for the cloudwatch logs for the containers to be retained"
 }
 
 variable "cloudwatch_kms_key" {
-  default = ""
+  default     = ""
   description = "kms_key for the cloudwatch logs"
 }
 
 variable "scheduling_strategy" {
-  default = "REPLICA"
+  default     = "REPLICA"
   description = "scheduling_strategy defaults to REPLICA"
 }
 
 variable "with_placement_strategy" {
-  default = false
+  default     = false
   description = "Spread tasks over ECS Cluster based on AZ, Instance-id, memory"
 }
 
@@ -48,6 +48,7 @@ variable "deployment_controller_type" {
 deployment_controller_type sets the deployment type
 ECS for Rolling update, and CODE_DEPLOY for Blue/Green deployment via CodeDeploy
 EOF
+
   default = "ECS"
 }
 
@@ -57,7 +58,7 @@ variable "load_balancing_properties_lb_arn" {
 }
 
 variable "load_balancing_type" {
-  default = "none"
+  default     = "none"
   description = "load_balancing_type is either \"none\", \"network\",\"application\""
 }
 
@@ -73,13 +74,13 @@ variable "load_balancing_properties_route53_custom_name" {
 
 variable "load_balancing_properties_custom_listen_hosts" {
   description = "Extra hosts the ALB needs to make listener_rules for to the ECS target group"
-  default = []
-  type    = "list"
+  default     = []
+  type        = "list"
 }
 
 variable "load_balancing_properties_custom_listen_hosts_count" {
   description = "necessary count for the load_balancing_properties_custom_listen_hosts"
-  default = 0
+  default     = 0
 }
 
 variable "load_balancing_properties_redirect_http_to_https" {
@@ -234,18 +235,18 @@ variable "container_docker_labels" {
 }
 
 variable "container_memory_reservation" {
-  default = ""
+  default     = ""
   description = "container_memory_reservation defines the ECS Memory reservation for this service and Soft/limit"
 }
 
 variable "container_port" {
-  default = ""
+  default     = ""
   description = "port defines the needed port of the container"
 }
 
 variable "container_healthcheck" {
-  type    = "map"
-  default = {}
+  type        = "map"
+  default     = {}
   description = "healthcheck, describes the extra HEALTHCHECK for the container"
 }
 
@@ -310,48 +311,48 @@ variable "name" {
 }
 
 variable "kms_enabled" {
-  default = false
+  default     = false
   description = "Whether to provide access to the supplied kms_keys. If no kms keys are passed, set this to false."
 }
 
 variable "kms_keys" {
-  default = []
+  default     = []
   description = "List of KMS keys the task has access to"
 }
 
 variable "ssm_enabled" {
-  default = false
+  default     = false
   description = "Whether to provide access to the supplied ssm_paths. If no ssm paths are passed, set this to false"
 }
 
 variable "ssm_paths" {
-  default = []
+  default     = []
   description = "List of SSM Paths the task has access to"
 }
 
 variable "awsvpc_subnets" {
-  default = []
+  default     = []
   description = "AWSVPC ( FARGATE ) need subnets to reside in"
 }
 
 variable "awsvpc_security_group_ids" {
-  default = []
+  default     = []
   description = "AWSVPC ( FARGATE ) need awsvpc_security_group_ids attached to the task"
 }
 
 variable "s3_ro_paths" {
-  default = []
+  default     = []
   description = "S3 Read-only paths the Task has access to"
 }
 
 variable "s3_rw_paths" {
-  default = []
+  default     = []
   description = "S3 Read-write paths the Task has access to"
 }
 
 variable "docker_volume" {
-  type    = "map"
-  default = {}
+  type        = "map"
+  default     = {}
   description = "A Docker volume to add to the task"
 
   # {
@@ -368,8 +369,8 @@ variable "docker_volume" {
 }
 
 variable "host_path_volumes" {
-  type    = "list"
-  default = []
+  type        = "list"
+  default     = []
   description = "list of host paths to add as volumes to the task"
 
   ## Example:
@@ -384,8 +385,8 @@ variable "host_path_volumes" {
 }
 
 variable "mountpoints" {
-  type    = "list"
-  default = []
+  type        = "list"
+  default     = []
   description = "list of mount points to add to every container in the task"
 
   ## Example 
