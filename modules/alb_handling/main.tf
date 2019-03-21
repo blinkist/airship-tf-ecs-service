@@ -153,7 +153,7 @@ resource "aws_lb_listener_rule" "host_based_routing_redirect_to_https" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl" {
-  count = "${var.create && var.load_balancing_type == "application" && ! var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && var.https_enabled && var.load_balancing_type == "application" && ! var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
@@ -176,7 +176,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl" {
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_cognito_auth" {
-  count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
+  count = "${var.create && var.https_enabled && var.load_balancing_type == "application" && var.cognito_auth_enabled && local.route53_record_type != "NONE" ? 1 : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
@@ -260,7 +260,7 @@ resource "aws_lb_listener_rule" "host_based_routing_custom_listen_host_redirect_
 ##
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
-  count = "${var.create && var.load_balancing_type == "application" && !var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0 }"
+  count = "${var.create && var.https_enabled && var.load_balancing_type == "application" && !var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0 }"
 
   listener_arn = "${var.lb_listener_arn_https}"
 
@@ -279,7 +279,7 @@ resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host" {
 ## An aws_lb_listener_rule will only be created when a service has a load balancer attached
 resource "aws_lb_listener_rule" "host_based_routing_ssl_custom_listen_host_cognito_auth" {
   # count = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0 }"
-  count        = "${var.create && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0}"
+  count        = "${var.create && var.https_enabled && var.load_balancing_type == "application" && var.cognito_auth_enabled ? var.custom_listen_hosts_count : 0}"
   listener_arn = "${var.lb_listener_arn_https}"
 
   action {
