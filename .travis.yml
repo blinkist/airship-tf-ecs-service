@@ -20,12 +20,13 @@ script:
 
 after_script:
   - |
+    gem install travis
     if [ "$TRAVIS_BRANCH" == "master" ] ; then
       if git diff --name-only $TRAVIS_COMMIT_RANGE airship.tf | grep -qE '(\.md$)|(\.rst$)'
       then
         echo "There appear to be docs in this commit. Thank you.!"
         curl -LO https://raw.github.com/maartenvanderhoef/travis-dependent-builds/master/trigger.sh
         chmod +x trigger.sh
-        ./trigger.sh stephanmg downstream master $TRAVIS_ACCESS_TOKEN
+        ./trigger.sh doingcloudright airship.tf master $TRAVIS_ACCESS_TOKEN
       fi
     fi
