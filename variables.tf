@@ -2,7 +2,8 @@
 # of the map is being defined. This is mitigated by using an extra set of default_* variables 
 
 variable "create" {
-  default = true
+  default     = true
+  description = "create is the variable used in all resources to conditionally create them"
 }
 
 variable "ecs_cluster_id" {
@@ -145,7 +146,7 @@ variable "load_balancing_properties_https_enabled" {
 
 variable "load_balancing_properties_deregistration_delay" {
   description = "load_balancing_properties_deregistration_delay sets the deregistration_delay for the targetgroup"
-  default     = true
+  default     = 300
 }
 
 variable "load_balancing_properties_route53_record_identifier" {
@@ -250,13 +251,15 @@ variable "container_healthcheck" {
   description = "healthcheck, describes the extra HEALTHCHECK for the container"
 }
 
-variable "command" {
-  type    = "list"
-  default = [""]
+variable "container_command" {
+  type        = "list"
+  default     = [""]
+  description = "container_command, describes the command for the container a a list, leaving default should run docker defined CMD"
 }
 
 variable "host_port" {
-  default = ""
+  default     = ""
+  description = "host_port, to be filled in to have a static host port mapping for non-awsvpc ecs, defaults to dynamic port mapping"
 }
 
 variable "scaling_properties" {
@@ -441,27 +444,33 @@ ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to ru
 }
 
 variable "service_discovery_enabled" {
-  default = "false"
+  default     = "false"
+  description = "service_discovery_enabled enables service discovery"
 }
 
 variable "service_discovery_properties_namespace_id" {
-  default = ""
+  default     = ""
+  description = "service_discovery_properties_namespace_id sets the service discovery namespace"
 }
 
 variable "service_discovery_properties_dns_ttl" {
-  default = "60"
+  default     = "60"
+  description = "service_discovery_properties_dns_ttl sets the service discovery dns ttl"
 }
 
 variable "service_discovery_properties_dns_type" {
-  default = "A"
+  default     = "A"
+  description = "service_discovery_properties_dns_ttl sets the service discovery dns ttl"
 }
 
 variable "service_discovery_properties_routing_policy" {
-  default = "MULTIVALUE"
+  default     = "MULTIVALUE"
+  description = "The routing policy that you want to apply to all records that Route 53 creates when you register an instance and specify the service. Valid Values: MULTIVALUE, WEIGHTED"
 }
 
 variable "service_discovery_properties_healthcheck_custom_failure_threshold" {
-  default = "1"
+  default     = "1"
+  description = "The number of 30-second intervals that you want service discovery to wait before it changes the health status of a service instance. Maximum value of 10."
 }
 
 variable "tags" {

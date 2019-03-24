@@ -166,7 +166,7 @@ module "live_task_lookup" {
 module "container_definition" {
   source         = "./modules/ecs_container_definition/"
   container_name = "${var.container_name}"
-  command        = ["${var.command}"]
+  command        = ["${var.container_command}"]
 
   # if var.force_bootstrap_container_image is enabled, we always take the terraform param as container_image
   # otherwise we take the image from the datasource lookup
@@ -344,7 +344,7 @@ module "ecs_service" {
   # dns_type defaults to A (AWSVPC)
   service_discovery_dns_type = "${var.service_discovery_properties_dns_type}"
 
-  # routing_policy def
+  # service_discovery_properties_routing_policy
   service_discovery_routing_policy = "${var.service_discovery_properties_routing_policy}"
 
   # healthcheck_custom_failure_threshold needed, set to 1 by default

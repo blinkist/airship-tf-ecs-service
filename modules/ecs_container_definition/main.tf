@@ -40,7 +40,7 @@ locals {
     cpu                    = "${var.container_cpu}"
     essential              = "${var.essential}"
     entryPoint             = "${var.entrypoint}"
-    command                = "${var.command}"
+    command                = "${var.container_command}"
     workingDirectory       = "${var.working_directory}"
     readonlyRootFilesystem = "${var.readonly_root_filesystem}"
 
