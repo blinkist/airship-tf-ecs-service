@@ -35,10 +35,6 @@ Apply your added terraform code, in the EC2 Panel on the AWS Console you will se
 
 ## Airship ECS Service
 
-::: warning
-It's important to have applied terraform, before continuing with this step.
-:::
-
 Now that we have an ECS Cluster, we need to add an actual service. For this demonstration, we will use a very standard `nginx:stable` docker image. A summary of the specifics of the service. Replace `<YOUR REGION>` with the active AWS region.
 
 - [x] This ECS Service uses Fargate
@@ -50,7 +46,7 @@ Now that we have an ECS Cluster, we need to add an actual service. For this demo
 ```json
 module "fargate_service" {
   source  = "blinkist/airship-ecs-service/aws"
-  version = "0.9.1"
+  version = "0.9.2"
 
   name = "demo-web"
 
@@ -70,9 +66,6 @@ module "fargate_service" {
     # The ARN of the ALB, when left-out the service, 
   load_balancing_properties_lb_arn = "${module.alb_shared_services_external.load_balancer_id}"
 
-    # https listener ARN
-  load_balancing_properties_lb_listener_arn_https = "${element(module.alb_shared_services_external.https_listener_arns,0)}"
-
   # http listener ARN
   load_balancing_properties_lb_listener_arn = "${element(module.alb_shared_services_external.http_tcp_listener_arns,0)}"
 
@@ -86,8 +79,8 @@ module "fargate_service" {
   # group needs to check on for health_check, defaults to /ping
   load_balancing_properties_health_uri = "/"
 
-  # Creates a listener rule which redirects to https
-  load_balancing_properties_redirect_http_to_https = true
+  load_balancing_properties_https_enabled = false
+
 
   container_cpu = 256
   container_memory = 512

@@ -112,19 +112,6 @@ data "aws_route53_zone" "zone" {
 This module will create a record inside your existing zone, make sure that there is no overlap with existing records. If you create the certificate, it is best to use DNS validation.
 :::
 
-
-## ACM SSL Certificate
-No HTTP service goes unprotected, there are many public modules out there for automatic SSL Certificate registration with ACM. Please create a wildcard certificate in the Region you are using ECS and refer it in this demo setup as:  
-
-```json
-data "aws_acm_certificate" "cert" {
-  domain      = "*.yourdomain_at_route53.com"
-  types       = ["AMAZON_ISSUED"]
-  most_recent = true
-}
-```
-
-
 ## Application Load Balancer
 
 The ECS Service module can add many ECS Services to the same Application Load Balancer (ALB) by creating hostname based listener rules. For this module to operate with an ALB we need to setup one. We setup a loggin bucket first to make sure the ALB can log to S3.
@@ -152,8 +139,8 @@ module "alb_shared_services_external" {
     subnets                   = ["${module.vpc.public_subnets}"]
     tags                      = "${map("Environment", "ECS Test Setup")}"
     vpc_id                    = "${module.vpc.vpc_id}"
-    https_listeners           = "${list(map("certificate_arn", "${data.aws_acm_certificate.cert.arn}", "port", 443))}"
-    https_listeners_count     = "1"
+    https_listeners           = ""
+    https_listeners_count     = "0"
     http_tcp_listeners        = "${list(map("port", "80", "protocol", "HTTP"))}"
     http_tcp_listeners_count  = "1"
     target_groups             = "${list(map("name", "default-ext", "backend_protocol", "HTTP", "backend_port", "80"))}"
@@ -161,7 +148,3 @@ module "alb_shared_services_external" {
   }
 
 ```
-
-## Important
-
-Make sure to run Terraform apply with everything added until now. This will make sure no surprises show up the moment the ECS Service is being created.
