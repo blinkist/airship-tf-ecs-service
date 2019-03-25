@@ -60,7 +60,7 @@ variable "entrypoint" {
   default     = [""]
 }
 
-variable "container_command" {
+variable "command" {
   description = "The command that is passed to the container."
   default     = [""]
 }
