@@ -1,3 +1,4 @@
+/*jshint esversion: 8 */
 const AWS = require('aws-sdk');
 const ecs = new AWS.ECS();
 
@@ -36,7 +37,7 @@ exports.handler = async (event) => {
     const error = new AirshipLambdaError(`multiple services with name ${event.ecs_service} found in cluster ${event.ecs_cluster}`);
     throw error;
   } else if (res.services.length < 1) {
-    console.log("Could not find service, returning empty map")
+    console.log("Could not find service, returning empty map");
     return returnMap;
   }
 
@@ -65,21 +66,21 @@ exports.handler = async (event) => {
     throw error;
   }
 
-  // Populating the map for return
-  returnMap['task_revision'] = String(resTask.taskDefinition.revision);
-  returnMap['image'] = String(containerDefinitions[0].image);
-  returnMap['memory_reservation'] = String(containerDefinitions[0].memoryReservation);
-  returnMap['cpu'] = String(containerDefinitions[0].cpu);
-  returnMap['memory'] =  String(containerDefinitions[0].memory);
-
   var envDict = {};
   containerDefinitions[0].environment.forEach(function(element) {
     // HCL parses "true" as 1, we need to copy this behaviour
     envDict[String(element.name)] = ( String(element.value) == "true" ? "1" : String(element.value) ) ;
   });
 
-  returnMap['environment'] = JSON.stringify(envDict,Object.keys(envDict).sort());
-  console.log("Successfully returning populated map")
-  console.log(returnMap)
+  // Populating the map for return
+  returnMap.task_revision = String(resTask.taskDefinition.revision);
+  returnMap.image = String(containerDefinitions[0].image);
+  returnMap.memory_reservation = String(containerDefinitions[0].memoryReservation);
+  returnMap.cpu = String(containerDefinitions[0].cpu);
+  returnMap.memory =  String(containerDefinitions[0].memory);
+  returnMap.environment = JSON.stringify(envDict,Object.keys(envDict).sort());
+
+  console.log("Successfully returning populated map");
+  console.log(returnMap);
   return returnMap;
 };
