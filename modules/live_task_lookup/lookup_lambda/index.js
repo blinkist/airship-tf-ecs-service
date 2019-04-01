@@ -15,6 +15,7 @@ exports.handler = async (event) => {
   function AirshipLambdaError(message) {
     this.name = "AirshipLambdaError";
     this.message = message;
+    this.stack = (new Error()).stack;
   }
   AirshipLambdaError.prototype = new Error();
 
@@ -32,7 +33,7 @@ exports.handler = async (event) => {
   // Throw an error when the lookup returns more than one service
   // Return empty definitions in case no services have been found
   if (res.services.length > 1) {
-    const error = new AirshipLambdaError("multiple services with name %s found in cluster %s" % event.ecs_service, event.ecs_cluster);
+    const error = new AirshipLambdaError(`multiple services with name ${event.ecs_service} found in cluster ${event.ecs_cluster}`);
     throw error;
   } else if (res.services.length < 1) {
     console.log("Could not find service, returning empty map")
@@ -60,7 +61,7 @@ exports.handler = async (event) => {
   });
 
   if ( containerDefinitions.length != 1 ){
-    const error = new AirshipLambdaError("Could not find container definition: %s" % event.ecs_task_container_name );
+    const error = new AirshipLambdaError(`Could not find container definition: ${event.ecs_task_container_name}` );
     throw error;
   }
 

@@ -14,9 +14,7 @@ exports.handler = async (event, context, callback) => {
         .promise();
 
     if (services.services.length > 1) {
-        throw new Error("multiple services with name %s found in cluster %s" %
-            ecs_service,
-            ecs_cluster);
+        throw new Error(`multiple services with name ${ecs_service} found in cluster ${ecs_cluster}`);
     }
     if (services.services.length < 1) {
         throw new Error("Could not find service");
