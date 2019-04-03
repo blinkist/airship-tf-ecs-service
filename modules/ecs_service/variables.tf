@@ -64,9 +64,8 @@ variable "load_balancing_type" {}
 # Spread tasks over ECS Cluster based on AZ, Instance-id, memory
 variable "with_placement_strategy" {}
 
-variable "health_check_grace_period_seconds" {
-  default = "300"
-}
+# The amount of time to wait before the first health check. Only relevant for load balanced apps
+variable "health_check_grace_period_seconds" {}
 
 variable "tags" {
   type    = "map"

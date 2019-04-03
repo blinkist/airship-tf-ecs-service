@@ -301,6 +301,8 @@ module "ecs_service" {
   # deployment_minimum_healthy_percent sets the minimum % in capacity at deployment
   deployment_minimum_healthy_percent = "${var.capacity_properties_deployment_minimum_healthy_percent}"
 
+  health_check_grace_period_seconds = "${var.health_check_grace_period_seconds}"
+
   # load_balancing_type sets the type, either "none", "application", or "network"
   load_balancing_type = "${var.load_balancing_type}"
 
