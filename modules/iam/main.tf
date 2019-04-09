@@ -65,7 +65,7 @@ data "aws_iam_policy_document" "ssm_permissions" {
   ## Add Describe Parameters as per https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html
   statement {
     effect    = "Allow"
-    actions   = "ssm:DescribeParameters"
+    actions   = ["ssm:DescribeParameters"]
     resources = ["*"]
   }
 
