@@ -309,6 +309,16 @@ container_envvars defines extra container env vars, list of maps:
   default = {}
 }
 
+variable "container_secrets" {
+  description = <<EOF
+    The environment variables to pass to the container as SSM keys. 
+    The keys will be looked up and the resulting values will be passed to the environment variable.
+    This is a map
+  EOF
+
+  default = {}
+}
+
 variable "name" {
   description = "The name of the project, must be unique"
 }

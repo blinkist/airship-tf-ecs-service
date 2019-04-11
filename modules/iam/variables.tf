@@ -16,6 +16,11 @@ variable "fargate_enabled" {
   default = false
 }
 
+variable "has_secrets" {
+  description = "true, if the container needs access to SSM secrets"
+  default     = false
+}
+
 # Whether to provide access to the supplied kms_keys. If no kms keys are
 # passed, set this to false.
 variable "kms_enabled" {

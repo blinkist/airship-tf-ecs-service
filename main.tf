@@ -49,6 +49,9 @@ module "iam" {
 
   # In case Fargate is enabled an extra role needs to be added
   fargate_enabled = "${var.fargate_enabled}"
+
+  # The container uses secrets and needs a task execution role to get access to them
+  has_secrets = "${length(keys(var.container_secrets)) > 0}"
 }
 
 #
@@ -184,6 +187,7 @@ module "container_definition" {
   hostname = "${var.awsvpc_enabled == 1 ? "" : var.name}"
 
   container_envvars = "${var.container_envvars}"
+  container_secrets = "${var.container_secrets}"
 
   container_docker_labels = "${var.container_docker_labels}"
 

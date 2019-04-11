@@ -75,6 +75,16 @@ variable "container_envvars" {
   default     = {}
 }
 
+variable "container_secrets" {
+  description = <<EOF
+    The environment variables to pass to the container as SSM keys. 
+    The keys will be looked up and the resulting values will be passed to the environment variable.
+    This is a map
+  EOF
+
+  default = {}
+}
+
 variable "readonly_root_filesystem" {
   description = "Determines whether a container is given read-only access to its root filesystem. Due to how Terraform type casts booleans in json it is required to double quote this value."
   default     = "false"
