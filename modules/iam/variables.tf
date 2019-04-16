@@ -16,7 +16,7 @@ variable "fargate_enabled" {
   default = false
 }
 
-variable "has_secrets" {
+variable "container_secrets_enabled" {
   description = "true, if the container needs access to SSM secrets"
   default     = false
 }

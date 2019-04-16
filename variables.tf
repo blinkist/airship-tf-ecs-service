@@ -19,6 +19,11 @@ variable "fargate_enabled" {
   default     = false
 }
 
+variable "container_secrets_enabled" {
+  description = "true, if the container uses secrets and needs a task execution role to get access to them"
+  default     = false
+}
+
 variable "awsvpc_enabled" {
   default     = false
   description = "With awsvpc_enabled the network_mode for the ECS task definition will be awsvpc, defaults to bridge"

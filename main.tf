@@ -51,7 +51,7 @@ module "iam" {
   fargate_enabled = "${var.fargate_enabled}"
 
   # The container uses secrets and needs a task execution role to get access to them
-  has_secrets = "${length(keys(var.container_secrets)) > 0}"
+  container_secrets_enabled = "${var.container_secrets_enabled}"
 }
 
 #

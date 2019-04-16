@@ -20,14 +20,14 @@ data "aws_iam_policy_document" "ecs_task_assume_role" {
 
 # The ECS TASK ROLE execution role needed for FARGATE & AWS LOGS
 resource "aws_iam_role" "ecs_task_execution_role" {
-  count              = "${(var.create && (var.fargate_enabled || var.has_secrets) ) ? 1 : 0 }"
+  count              = "${(var.create && (var.fargate_enabled || var.container_secrets_enabled) ) ? 1 : 0 }"
   name               = "${var.name}-ecs-task-execution_role"
   assume_role_policy = "${data.aws_iam_policy_document.ecs_task_assume_role.json}"
 }
 
 # We need this for tasks with an execution role, e.g. those using Fargate or SSM secrets
 resource "aws_iam_role_policy_attachment" "ecs_tasks_execution_role" {
-  count      = "${(var.create && (var.fargate_enabled || var.has_secrets) ) ? 1 : 0 }"
+  count      = "${(var.create && (var.fargate_enabled || var.container_secrets_enabled) ) ? 1 : 0 }"
   role       = "${aws_iam_role.ecs_task_execution_role.id}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
@@ -60,7 +60,7 @@ resource "aws_iam_role_policy" "kms_permissions" {
 
 # Policy Document to allow access to SSM Parameter Store paths
 data "aws_iam_policy_document" "ssm_permissions" {
-  count = "${var.create && (var.ssm_enabled || var.has_secrets) ? 1 : 0 }"
+  count = "${var.create && (var.ssm_enabled || var.container_secrets_enabled) ? 1 : 0 }"
 
   ## Add Describe Parameters as per https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html
   statement {
@@ -94,7 +94,7 @@ resource "aws_iam_role_policy" "ssm_permissions" {
 
 # Add the SSM policy to the task execution role
 resource "aws_iam_role_policy" "ssm_permissions_execution" {
-  count  = "${(var.create && var.has_secrets) ? 1 : 0 }"
+  count  = "${(var.create && var.container_secrets_enabled) ? 1 : 0 }"
   name   = "${var.name}-ssm-permissions-exution-role"
   role   = "${aws_iam_role.ecs_task_execution_role.id}"
   policy = "${data.aws_iam_policy_document.ssm_permissions.json}"
