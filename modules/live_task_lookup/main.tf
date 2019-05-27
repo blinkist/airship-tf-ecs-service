@@ -7,6 +7,13 @@ resource "null_resource" "force_policy_dependency" {
   }
 }
 
+# Zip the lambda dir
+data "archive_file" "lookup_zip" {
+    type        = "zip"
+    source_dir  = "${path.module}/lookup_lambda"
+    output_path = "${path.module}/lookup.zip"
+}
+
 #
 # lookup_type lambda
 #
@@ -16,7 +23,7 @@ resource "aws_lambda_function" "lambda_lookup" {
   handler          = "index.handler"
   runtime          = "nodejs8.10"
   filename         = "${path.module}/lookup.zip"
-  source_code_hash = "${base64sha256(file("${path.module}/lookup.zip"))}"
+  source_code_hash = "${data.archive_file.lookup_zip.output_base64sha256}"
   role             = "${var.lambda_lookup_role_arn}"
   publish          = true
   tags             = "${var.tags}"

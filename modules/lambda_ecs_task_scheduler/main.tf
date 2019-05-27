@@ -2,6 +2,13 @@ locals {
   identifier = "${basename(var.ecs_cluster_id)}-${var.ecs_service_name}-task-scheduler"
 }
 
+# Zip the lambda dir
+data "archive_file" "ecs_task_scheduler_zip" {
+    type        = "zip"
+    source_dir  = "${path.module}/lambda"
+    output_path = "${path.module}/ecs_task_scheduler.zip"
+}
+
 #
 # The lambda taking care of running the tasks in scheduled fasion
 #
@@ -12,7 +19,7 @@ resource "aws_lambda_function" "lambda_task_runner" {
   runtime          = "nodejs8.10"
   timeout          = 30
   filename         = "${path.module}/ecs_task_scheduler.zip"
-  source_code_hash = "${base64sha256(file("${path.module}/ecs_task_scheduler.zip"))}"
+  source_code_hash = "${data.archive_file.ecs_task_scheduler_zip.output_base64sha256}"
   role             = "${var.lambda_ecs_task_scheduler_role_arn}"
 
   publish = true
