@@ -9,9 +9,9 @@ resource "null_resource" "force_policy_dependency" {
 
 # Zip the lambda dir
 data "archive_file" "lookup_zip" {
-    type        = "zip"
-    source_dir  = "${path.module}/lookup_lambda"
-    output_path = "${path.module}/lookup.zip"
+  type        = "zip"
+  source_dir  = "${path.module}/lookup_lambda"
+  output_path = "${path.module}/lookup.zip"
 }
 
 #

@@ -4,9 +4,9 @@ locals {
 
 # Zip the lambda dir
 data "archive_file" "ecs_task_scheduler_zip" {
-    type        = "zip"
-    source_dir  = "${path.module}/lambda"
-    output_path = "${path.module}/ecs_task_scheduler.zip"
+  type        = "zip"
+  source_dir  = "${path.module}/lambda"
+  output_path = "${path.module}/ecs_task_scheduler.zip"
 }
 
 #
