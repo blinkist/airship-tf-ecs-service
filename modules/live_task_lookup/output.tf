@@ -18,7 +18,7 @@ locals {
   # data.aws_ecs_container_definition.lookup returns a map, coalescelist again makes it save to use inside a conditional
   environment_coalesce = "${coalescelist(data.aws_ecs_container_definition.lookup.*.environment, list(map()))}"
 
-  dockerlabels_coalesce = "${coalescelist(data.aws_ecs_container_definition.lookup.*.docker_labels, list(map("_airship_dockerlabel_hash","")))}"
+  dockerlabels_coalesce = "${coalescelist(data.aws_ecs_container_definition.lookup.*.docker_labels, list(map("_airship_dockerlabel_hash","","_airship_secrets_hash","")))}"
 }
 
 output "docker_label_hash" {
@@ -26,6 +26,13 @@ output "docker_label_hash" {
               lookup(local.lambda_lookup, "docker_label_hash", "") :
                 ( var.lookup_type == "datasource" ?
                    lookup(local.dockerlabels_coalesce[0],"_airship_dockerlabel_hash", "") : "" )}"
+}
+
+output "secrets_hash" {
+  value = "${var.lookup_type == "lambda" ? 
+              lookup(local.lambda_lookup, "secrets_hash", "") :
+                ( var.lookup_type == "datasource" ?
+                   lookup(local.dockerlabels_coalesce[0],"_airship_secrets_hash", "") : "" )}"
 }
 
 output "environment_json" {

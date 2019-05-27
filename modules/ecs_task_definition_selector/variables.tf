@@ -18,3 +18,4 @@ variable "live_aws_ecs_task_definition_memory" {}
 variable "live_aws_ecs_task_definition_memory_reservation" {}
 variable "live_aws_ecs_task_definition_environment_json" {}
 variable "live_aws_ecs_task_definition_docker_label_hash" {}
+variable "live_aws_ecs_task_definition_secrets_hash" {}

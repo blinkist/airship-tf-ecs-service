@@ -143,9 +143,19 @@ locals {
     }
   }
 
+  # Secrets aren't trackable by the live_task_loop (thanks AWS!), so we store a hash of them as a synthetic Docker label on the container.
+  secrets_merge = {
+    "0" = {}
+
+    "1" = {
+      _airship_secrets_hash = "${md5(jsonencode(var.container_secrets))}"
+    }
+  }
+
   docker_labels = "${merge(
      var.container_docker_labels,
-     local.docker_label_merge[signum(length(var.container_docker_labels))])}"
+     local.docker_label_merge[signum(length(var.container_docker_labels))],
+     local.secrets_merge[signum(length(var.container_secrets))])}"
 }
 
 variable "tags" {

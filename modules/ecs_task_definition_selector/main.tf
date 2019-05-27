@@ -21,6 +21,7 @@ locals {
                    local.memory[0] != var.live_aws_ecs_task_definition_memory ||
                    local.memory_reservation[0] != "${var.live_aws_ecs_task_definition_memory_reservation == "undefined" ? "0" : var.live_aws_ecs_task_definition_memory_reservation}" ||
                    lookup(local.docker_labels[0],"_airship_dockerlabel_hash","") != var.live_aws_ecs_task_definition_docker_label_hash ||
+                   lookup(local.docker_labels[0],"_airship_secrets_hash","") != var.live_aws_ecs_task_definition_secrets_hash ||
                    jsonencode(local.environment[0]) != var.live_aws_ecs_task_definition_environment_json }"
 
   # If there is a difference, between the ( newly created) terraform state task definition and the live task definition

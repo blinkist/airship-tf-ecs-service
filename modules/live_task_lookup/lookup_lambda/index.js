@@ -8,6 +8,8 @@ var returnMap = {
   'cpu': '',
   'memory': '',
   'environment': '',
+  'docker_label_hash': '',
+  'secrets_hash': '',
   'task_revision': ''
 };
 
@@ -72,6 +74,8 @@ exports.handler = async (event) => {
     envDict[String(element.name)] = ( String(element.value) == "true" ? "1" : String(element.value) ) ;
   });
 
+  var dockerLabels = containerDefinitions[0].dockerLabels || {};
+
   // Populating the map for return
   returnMap.task_revision = String(resTask.taskDefinition.revision);
   returnMap.image = String(containerDefinitions[0].image);
@@ -79,6 +83,8 @@ exports.handler = async (event) => {
   returnMap.cpu = String(containerDefinitions[0].cpu);
   returnMap.memory =  String(containerDefinitions[0].memory);
   returnMap.environment = JSON.stringify(envDict,Object.keys(envDict).sort());
+  returnMap.docker_label_hash = dockerLabels._airship_dockerlabel_hash || '';
+  returnMap.secrets_hash =  dockerLabels._airship_secrets_hash || '';
 
   console.log("Successfully returning populated map");
   console.log(returnMap);
