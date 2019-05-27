@@ -52,6 +52,7 @@ locals {
     command                = "${var.container_command}"
     workingDirectory       = "${var.working_directory}"
     readonlyRootFilesystem = "${var.readonly_root_filesystem}"
+    dockerLabels           = "${local.docker_labels}"
 
     privileged = "${var.privileged}"
 
