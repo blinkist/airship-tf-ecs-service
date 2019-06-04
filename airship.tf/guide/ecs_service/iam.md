@@ -10,7 +10,7 @@ Task IAM Roles are a mechanism similar to EC2 Instance profiles. All available A
 This ECS Module takes care of creating an IAM role for the task and will also attach certain policies in case they are configured.
 
 ### KMS
-[KMS](https://aws.amazon.com/kms/) (Key Management Service) is AWS' offering for envelope encryptiong next to the expensive CloudHSM. The module has as a list as input `kms_keys` which should be filled with the ARNs of KMS keys which the ECS Service then has allows kms:Decrypt on.
+[KMS](https://aws.amazon.com/kms/) (Key Management Service) is AWS' offering for envelope encrypting next to the expensive CloudHSM. The module has as a list as input `kms_keys` which should be filled with the ARNs of KMS keys which the ECS Service then has allows kms:Decrypt on.
 
 ```json
     kms_keys  = ["${module.global-kms.aws_kms_key_arn}", "${module.demo-kms.aws_kms_key_arn}"]
