@@ -26,15 +26,15 @@ data "aws_vpc" "selected" {
 }
 
 resource "aws_ssm_parameter" "user" {
-  name        = "/myapp/dev/db.user"
-  type        = "String"
-  value       = "jdoe"
+  name  = "/myapp/dev/db.user"
+  type  = "String"
+  value = "jdoe"
 }
 
 resource "aws_ssm_parameter" "password" {
-  name        = "/myapp/dev/db.password"
-  type        = "SecureString"
-  value       = "CorrectHorseBatteryStaple"
+  name  = "/myapp/dev/db.password"
+  type  = "SecureString"
+  value = "CorrectHorseBatteryStaple"
 }
 
 module "ecs-base" {

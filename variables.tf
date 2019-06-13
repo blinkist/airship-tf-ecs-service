@@ -316,10 +316,18 @@ container_envvars defines extra container env vars, list of maps:
 
 variable "container_secrets" {
   description = <<EOF
-    The environment variables to pass to the container as SSM keys. 
-    The keys will be looked up and the resulting values will be passed to the environment variable.
-    This is a map
-  EOF
+The environment variables to pass to the container as SSM keys.  Should be a map of environment vairable names to either SSM var ANRs or paths.
+Example:
+```hcl
+container_secrets_enabled = true
+container_secrets = {
+  DB_USER     = "${data.aws_ssm_parameter.username.arn}"
+  DB_PASSWORD = "/myapp/dev/db.password"
+}
+ssm_enabled = true
+ssm_paths   = ["myapp/dev"]
+```
+EOF
 
   default = {}
 }
