@@ -1,5 +1,5 @@
 terraform {
-  required_version = "< 0.12"
+  required_version = "~> 0.11"
 }
 
 provider "aws" {
@@ -8,7 +8,7 @@ provider "aws" {
   skip_metadata_api_check     = true
   skip_region_validation      = true
   skip_credentials_validation = true
-  version                     = "> 1.57"
+  version                     = "~> 2.14"
 }
 
 variable "region" {

@@ -29,3 +29,15 @@ output "lb_address" {
 output "has_changed" {
   value = "${module.nlb_service.has_changed}"
 }
+
+output "cluster_id" {
+  value = "${module.ecs_cluster.cluster_id}"
+}
+
+output "zone_id" {
+  value = "${aws_route53_zone.this.zone_id}"
+}
+
+output "lb_arn" {
+  value = "${aws_lb.this.arn}"
+}
