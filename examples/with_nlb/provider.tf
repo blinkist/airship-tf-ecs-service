@@ -12,6 +12,7 @@ provider "aws" {
 }
 
 variable "region" {
+  ## Sorry I'm from this region
   default = "ap-southeast-2"
 }
 

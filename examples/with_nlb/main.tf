@@ -1,3 +1,25 @@
+##
+## Variables
+##
+
+variable "echo_port" {
+  default = "1025"
+}
+
+##
+## Locals
+##
+
+locals {
+  tags = {
+    Environment = "${terraform.workspace}"
+  }
+}
+
+##
+## Data Sources
+##
+
 data "aws_vpc" "selected" {
   default = true
 }
@@ -14,6 +36,78 @@ data "aws_security_group" "selected" {
   name   = "default"
   vpc_id = "${data.aws_vpc.selected.id}"
 }
+
+### This looks up the IP of where this terraform is being run from, 
+### and adds it to the white list, so you can access the service.
+data "http" "icanhazip" {
+  url = "http://ipv4.icanhazip.com"
+}
+
+## This looks up all of the private IP's used by the aws network load balancer
+data "aws_network_interface" "nlb" {
+  depends_on = ["aws_lb.this"]
+
+  filter = {
+    name   = "description"
+    values = ["ELB ${aws_lb.this.arn_suffix}"]
+  }
+
+  filter = {
+    name   = "subnet-id"
+    values = ["${data.aws_subnet.selected.id}"]
+  }
+}
+
+##
+## Resources
+##
+
+resource "aws_route53_zone" "this" {
+  name = "some.zonename.com"
+}
+
+resource "aws_security_group_rule" "allow_all" {
+  type              = "ingress"
+  from_port         = "${var.echo_port}"
+  to_port           = "${var.echo_port}"
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${data.aws_security_group.selected.id}"
+}
+
+resource "aws_security_group_rule" "allow_user" {
+  type              = "ingress"
+  from_port         = "0"
+  to_port           = "65535"
+  protocol          = "tcp"
+  cidr_blocks       = ["${format("%s/%s",trimspace(data.http.icanhazip.body), "32")}"]
+  security_group_id = "${data.aws_security_group.selected.id}"
+}
+
+resource "aws_security_group_rule" "allow_nlb_health_checks" {
+  type              = "ingress"
+  from_port         = "32768"
+  to_port           = "65535"
+  protocol          = "tcp"
+  cidr_blocks       = ["${formatlist("%s/32",sort(distinct(compact(concat(list(""),data.aws_network_interface.nlb.private_ips)))))}"]
+  security_group_id = "${data.aws_security_group.selected.id}"
+}
+
+resource "aws_lb" "this" {
+  name               = "${terraform.workspace}-service-nlb"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = ["${data.aws_subnet.selected.id}"]
+
+  enable_deletion_protection       = false
+  enable_cross_zone_load_balancing = true
+
+  tags = "${local.tags}"
+}
+
+##
+## Modules
+##
 
 module "ecs_cluster" {
   source  = "blinkist/airship-ecs-cluster/aws"
@@ -49,44 +143,7 @@ module "ecs_cluster" {
     block_metadata_service = false
   }
 
-  tags = {
-    Environment = "${terraform.workspace}"
-  }
-}
-
-resource "aws_route53_zone" "this" {
-  name = "some.zonename.com"
-}
-
-data "http" "icanhazip" {
-  url = "http://ipv4.icanhazip.com"
-}
-
-resource "aws_security_group_rule" "allow_user" {
-  type              = "ingress"
-  from_port         = "0"
-  to_port           = "65535"
-  protocol          = "tcp"
-  cidr_blocks       = ["${format("%s/%s",trimspace(data.http.icanhazip.body), "32")}"]
-  security_group_id = "${data.aws_security_group.selected.id}"
-}
-
-resource "aws_lb" "this" {
-  name               = "${terraform.workspace}-service-nlb"
-  internal           = false
-  load_balancer_type = "network"
-  subnets            = ["${data.aws_subnet.selected.id}"]
-
-  enable_deletion_protection       = false
-  enable_cross_zone_load_balancing = true
-
-  tags = {
-    Environment = "${terraform.workspace}"
-  }
-}
-
-variable "echo_port" {
-  default = "1025"
+  tags = "${local.tags}"
 }
 
 # Test that create true works
@@ -149,9 +206,7 @@ module "nlb_service" {
   # Whether to provide access to the supplied kms_keys. If no kms keys are
   # passed, set this to false.
 
-  tags = {
-    Environment = "${terraform.workspace}"
-  }
+  tags = "${local.tags}"
 }
 
 # Test that create false works
