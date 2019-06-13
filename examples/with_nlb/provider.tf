@@ -16,7 +16,7 @@ variable "region" {
 }
 
 provider "http" {
-  version = "~> 1.0"
+  version = "~> 1.1"
 }
 
 provider "null" {
@@ -25,4 +25,8 @@ provider "null" {
 
 provider "template" {
   version = "~> 2.1"
+}
+
+provider "archive" {
+  version = "~> 1.2"
 }
