@@ -244,9 +244,9 @@ data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
     resources = ["*"]
 
     condition {
-      test     = "ArnEquals"
+      test     = "ArnLike"
       variable = "ecs:cluster"
-      values   = ["${var.ecs_cluster_id}"]
+      values   = ["arn:aws:ecs:${var.region}:*:cluster/${var.ecs_cluster_id}"]
     }
   }
 
