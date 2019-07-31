@@ -506,3 +506,9 @@ variable "health_check_grace_period_seconds" {
   description = "The amount of seconds to wait before the first health check. Only relevant for load balanced apps. Default 5 minutes"
   default     = 300
 }
+
+variable "repository_credentials_secret_arn" {
+  description = "ARN of Docker private registry credentials stored in secrets manager"
+  type        = "string"
+  default     = ""
+}

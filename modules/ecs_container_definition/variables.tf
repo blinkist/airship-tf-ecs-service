@@ -163,3 +163,9 @@ variable "tags" {
   type        = "map"
   default     = {}
 }
+
+variable "repository_credentials_secret_arn" {
+  description = "ARN of Docker private registry credentials stored in secrets manager"
+  type        = "string"
+  default     = ""
+}

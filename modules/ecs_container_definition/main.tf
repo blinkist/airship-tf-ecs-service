@@ -39,7 +39,16 @@ locals {
     without_port = []
   }
 
-  use_port = "${var.container_port == "" ? "without_port" : "with_port" }"
+  repository_credentials = {
+    with_credentials = {
+        credentialsParameter = "${var.repository_credentials_secret_arn}"
+    }
+
+    without_credentials = {}
+  }
+
+  use_port        = "${var.container_port == "" ? "without_port" : "with_port" }"
+  use_credentials = "${var.repository_credentials_secret_arn == "" ? "without_credentials" : "with_credentials" }"
 
   container_definitions = [{
     name                   = "${var.container_name}"
@@ -56,12 +65,13 @@ locals {
 
     privileged = "${var.privileged}"
 
-    hostname     = "${var.hostname}"
-    environment  = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
-    secrets      = ["${null_resource.secrets_as_list_of_maps.*.triggers}"]
-    mountPoints  = ["${var.mountpoints}"]
-    portMappings = "${local.port_mappings[local.use_port]}"
-    healthCheck  = "${var.healthcheck}"
+    hostname              = "${var.hostname}"
+    environment           = ["${null_resource.envvars_as_list_of_maps.*.triggers}"]
+    secrets               = ["${null_resource.secrets_as_list_of_maps.*.triggers}"]
+    mountPoints           = ["${var.mountpoints}"]
+    portMappings          = "${local.port_mappings[local.use_port]}"
+    healthCheck           = "${var.healthcheck}"
+    repositoryCredentials = "${local.repository_credentials[local.use_credentials]}"
 
     logConfiguration = {
       logDriver = "${var.log_driver}"

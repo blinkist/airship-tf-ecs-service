@@ -189,6 +189,8 @@ module "container_definition" {
   container_envvars = "${var.container_envvars}"
   container_secrets = "${var.container_secrets}"
 
+  repository_credentials_secret_arn = "${var.repository_credentials_secret_arn}"
+
   container_docker_labels = "${var.container_docker_labels}"
 
   mountpoints = ["${var.mountpoints}"]
