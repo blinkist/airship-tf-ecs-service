@@ -224,6 +224,11 @@ resource "aws_iam_role_policy" "lambda_lookup_policy" {
   policy = "${data.aws_iam_policy_document.lambda_lookup_policy.0.json}"
 }
 
+# Fetch ECS cluster ARN for below policy
+data "aws_ecs_cluster" "default" {
+  cluster_name = "${var.ecs_cluster_id}"
+}
+
 # Policy for the Lambda Logging & ECS
 data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
   count = "${var.create ? 1 : 0 }"
@@ -246,7 +251,7 @@ data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
     condition {
       test     = "ArnEquals"
       variable = "ecs:cluster"
-      values   = ["${var.ecs_cluster_id}"]
+      values   = ["${data.aws_ecs_cluster.default.arn}"]
     }
   }
 
