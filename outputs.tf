@@ -14,6 +14,10 @@ output "task_execution_role_arn" {
   value = "${module.iam.ecs_task_execution_role_arn}"
 }
 
+output "task_execution_role_name" {
+  value = "${module.iam.ecs_task_execution_role_name}"
+}
+
 output "aws_ecs_task_definition_arn" {
   value = "${module.ecs_task_definition_selector.selected_task_definition_for_deployment}"
 }
