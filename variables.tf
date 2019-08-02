@@ -24,6 +24,11 @@ variable "container_secrets_enabled" {
   default     = false
 }
 
+variable "container_init_process_enabled" {
+  description = "Should the container be run with initProcessEnabled (--init)"
+  default     = false
+}
+
 variable "awsvpc_enabled" {
   default     = false
   description = "With awsvpc_enabled the network_mode for the ECS task definition will be awsvpc, defaults to bridge"

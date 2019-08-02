@@ -181,6 +181,8 @@ module "container_definition" {
   container_memory             = "${var.container_memory}"
   container_memory_reservation = "${var.container_memory_reservation}"
 
+  container_init_process_enabled = "${var.container_init_process_enabled}"
+
   container_port = "${var.container_port}"
   host_port      = "${var.awsvpc_enabled ? var.container_port : var.host_port }"
 

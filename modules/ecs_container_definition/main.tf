@@ -73,6 +73,10 @@ locals {
     healthCheck           = "${var.healthcheck}"
     repositoryCredentials = "${local.repository_credentials[local.use_credentials]}"
 
+    linuxParameters = {
+      initProcessEnabled = "${var.container_init_process_enabled ? true : false }"
+    }
+
     logConfiguration = {
       logDriver = "${var.log_driver}"
       options   = "${var.log_options}"

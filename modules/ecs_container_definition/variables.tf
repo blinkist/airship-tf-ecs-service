@@ -26,6 +26,11 @@ variable "container_port" {
   default     = 80
 }
 
+variable "container_init_process_enabled" {
+  description = "Should the container be run with initProcessEnabled (--init)"
+  default     = false
+}
+
 variable "host_port" {
   description = "The port number on the container instance (host) to reserve for the container_port. If using containers in a task with the awsvpc or host network mode, the hostPort can either be left blank or set to the same value as the containerPort."
 }
