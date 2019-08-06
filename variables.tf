@@ -517,3 +517,21 @@ variable "repository_credentials_secret_arn" {
   type        = "string"
   default     = ""
 }
+
+variable "container_ulimit_name" {
+  type        = "string"
+  default     = "nofile"
+  description = "ECS container definition ulimits name"
+}
+
+variable "container_ulimit_soft_limit" {
+  type        = "string"
+  default     = ""
+  description = "ECS container definition ulimits soft limit"
+}
+
+variable "container_ulimit_hard_limit" {
+  type        = "string"
+  default     = ""
+  description = "ECS containter definition ulimits hard limit"
+}

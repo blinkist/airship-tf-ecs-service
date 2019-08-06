@@ -183,6 +183,10 @@ module "container_definition" {
 
   container_init_process_enabled = "${var.container_init_process_enabled}"
 
+  ulimit_name       = "${var.container_ulimit_name}"
+  ulimit_soft_limit = "${var.container_ulimit_soft_limit}"
+  ulimit_hard_limit = "${var.container_ulimit_hard_limit}"
+
   container_port = "${var.container_port}"
   host_port      = "${var.awsvpc_enabled ? var.container_port : var.host_port }"
 

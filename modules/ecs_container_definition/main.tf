@@ -39,6 +39,18 @@ locals {
     without_port = []
   }
 
+  ulimits = {
+    with_ulimits = [
+      {
+        softLimit = "${var.ulimit_soft_limit}"
+        hardLimit = "${var.ulimit_hard_limit}"
+        name      = "${var.ulimit_name}"
+      }
+    ]
+
+    without_ulimits = []
+  }
+
   repository_credentials = {
     with_credentials = {
         credentialsParameter = "${var.repository_credentials_secret_arn}"
@@ -49,6 +61,7 @@ locals {
 
   use_port        = "${var.container_port == "" ? "without_port" : "with_port" }"
   use_credentials = "${var.repository_credentials_secret_arn == "" ? "without_credentials" : "with_credentials" }"
+  use_ulimits     = "${var.ulimit_soft_limit == "" && var.ulimit_hard_limit == "" ? "without_ulimits" : "with_ulimits" }"
 
   container_definitions = [{
     name                   = "${var.container_name}"
@@ -76,6 +89,8 @@ locals {
     linuxParameters = {
       initProcessEnabled = "${var.container_init_process_enabled ? true : false }"
     }
+
+    ulimits = "${local.ulimits[local.use_ulimits]}"
 
     logConfiguration = {
       logDriver = "${var.log_driver}"

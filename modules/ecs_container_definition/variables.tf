@@ -174,3 +174,18 @@ variable "repository_credentials_secret_arn" {
   type        = "string"
   default     = ""
 }
+
+variable "ulimit_name" {
+  type    = "string"
+  default = "nofile"
+}
+
+variable "ulimit_soft_limit" {
+  type    = "string"
+  default = ""
+}
+
+variable "ulimit_hard_limit" {
+  type    = "string"
+  default = ""
+}
