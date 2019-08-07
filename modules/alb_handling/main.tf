@@ -1,5 +1,5 @@
 data "aws_lb" "main" {
-  count = "${var.create ? 1 : 0}"
+  count = "${var.create && var.route53_record_type != "NONE" ? 1 : 0}"
   arn   = "${var.lb_arn}"
 }
 
