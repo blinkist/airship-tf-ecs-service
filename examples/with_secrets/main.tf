@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 0.11"
+  required_version = "~> 0.11.0"
 }
 
 locals {
@@ -38,7 +38,7 @@ resource "aws_ssm_parameter" "password" {
 }
 
 module "ecs-base" {
-  source = "../with_nlb"
+  source = "../with_nlb" # Reuse the infrastructure defined in the "with_nlb" example :)
   region = "${local.region}"
 }
 
