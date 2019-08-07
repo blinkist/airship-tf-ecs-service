@@ -535,3 +535,27 @@ variable "container_ulimit_hard_limit" {
   default     = ""
   description = "ECS containter definition ulimits hard limit"
 }
+
+variable "is_scheduled_task" {
+  description = <<EOF
+When this is enabled, any load balancer- and autoscaling settings are ignored, and no ECS service is created. 
+Instead, a scheduled task is created using the task defintion and the 'scheduled_task_*' settings.
+EOF
+
+  default = false
+}
+
+variable "scheduled_task_expression" {
+  description = "The scheduling expression. For example, cron(0 20 * * ? *) or rate(5 minutes)."
+  default     = "rate(1 hour)"
+}
+
+variable "scheduled_task_group" {
+  description = "(Optional) Specifies an ECS task group for the task. The maximum length is 255 characters"
+  default     = "default"
+}
+
+variable "scheduled_task_count" {
+  description = "The number of tasks to create based on the TaskDefinition"
+  default     = 1
+}

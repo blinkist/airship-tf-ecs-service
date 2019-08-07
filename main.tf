@@ -52,6 +52,9 @@ module "iam" {
 
   # The container uses secrets and needs a task execution role to get access to them
   container_secrets_enabled = "${var.container_secrets_enabled}"
+
+  # If this is a scheduled task, cloudwatch needs permission to start the task
+  is_scheduled_task = "${var.is_scheduled_task}"
 }
 
 #
@@ -99,7 +102,7 @@ module "alb_handling" {
 
   # route53_record_type sets the record type of the route53 record, can be ALIAS, CNAME or NONE,  defaults to ALIAS
   # In case of NONE no record will be made
-  route53_record_type = "${var.load_balancing_properties_route53_record_type}"
+  route53_record_type = "${var.is_scheduled_task ? "NONE" : var.load_balancing_properties_route53_record_type}"
 
   # Sets the zone in which the sub-domain will be added for this service
   route53_zone_id = "${var.load_balancing_properties_route53_zone_id}"
@@ -293,7 +296,7 @@ module "ecs_service" {
   name = "${var.name}"
 
   # create defines if resources are being created inside this module
-  create = "${var.create}"
+  create = "${var.create && !var.is_scheduled_task}"
 
   cluster_id = "${var.ecs_cluster_id}"
 
@@ -376,7 +379,7 @@ module "ecs_autoscaling" {
   source = "./modules/ecs_autoscaling/"
 
   # create defines if resources inside this module are being created.
-  create = "${var.create && length(var.scaling_properties) > 0 ? true : false }"
+  create = "${var.create && !var.is_scheduled_task && length(var.scaling_properties) > 0 ? true : false }"
 
   cluster_name = "${local.ecs_cluster_name}"
 
@@ -393,14 +396,13 @@ module "ecs_autoscaling" {
   scaling_properties = "${var.scaling_properties}"
 }
 
-#
-# This modules creates scheduled tasks for the ecs service
-#
+# This modules creates scheduled tasks for the ecs service. This is not the same as ECS scheduled tasks! 
+# Instead it runs a command inside an existing task, similar to a cron job on that task.
 module "lambda_ecs_task_scheduler" {
   source = "./modules/lambda_ecs_task_scheduler/"
 
   # create defines if resources inside this module are being created.
-  create = "${var.create && length(var.ecs_cron_tasks) > 0 ? true : false }"
+  create = "${var.create && !var.is_scheduled_task && length(var.ecs_cron_tasks) > 0 ? true : false }"
 
   ecs_cluster_id = "${var.ecs_cluster_id}"
 
@@ -414,4 +416,35 @@ module "lambda_ecs_task_scheduler" {
 
   # lambda_ecs_task_scheduler_role_arn sets the role arn of the task scheduling lambda
   lambda_ecs_task_scheduler_role_arn = "${module.iam.lambda_ecs_task_scheduler_role_arn}"
+}
+
+# ECS scheduled task configuration. This uses a CloudWatch rulle to start an ECS task at given intervals.
+data "aws_ecs_cluster" "this" {
+  cluster_name = "${var.ecs_cluster_id}"
+}
+
+resource "aws_cloudwatch_event_rule" "scheduled_task" {
+  name                = "${var.name}_scheduled_task"
+  description         = "Run ${var.name} task at a scheduled time (${var.scheduled_task_expression})"
+  schedule_expression = "${var.scheduled_task_expression}"
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_cloudwatch_event_target" "scheduled_task" {
+  rule     = "${aws_cloudwatch_event_rule.scheduled_task.name}"
+  arn      = "${data.aws_ecs_cluster.this.arn}"
+  role_arn = "${module.iam.scheduled_task_cloudwatch_role_arn}"
+
+  ecs_target {
+    group               = "${var.scheduled_task_group}"
+    launch_type         = "${local.launch_type}"
+    task_count          = "${var.scheduled_task_count}"
+    task_definition_arn = "arn:aws:ecs:${var.region}:${data.aws_caller_identity.current.account_id}:task-definition/${module.ecs_task_definition_selector.selected_task_definition_for_deployment}"
+
+    network_configuration = {
+      subnets          = ["${var.awsvpc_subnets}"]
+      security_groups  = ["${var.awsvpc_security_group_ids}"]
+    }
+  }
 }

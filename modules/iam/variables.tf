@@ -21,34 +21,37 @@ variable "container_secrets_enabled" {
   default     = false
 }
 
-# Whether to provide access to the supplied kms_keys. If no kms keys are
-# passed, set this to false.
 variable "kms_enabled" {
-  default = false
+  description = "Whether to provide access to the supplied kms_keys. If no kms keys are passed, set this to false."
+  default     = false
 }
 
-# List of KMS keys the task has access to
 variable "kms_keys" {
-  default = []
+  description = "List of KMS keys the task has access to."
+  default     = []
 }
 
-# Whether to provide access to the supplied ssm_paths. If no ssm paths are
-# passed, set this to false.
 variable "ssm_enabled" {
-  default = false
+  description = "Whether to provide access to the supplied ssm_paths. If no ssm paths are passed, set this to false."
+  default     = false
 }
 
-# List of SSM Paths the task has access to
 variable "ssm_paths" {
-  default = []
+  description = "List of SSM Paths the task has access to."
+  default     = []
 }
 
-# S3 Read-only paths the Task has access to
 variable "s3_ro_paths" {
-  default = []
+  description = "S3 Read-only paths the Task has access to."
+  default     = []
 }
 
-# S3 Read-write paths the Task has access to
 variable "s3_rw_paths" {
-  default = []
+  description = "S3 Read-write paths the Task has access to."
+  default     = []
+}
+
+variable "is_scheduled_task" {
+  description = "If true, this not a service, but a schedulked task."
+  default     = false
 }
