@@ -443,8 +443,8 @@ resource "aws_cloudwatch_event_target" "scheduled_task" {
     task_definition_arn = "arn:aws:ecs:${var.region}:${data.aws_caller_identity.current.account_id}:task-definition/${module.ecs_task_definition_selector.selected_task_definition_for_deployment}"
 
     network_configuration = {
-      subnets          = ["${var.awsvpc_subnets}"]
-      security_groups  = ["${var.awsvpc_security_group_ids}"]
+      subnets         = ["${var.awsvpc_subnets}"]
+      security_groups = ["${var.awsvpc_security_group_ids}"]
     }
   }
 }

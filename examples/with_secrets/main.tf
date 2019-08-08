@@ -38,7 +38,7 @@ resource "aws_ssm_parameter" "password" {
 }
 
 module "ecs-base" {
-  source = "../with_nlb" # Reuse the infrastructure defined in the "with_nlb" example :)
+  source = "../with_nlb"     # Reuse the infrastructure defined in the "with_nlb" example :)
   region = "${local.region}"
 }
 
