@@ -63,7 +63,7 @@ module "alb_handling" {
   cluster_name = "${local.ecs_cluster_name}"
 
   # Create defines if we need to create resources inside this module
-  create = "${var.create}"
+  create = "${var.create && var.load_balancing_type != "none" ? true : false}"
 
   # load_balancing_type sets the type, either "none", "application", or "network"
   load_balancing_type = "${var.load_balancing_type}"
