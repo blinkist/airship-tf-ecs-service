@@ -424,6 +424,7 @@ data "aws_ecs_cluster" "this" {
 }
 
 resource "aws_cloudwatch_event_rule" "scheduled_task" {
+  count               = "${var.is_scheduled_task ? 1 : 0}"
   name                = "${var.name}_scheduled_task"
   description         = "Run ${var.name} task at a scheduled time (${var.scheduled_task_expression})"
   schedule_expression = "${var.scheduled_task_expression}"
@@ -432,6 +433,7 @@ resource "aws_cloudwatch_event_rule" "scheduled_task" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_cloudwatch_event_target" "scheduled_task" {
+  count    = "${var.is_scheduled_task ? 1 : 0}"
   rule     = "${aws_cloudwatch_event_rule.scheduled_task.name}"
   arn      = "${data.aws_ecs_cluster.this.arn}"
   role_arn = "${module.iam.scheduled_task_cloudwatch_role_arn}"

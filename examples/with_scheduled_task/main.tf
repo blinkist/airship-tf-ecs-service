@@ -12,6 +12,7 @@ locals {
 
 resource "aws_ecs_cluster" "this" {
   name = "${terraform.workspace}-cluster"
+  tags = "${local.tags}"
 
   lifecycle {
     create_before_destroy = true
