@@ -58,46 +58,4 @@ module "demo_web" {
 
 ## Volume Mounting
 
-When running on an EC2 backed ECS cluster, it is possible to mount folders from the host machines inside task containers.
-
-```json
-module "mycluster" {
-  source  = "blinkist/airship-ecs-cluster/aws"
-  version = "0.5.1"
-  
-  name = "mycluster"
-
-  ...
-  
-  cluster_properties = {
-    ...
-    efs_enabled = true            # Mount a volume to "/efs" on every EC2 host instance in the cluster
-    efs_id      = "${var.efs_id}" # EFS volume id
-  }
-}
-
-module "myservice" {
-  source  = "blinkist/airship-ecs-service/aws"
-  version = "0.9.7"
-
-  name                      = "myservice"
-  bootstrap_container_image = "nginx:stable"
-  container_cpu             = 256
-  container_memory          = 512
-  ecs_cluster_id            = "${module.mycluster.id}"
-  region                    = "eu-west-1"
-
-  # Maps host folders as volumes
-  host_path_volumes = [{
-    name      = "efs"
-    host_path = "/mnt/efs/myservice"
-  }]
-
-  # Mounts volumes inside containers
-  mountpoints = [{
-    sourceVolume  = "efs"
-    containerPath = "/usr/share/nginx/html" # This dir is what the nginx server serves at http://localhost:80/
-    readOnly      = "false" # Must be quoted string!
-  }]
-}
-```
+TODO

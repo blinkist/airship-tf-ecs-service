@@ -45,7 +45,7 @@ locals {
         softLimit = "${var.ulimit_soft_limit}"
         hardLimit = "${var.ulimit_hard_limit}"
         name      = "${var.ulimit_name}"
-      },
+      }
     ]
 
     without_ulimits = []
@@ -53,7 +53,7 @@ locals {
 
   repository_credentials = {
     with_credentials = {
-      credentialsParameter = "${var.repository_credentials_secret_arn}"
+        credentialsParameter = "${var.repository_credentials_secret_arn}"
     }
 
     without_credentials = {}

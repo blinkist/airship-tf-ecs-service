@@ -2,18 +2,10 @@
 sidebarDepth: 2
 ---
 
-# Scheduled tasks
+# ECS Cron tasks
 
-Airship supports two types of scheduled tasks. 
-
-"Cron tasks" are commands that are run inside running task containers at intervals.
-
-"ECS Scheduled Tasks" are containers that are started at intervals by CloudWatch rules, and run until they terminate naturally.
-
-
-## Cron tasks
-
-In many environments it's common to have cronjob like tasks. This module provide an easy way of configuring cron jobs for a running docker. The cronjobs will not be executed inside a running docker but a new task will be executed and the configured command will be ran.
+## Introduction
+In many environments it's common to have cronjob like tasks. This module provide an easy way of configuring crontjobs for a running docker. The cronjobs will not be executed inside a running docker but a new task will be executed and the configured command will be ran.
 
 <mermaid/>
 <div class="mermaid">
@@ -26,7 +18,7 @@ sequenceDiagram
 
 ## Implementation
 
-The `ecs_cron_tasks` parameter holds a list of maps with information regarding the 'cron' jobs.
+The `ecs_cron_tasks` param holds a list of maps with information regarding the 'cron' jobs.
 
 ```json
    # ecs_cron_tasks holds a list of maps defining scheduled jobs
@@ -54,29 +46,4 @@ The `ecs_cron_tasks` parameter holds a list of maps with information regarding t
      command             = "/usr/local/bin/something_else"
    }
    ]
-```
-
-## ECS Scheduled Tasks
-
-Scheduled tasks are a good fit for replacing containers that spend most of their time idle, and only occasionally run batch jobs or other maintenance.
-They use AWS [scheduled tasks](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html) to start temporary containers at intervals. 
-The containers are expected to run and terminate when they are done.
-
-```json
-module "myservice" {
-  source  = "blinkist/airship-ecs-service/aws"
-  version = "0.9.7"
-
-  name                      = "myservice"
-  bootstrap_container_image = "hello-world:latest"
-  container_cpu             = 256
-  container_memory          = 512
-  ecs_cluster_id            = "${var.cluster_id}"
-  region                    = "eu-west-1"
-
-  # Run the hello world task in one container every 15 minutes
-  is_scheduled_task         = true
-  scheduled_task_expression = "rate(15 minutes)" # Same as "cron(0,15,30,45 * * * *)"
-  scheduled_task_count      = 1
-}
 ```
