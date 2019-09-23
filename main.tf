@@ -124,6 +124,9 @@ module "alb_handling" {
   # health_uri defines which health-check uri the target group needs to check on for health_check
   health_uri = "${var.load_balancing_properties_health_uri}"
 
+  # health_port defines port of the health-check
+  health_port= "${var.load_balancing_properties_health_port}"
+
   # The expected HTTP status for the health check to be marked healthy
   # You can specify multiple values (for example, "200,202") or a range of values (for example, "200-299")
   health_matcher = "${var.load_balancing_properties_health_matcher}"
