@@ -97,6 +97,7 @@ resource "aws_lb_target_group" "service" {
     path                = "${var.health_uri}"
     unhealthy_threshold = "${var.unhealthy_threshold}"
     healthy_threshold   = "${var.healthy_threshold}"
+    port                = "${var.health_port}"
   }
 }
 

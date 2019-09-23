@@ -79,6 +79,11 @@ variable "health_uri" {
   default = ""
 }
 
+# port for the health check. Defaults to traffic-port
+variable "health_port" {
+  default = "traffic-port"
+}
+
 # The expected HTTP status for the health check to be marked healthy
 # You can specify multiple values (for example, "200,202") or a range of values (for example, "200-299")
 variable "health_matcher" {
