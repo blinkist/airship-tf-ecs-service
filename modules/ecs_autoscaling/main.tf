@@ -53,7 +53,8 @@ resource "aws_cloudwatch_metric_alarm" "alarm" {
     ServiceName = "${var.ecs_service_name}"
   }
 
-  alarm_actions = ["${aws_appautoscaling_policy.policy.*.arn[count.index]}"]
+  alarm_actions   = ["${aws_appautoscaling_policy.policy.*.arn[count.index]}"]
+  actions_enabled = true
 
-  depends_on = ["aws_appautoscaling_target.target"]
+  depends_on = ["aws_appautoscaling_target.target", "aws_appautoscaling_policy.policy"]
 }
