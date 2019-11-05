@@ -566,6 +566,6 @@ variable "scheduled_task_count" {
 }
 
 variable "scheduled_task_name" {
-  description = "The name of the scheduled_task event rule. If blank, this defaults to var.name".
+  description = "The name of the scheduled_task event rule. If blank, this defaults to var.name"
   default     = ""
 }

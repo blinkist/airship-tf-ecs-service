@@ -36,8 +36,8 @@ module "scheduled_task" {
   tags                      = "${local.tags}"
 
   # Scheduled task configuration
-  is_scheduled_task         = true                           # Make this a scheduled task
-  scheduled_task_expression = "rate(1 minute)"               # Every minute
-  scheduled_task_count      = 1                              # The number of tasks to run
-  scheduled_task_name       = "my_task"                      # An optional uniquename for the event_rule. Defaults to the service name
+  is_scheduled_task         = true             # Make this a scheduled task
+  scheduled_task_expression = "rate(1 minute)" # Every minute
+  scheduled_task_count      = 1                # The number of tasks to run
+  scheduled_task_name       = "my_task"        # An optional uniquename for the event_rule. Defaults to the service name
 }
