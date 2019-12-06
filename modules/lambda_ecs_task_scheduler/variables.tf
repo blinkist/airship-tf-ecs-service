@@ -38,3 +38,7 @@ variable "tags" {
   type    = "map"
   default = {}
 }
+
+variable "lambda_runtime" {
+  type = "string"
+}

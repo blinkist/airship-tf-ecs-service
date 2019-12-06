@@ -16,7 +16,7 @@ resource "aws_lambda_function" "lambda_task_runner" {
   count            = "${var.create ? 1 : 0}"
   function_name    = "${local.identifier}"
   handler          = "index.handler"
-  runtime          = "nodejs8.10"
+  runtime          = "${var.lambda_runtime}"
   timeout          = 30
   filename         = "${path.module}/ecs_task_scheduler.zip"
   source_code_hash = "${data.archive_file.ecs_task_scheduler_zip.output_base64sha256}"
