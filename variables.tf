@@ -229,6 +229,12 @@ EOF
   default = "lambda"
 }
 
+variable "live_task_lookup_lambda_runtime" {
+  description = "Runtime version of live task lookup lambda"
+  type        = "string"
+  default     = "nodejs8.10"
+}
+
 variable "bootstrap_container_image" {
   description = "The docker image location"
 }
@@ -568,4 +574,10 @@ variable "scheduled_task_count" {
 variable "scheduled_task_name" {
   description = "The name of the scheduled_task event rule. If blank, this defaults to var.name".
   default     = ""
+}
+
+variable "lambda_ecs_task_scheduler_runtime" {
+  description = "Runtime version of ecs task scheduler lambda"
+  type        = "string"
+  default     = "nodejs8.10"
 }
