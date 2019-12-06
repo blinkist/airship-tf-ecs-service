@@ -16,7 +16,7 @@ variable "lambda_lookup_role_arn" {}
 # lambda_lookup_role_policy_id sets the id of the added policy to the lambda, this to force dependency
 variable "lambda_lookup_role_policy_id" {}
 
-# lookup_type sets the type of lookup, either 
+# lookup_type sets the type of lookup, either
 # * lambda - works during bootstrap and after bootstrap
 # * datasource - uses terraform datasources ( aws_ecs_service ) which won't work during bootstrap
 variable "lookup_type" {
@@ -33,10 +33,14 @@ variable "allowed_lookup_types" {
 
 locals {
   # validating the var.lookup_type input
-  test_lookup_type = "${lookup(var.allowed_lookup_types,var.lookup_type)}"
+  test_lookup_type = "${lookup(var.allowed_lookup_types, var.lookup_type)}"
 }
 
 # tags
 variable "tags" {
   default = {}
+}
+
+variable "lambda_runtime" {
+  type = "string"
 }

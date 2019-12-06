@@ -21,7 +21,7 @@ resource "aws_lambda_function" "lambda_lookup" {
   count            = "${var.create ? 1 : 0}"
   function_name    = "${basename(var.ecs_cluster_id)}-${var.ecs_service_name}-lambda-lookup"
   handler          = "index.handler"
-  runtime          = "nodejs8.10"
+  runtime          = "${var.lambda_runtime}"
   filename         = "${path.module}/lookup.zip"
   source_code_hash = "${data.archive_file.lookup_zip.output_base64sha256}"
   role             = "${var.lambda_lookup_role_arn}"
