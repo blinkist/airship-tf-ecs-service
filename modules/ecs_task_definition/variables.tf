@@ -1,5 +1,6 @@
 # name of the ecs_service
-variable "name" {}
+variable "name" {
+}
 
 # create
 variable "create" {
@@ -7,7 +8,8 @@ variable "create" {
 }
 
 # cluster name
-variable "cluster_name" {}
+variable "cluster_name" {
+}
 
 # is awsvpc enabled ?
 variable "awsvpc_enabled" {
@@ -20,33 +22,39 @@ variable "fargate_enabled" {
 }
 
 # container_definitions set the json with the container definitions
-variable "container_definitions" {}
+variable "container_definitions" {
+}
 
 # cpu is set in case Fargate is used
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
-variable "cpu" {}
+variable "cpu" {
+}
 
 # memory is set in case Fargate is used
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html
-variable "memory" {}
+variable "memory" {
+}
 
 # ecs_taskrole_arn sets the arn of the ECS Task role
-variable "ecs_taskrole_arn" {}
+variable "ecs_taskrole_arn" {
+}
 
 # ecs_task_execution_role_arn sets the execution role arn, needed for FARGATE
-variable "ecs_task_execution_role_arn" {}
+variable "ecs_task_execution_role_arn" {
+}
 
 # AWS Region
-variable "region" {}
+variable "region" {
+}
 
 # launch_type sets the launch_type, either EC2 or FARGATE
-variable "launch_type" {}
+variable "launch_type" {
+}
 
 # A Docker volume to add to the task
 variable "docker_volume" {
-  type    = "map"
+  type    = map(string)
   default = {}
-
   # {
   # # these properties are supported as a 'flattened' version of the docker volume configuration:
   # # https://www.terraform.io/docs/providers/aws/r/ecs_task_definition.html#docker_volume_configuration
@@ -62,9 +70,8 @@ variable "docker_volume" {
 
 # list of host paths to add as volumes to the task
 variable "host_path_volumes" {
-  type    = "list"
+  type    = list(map(string))
   default = []
-
   # {
   #     name = "service-storage",
   #     host_path = "/foo"
@@ -73,12 +80,12 @@ variable "host_path_volumes" {
 
 # list of mount points to add to every container in the task
 variable "mountpoints" {
-  type    = "list"
+  type    = list(map(string))
   default = []
-
   # {
   #     source_volume = "service-storage",
   #     container_path = "/foo",
   #     read_only = "false"
   # },
 }
+

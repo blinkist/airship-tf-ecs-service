@@ -1,20 +1,26 @@
 # ecs_service_name sets the service name
-variable "ecs_service_name" {}
+variable "ecs_service_name" {
+}
 
 # create sets if resources are created
-variable "create" {}
+variable "create" {
+}
 
 # container_name sets the name of the container where we lookup the container_image
-variable "container_name" {}
+variable "container_name" {
+}
 
 # ecs_cluster_id sets the cluster id
-variable "ecs_cluster_id" {}
+variable "ecs_cluster_id" {
+}
 
 # lambda_lookup_role_arn sets the role arn of the lookup_lambda
-variable "lambda_lookup_role_arn" {}
+variable "lambda_lookup_role_arn" {
+}
 
 # lambda_lookup_role_policy_id sets the id of the added policy to the lambda, this to force dependency
-variable "lambda_lookup_role_policy_id" {}
+variable "lambda_lookup_role_policy_id" {
+}
 
 # lookup_type sets the type of lookup, either
 # * lambda - works during bootstrap and after bootstrap
@@ -33,7 +39,7 @@ variable "allowed_lookup_types" {
 
 locals {
   # validating the var.lookup_type input
-  test_lookup_type = "${lookup(var.allowed_lookup_types, var.lookup_type)}"
+  test_lookup_type = var.allowed_lookup_types[var.lookup_type]
 }
 
 # tags
@@ -42,5 +48,6 @@ variable "tags" {
 }
 
 variable "lambda_runtime" {
-  type = "string"
+  type = string
 }
+

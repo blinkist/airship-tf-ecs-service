@@ -1,5 +1,9 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
-  region                      = "${local.region}"
+  region                      = local.region
   skip_get_ec2_platforms      = true
   skip_metadata_api_check     = true
   skip_region_validation      = true
@@ -18,3 +22,4 @@ provider "null" {
 provider "template" {
   version = "~> 2.1"
 }
+

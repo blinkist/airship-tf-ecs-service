@@ -7,16 +7,19 @@ variable "create" {
 
 # What kind of load balancing, "none", "application", "network"
 variable "load_balancing_type" {
-  type = "string"
+  type = string
 }
 
 # The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. 
-variable "deregistration_delay" {}
+variable "deregistration_delay" {
+}
 
 # unhealthy_threshold defines the threashold for the target_group after which a service is seen as unhealthy.
-variable "unhealthy_threshold" {}
+variable "unhealthy_threshold" {
+}
 
-variable "healthy_threshold" {}
+variable "healthy_threshold" {
+}
 
 variable "cluster_name" {
   default = ""
@@ -115,11 +118,12 @@ variable "allowed_record_types" {
 }
 
 # route53_record_type, one of the allowed values of the map allowed_record_types
-variable "route53_record_type" {}
+variable "route53_record_type" {
+}
 
 # the custom_listen_hosts will be added as a host route rule as aws_lb_listener_rule to the given service e.g. www.domain.com -> Service
 variable "custom_listen_hosts" {
-  type    = "list"
+  type    = list(string)
   default = []
 }
 
@@ -133,7 +137,8 @@ variable "https_enabled" {
 }
 
 # route53_record_identifier, sets the identifier for the route53 record in case the record type is ALIAS 
-variable "route53_record_identifier" {}
+variable "route53_record_identifier" {
+}
 
 # cognito_auth_enabled is set when cognito authentication is used for the https listener
 variable "cognito_auth_enabled" {
@@ -157,14 +162,15 @@ variable "cognito_user_pool_domain" {
 
 variable "tags" {
   description = "A map of tags to apply to all resources"
-  type        = "map"
+  type        = map(string)
   default     = {}
 }
 
 locals {
   name_map = {
-    "Name" = "${var.name}"
+    "Name" = var.name
   }
 
-  tags = "${merge(var.tags, local.name_map)}"
+  tags = merge(var.tags, local.name_map)
 }
+

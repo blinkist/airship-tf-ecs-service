@@ -1,17 +1,22 @@
 # create defines if resources are created inside this module
-variable "create" {}
+variable "create" {
+}
 
 # ecs_cluster_id sets the cluster id
-variable "ecs_cluster_id" {}
+variable "ecs_cluster_id" {
+}
 
 # ecs_service_name sets the service name
-variable "ecs_service_name" {}
+variable "ecs_service_name" {
+}
 
 # Container name to run the command in
-variable "container_name" {}
+variable "container_name" {
+}
 
 # Role of the AWS Lambda
-variable "lambda_ecs_task_scheduler_role_arn" {}
+variable "lambda_ecs_task_scheduler_role_arn" {
+}
 
 # ecs_cron_tasks holds a list of maps defining the scheduled jobs which need to run
 #
@@ -29,16 +34,17 @@ variable "lambda_ecs_task_scheduler_role_arn" {}
 #
 #   },]
 variable "ecs_cron_tasks" {
-  type    = "list"
+  type    = list(map(string))
   default = []
 }
 
 # Tags applied to the resources in the submodule
 variable "tags" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "lambda_runtime" {
-  type = "string"
+  type = string
 }
+

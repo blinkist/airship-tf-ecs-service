@@ -10,7 +10,8 @@ variable "name" {
   default = ""
 }
 
-variable "ecs_cluster_id" {}
+variable "ecs_cluster_id" {
+}
 
 variable "fargate_enabled" {
   default = false
@@ -55,3 +56,4 @@ variable "is_scheduled_task" {
   description = "If true, this not a service, but a schedulked task."
   default     = false
 }
+

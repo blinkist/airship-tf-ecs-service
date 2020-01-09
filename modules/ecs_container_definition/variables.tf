@@ -85,7 +85,9 @@ variable "container_secrets" {
     The environment variables to pass to the container as SSM keys. 
     The keys will be looked up and the resulting values will be passed to the environment variable.
     This is a map
-  EOF
+  
+EOF
+
 
   default = {}
 }
@@ -102,9 +104,8 @@ variable "log_driver" {
 
 # list of mount points to add to every container in the task
 variable "mountpoints" {
-  type    = "list"
+  type    = list(map(string))
   default = []
-
   # {
   #   source_volume = "service-storage"
   #   container_path = "/foo"
@@ -121,10 +122,8 @@ variable "log_options" {
   description = "The configuration options to send to the log_driver."
 
   default = {
-    "awslogs-region" = "us-west-2"
-
-    "awslogs-group" = "default"
-
+    "awslogs-region"        = "us-west-2"
+    "awslogs-group"         = "default"
     "awslogs-stream-prefix" = "default"
   }
 }
@@ -132,7 +131,7 @@ variable "log_options" {
 # container_docker_labels sets the DockerLabels, in case it''s set, an extra
 # label '_airship_dockerlabel_hash' is set to keep track of changes.
 variable "container_docker_labels" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
@@ -142,50 +141,50 @@ locals {
   # if the signummed length of the input map is 0 we merge with an empty map, effectively doing nothing.
   docker_label_merge = {
     "0" = {}
-
     "1" = {
-      _airship_dockerlabel_hash = "${md5(jsonencode(var.container_docker_labels))}"
+      _airship_dockerlabel_hash = md5(jsonencode(var.container_docker_labels))
     }
   }
 
   # Secrets aren't trackable by the live_task_loop (thanks AWS!), so we store a hash of them as a synthetic Docker label on the container.
   secrets_merge = {
     "0" = {}
-
     "1" = {
-      _airship_secrets_hash = "${md5(jsonencode(var.container_secrets))}"
+      _airship_secrets_hash = md5(jsonencode(var.container_secrets))
     }
   }
 
-  docker_labels = "${merge(
-     var.container_docker_labels,
-     local.docker_label_merge[signum(length(var.container_docker_labels))],
-     local.secrets_merge[signum(length(var.container_secrets))])}"
+  docker_labels = merge(
+    var.container_docker_labels,
+    local.docker_label_merge[signum(length(var.container_docker_labels))],
+    local.secrets_merge[signum(length(var.container_secrets))],
+  )
 }
 
 variable "tags" {
   description = "A map of tags to apply to all taggable resources"
-  type        = "map"
+  type        = map(string)
   default     = {}
 }
 
 variable "repository_credentials_secret_arn" {
   description = "ARN of Docker private registry credentials stored in secrets manager"
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "ulimit_name" {
-  type    = "string"
+  type    = string
   default = "nofile"
 }
 
 variable "ulimit_soft_limit" {
-  type    = "string"
+  type    = string
   default = ""
 }
 
 variable "ulimit_hard_limit" {
-  type    = "string"
+  type    = string
   default = ""
 }
+

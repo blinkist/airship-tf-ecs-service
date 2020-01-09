@@ -1,5 +1,9 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 provider "aws" {
-  region  = "${local.region}"
+  region  = local.region
   version = "~> 2.26"
 }
 
