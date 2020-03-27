@@ -1,6 +1,6 @@
 # This is the terraform task definition
 data "aws_ecs_container_definition" "current" {
-  count           = var.create ? 1 : 0
+  count           = var.create && var.aws_ecs_task_definition_family != "" ? 1 : 0
   task_definition = "${var.aws_ecs_task_definition_family}:${var.aws_ecs_task_definition_revision}"
   container_name  = var.ecs_container_name
 }
