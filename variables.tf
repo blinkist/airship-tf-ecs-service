@@ -317,7 +317,7 @@ variable "container_healthcheck" {
 
 variable "container_command" {
   type        = list(string)
-  default     = [""]
+  default     = []
   description = "container_command, describes the command for the container a a list, leaving default should run docker defined CMD"
 }
 

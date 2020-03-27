@@ -47,7 +47,7 @@ variable "privileged" {
 
 variable "healthcheck" {
   description = "A map containing command (string), interval (duration in seconds), retries (1-10, number of times to retry before marking container unhealthy, and startPeriod (0-300, optional grace period to wait, in seconds, before failed healthchecks count toward retries)"
-  default     = {}
+  default     = null
 }
 
 variable "container_cpu" {
@@ -62,12 +62,12 @@ variable "essential" {
 
 variable "entrypoint" {
   description = "The entry point that is passed to the container."
-  default     = [""]
+  default     = null
 }
 
 variable "container_command" {
   description = "The command that is passed to the container."
-  default     = [""]
+  default     = null
 }
 
 variable "working_directory" {
@@ -115,7 +115,7 @@ variable "mountpoints" {
 
 variable "hostname" {
   description = "The optional hostname for the container, not allowed to use with Fargate"
-  default     = ""
+  default     = null
 }
 
 variable "log_options" {
