@@ -379,7 +379,7 @@ EOF
 
 variable "container_secrets" {
   description = <<EOF
-The environment variables to pass to the container as SSM keys.  Should be a map of environment vairable names to either SSM var ANRs or paths.
+The environment variables to pass to the container as SSM keys or Secrets Manager ARNs.  Should be a map of environment vairable names to SSM var ARNs or paths, or Secrets Manager ARNs.
 Example:
 ```hcl
 container_secrets_enabled = true
@@ -571,7 +571,7 @@ variable "health_check_grace_period_seconds" {
 variable "repository_credentials_secret_arn" {
   description = "ARN of Docker private registry credentials stored in secrets manager"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "container_ulimit_name" {

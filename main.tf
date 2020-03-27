@@ -14,8 +14,16 @@ locals {
 }
 
 #
-# The iam sub-module creates the IAM resources needed for the ECS Service. 
+# The iam sub-module creates the IAM resources needed for the ECS Service.
 #
+locals {
+  # ARNs for any Secrets Manager secrets used for container secrets
+  config_secret_arns = flatten([for val in values(var.container_secrets):
+                                regexall("^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]+:secret:.+", val)])
+  # above plus the credentials secret ARN, if any
+  secret_arns = compact(flatten(concat(local.config_secret_arns, [var.repository_credentials_secret_arn])))
+}
+
 module "iam" {
   source = "./modules/iam/"
 
@@ -44,6 +52,10 @@ module "iam" {
 
   # ssm_paths define which SSM paths the ecs_service can access
   ssm_paths = var.ssm_paths
+
+  # repository_credentials_secret_arn is the Secrets Manager secret
+  # containing credentials for an external Docker repo
+  secretsmanager_secret_arns = local.secret_arns
 
   # s3_ro_paths define which paths on S3 can be accessed from the ecs service in read-only fashion.
   s3_ro_paths = var.s3_ro_paths

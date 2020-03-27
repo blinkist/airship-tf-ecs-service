@@ -42,6 +42,11 @@ variable "ssm_paths" {
   default     = []
 }
 
+variable "secretsmanager_secret_arns" {
+  description = "ARNs of Secrets Manager secrets to allow access to"
+  default = []
+}
+
 variable "s3_ro_paths" {
   description = "S3 Read-only paths the Task has access to."
   default     = []

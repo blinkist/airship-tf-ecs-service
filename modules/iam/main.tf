@@ -106,6 +106,24 @@ resource "aws_iam_role_policy" "ssm_permissions_execution" {
   policy = data.aws_iam_policy_document.ssm_permissions[0].json
 }
 
+# Policy document allowing access to the repository credentials secret
+data "aws_iam_policy_document" "sm_secrets" {
+  count = signum(length(var.secretsmanager_secret_arns))
+
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [for arn in var.secretsmanager_secret_arns: "${arn}-??????"]
+  }
+}
+
+resource "aws_iam_role_policy" "sm_secrets" {
+  count  = signum(length(var.secretsmanager_secret_arns))
+  name   = "${var.name}-secretsmanager-permissions"
+  role   = aws_iam_role.ecs_task_execution_role[0].id
+  policy = data.aws_iam_policy_document.sm_secrets[0].json
+}
+
 # Policy Document to allow S3 Read-Write Access to given paths
 data "aws_iam_policy_document" "s3_rw_permissions" {
   count = var.create ? 1 : 0

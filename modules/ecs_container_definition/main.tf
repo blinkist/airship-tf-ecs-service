@@ -46,11 +46,11 @@ locals {
     with_credentials = {
       credentialsParameter = var.repository_credentials_secret_arn
     }
-    without_credentials = {}
+    without_credentials = null
   }
 
   use_port        = var.container_port == "" ? "without_port" : "with_port"
-  use_credentials = var.repository_credentials_secret_arn == "" ? "without_credentials" : "with_credentials"
+  use_credentials = var.repository_credentials_secret_arn == null ? "without_credentials" : "with_credentials"
   use_ulimits     = var.ulimit_soft_limit == "" && var.ulimit_hard_limit == "" ? "without_ulimits" : "with_ulimits"
 
   container_definitions = [
