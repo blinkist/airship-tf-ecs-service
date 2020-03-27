@@ -66,6 +66,11 @@ variable "awsvpc_security_group_ids" {
   default = []
 }
 
+# assign_public_ip is whether to assign a public IP address for AWSVPC
+variable "assign_public_ip" {
+  default = false
+}
+
 # lb_target_group_arn sets the arn of the target_group the service needs to connect to
 variable "lb_target_group_arn" {
   default = ""

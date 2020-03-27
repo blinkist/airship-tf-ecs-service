@@ -41,6 +41,12 @@ variable "awsvpc_enabled" {
   description = "With awsvpc_enabled the network_mode for the ECS task definition will be awsvpc, defaults to bridge"
 }
 
+variable "assign_public_ip" {
+  type        = bool
+  default     = false
+  description = "Should a service with awsvpc networking be assigned a public IP address"
+}
+
 variable "log_retention_in_days" {
   type        = number
   default     = 14

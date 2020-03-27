@@ -335,6 +335,9 @@ module "ecs_service" {
   # awsvpc_security_group_ids defines the vpc_security_group_ids for an awsvpc module
   awsvpc_security_group_ids = var.awsvpc_security_group_ids
 
+  # assign_public_ip is whether to assign a public IP address to an awsvpc service
+  assign_public_ip = var.assign_public_ip
+
   # lb_target_group_arn sets the arn of the target_group the service needs to connect to
   lb_target_group_arn = module.alb_handling.lb_target_group_arn
 

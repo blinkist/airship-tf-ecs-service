@@ -68,6 +68,7 @@ resource "aws_ecs_service" "this" {
     content {
       subnets          = var.awsvpc_subnets
       security_groups  = var.awsvpc_security_group_ids
+      assign_public_ip = var.assign_public_ip
     }
   }
 
