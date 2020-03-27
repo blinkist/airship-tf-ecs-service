@@ -95,7 +95,7 @@ locals {
   # Setting the port to false works through a local
   service_registries_container_port = {
     "SRV" = var.container_port
-    "A"   = false
+    "A"   = null
   }
 }
 
