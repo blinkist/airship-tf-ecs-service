@@ -39,3 +39,8 @@ variable "scaling_properties" {
   default = []
 }
 
+variable "tags" {
+  description = "A map of tags to apply to all taggable resources"
+  type        = map(string)
+  default     = {}
+}

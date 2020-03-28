@@ -62,3 +62,8 @@ variable "is_scheduled_task" {
   default     = false
 }
 
+variable "tags" {
+  description = "A map of tags to apply to all taggable resources"
+  type        = map(string)
+  default     = {}
+}

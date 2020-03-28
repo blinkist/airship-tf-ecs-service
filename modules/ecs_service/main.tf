@@ -86,6 +86,11 @@ resource "aws_ecs_service" "this" {
   }
 
   depends_on = [null_resource.aws_lb_listener_rules]
+
+  tags = var.tags
+
+  # propagate the service tags to tasks
+  propagate_tags = "SERVICE"
 }
 
 ### Service Registry resources

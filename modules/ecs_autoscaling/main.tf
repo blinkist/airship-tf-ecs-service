@@ -65,5 +65,6 @@ resource "aws_cloudwatch_metric_alarm" "alarm" {
   alarm_actions = [aws_appautoscaling_policy.policy[count.index].arn]
 
   depends_on = [aws_appautoscaling_target.target]
-}
 
+  tags = var.tags
+}

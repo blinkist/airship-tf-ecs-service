@@ -71,6 +71,9 @@ module "iam" {
 
   # If this is a scheduled task, cloudwatch needs permission to start the task
   is_scheduled_task = var.is_scheduled_task
+
+  # Propagate tags to IAM resources
+  tags = local.tags
 }
 
 #
@@ -161,6 +164,9 @@ module "alb_handling" {
 
   # cognito_user_pool_domain sets the domain of the cognito_user_pool
   cognito_user_pool_domain = var.load_balancing_properties_cognito_user_pool_domain
+
+  # Propagate tags to ALB resources
+  tags = local.tags
 }
 
 ###### CloudWatch Logs
@@ -169,6 +175,7 @@ resource "aws_cloudwatch_log_group" "app" {
   name              = "${local.ecs_cluster_name}/${var.name}"
   retention_in_days = var.log_retention_in_days
   kms_key_id        = var.cloudwatch_kms_key
+  tags              = local.tags
 }
 
 #
@@ -184,6 +191,7 @@ module "live_task_lookup" {
   lambda_lookup_role_arn       = module.iam.lambda_lookup_role_arn
   lookup_type                  = var.live_task_lookup_type
   lambda_runtime               = var.live_task_lookup_lambda_runtime
+  tags                         = local.tags
 }
 
 #
@@ -231,6 +239,8 @@ module "container_definition" {
     "awslogs-group"         = element(concat(aws_cloudwatch_log_group.app.*.name, [""]), 0)
     "awslogs-stream-prefix" = var.name
   }
+
+  tags = local.tags
 }
 
 #
@@ -277,6 +287,9 @@ module "ecs_task_definition" {
 
   # list of host paths to add as volumes to the task
   host_path_volumes = var.host_path_volumes
+
+  # propagate tags to task definition
+  tags = local.tags
 }
 
 #
@@ -417,6 +430,8 @@ module "ecs_autoscaling" {
 
   # scaling_properties holds a list of maps with the scaling properties defined.
   scaling_properties = var.scaling_properties
+
+  tags = local.tags
 }
 
 # This modules creates scheduled tasks for the ecs service. This is not the same as ECS scheduled tasks! 
@@ -441,6 +456,8 @@ module "lambda_ecs_task_scheduler" {
   lambda_ecs_task_scheduler_role_arn = module.iam.lambda_ecs_task_scheduler_role_arn
 
   lambda_runtime = var.lambda_ecs_task_scheduler_runtime
+
+  tags = local.tags
 }
 
 # ECS scheduled task configuration. This uses a CloudWatch rulle to start an ECS task at given intervals.
@@ -453,6 +470,7 @@ resource "aws_cloudwatch_event_rule" "scheduled_task" {
   name                = "${length(var.scheduled_task_name) == 0 ? var.name : var.scheduled_task_name}_scheduled_task"
   description         = "Run ${var.name} task at a scheduled time (${var.scheduled_task_expression})"
   schedule_expression = var.scheduled_task_expression
+  tags                = local.tags
 }
 
 data "aws_caller_identity" "current" {

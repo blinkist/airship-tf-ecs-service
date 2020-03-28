@@ -23,6 +23,7 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   count              = var.create && var.fargate_enabled || var.container_secrets_enabled ? 1 : 0
   name               = "${var.name}-ecs-task-execution_role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role[0].json
+  tags               = var.tags
 }
 
 # We need this for tasks with an execution role, e.g. those using Fargate or SSM secrets
@@ -37,6 +38,7 @@ resource "aws_iam_role" "ecs_tasks_role" {
   count              = var.create ? 1 : 0
   name               = "${var.name}-task-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role[0].json
+  tags               = var.tags
 }
 
 # Policy Document to allow KMS Decryption with given keys
@@ -250,6 +252,7 @@ resource "aws_iam_role" "lambda_lookup" {
   name               = "ecs-lambda-lookup-${var.name}"
   description        = "Role permitting Lambda functions to be invoked from Lambda"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy.json
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy" "lambda_lookup_policy" {
@@ -339,6 +342,7 @@ resource "aws_iam_role" "lambda_ecs_task_scheduler" {
   count              = var.create ? 1 : 0
   name               = "ecs-lambda-task-scheduler-${var.name}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy.json
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy" "lambda_ecs_task_scheduler_policy" {
@@ -384,6 +388,7 @@ resource "aws_iam_role" "scheduled_task_cloudwatch" {
   count              = var.create && var.is_scheduled_task ? 1 : 0
   name               = "cloudwatch_ecs_task-${var.name}"
   assume_role_policy = data.aws_iam_policy_document.scheduled-task-cloudwatch-assume-role-policy[0].json
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy" "scheduled_task_cloudwatch_policy" {
