@@ -24,7 +24,7 @@ resource "aws_ecs_service" "this" {
   scheduling_strategy                = var.scheduling_strategy
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
-  health_check_grace_period_seconds  = var.health_check_grace_period_seconds
+  health_check_grace_period_seconds  = local.lb_attached ? var.health_check_grace_period_seconds : null
 
   deployment_controller {
     type = var.deployment_controller_type

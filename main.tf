@@ -223,7 +223,8 @@ module "container_definition" {
 
   mountpoints = var.mountpoints
 
-  healthcheck = var.container_healthcheck
+  healthcheck_cmd     = var.container_healthcheck_cmd
+  healthcheck_timings = var.container_healthcheck_timings
 
   log_options = {
     "awslogs-region"        = var.region

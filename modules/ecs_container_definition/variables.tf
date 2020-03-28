@@ -45,8 +45,13 @@ variable "privileged" {
   default     = "false"
 }
 
-variable "healthcheck" {
-  description = "A map containing command (string), interval (duration in seconds), retries (1-10, number of times to retry before marking container unhealthy, and startPeriod (0-300, optional grace period to wait, in seconds, before failed healthchecks count toward retries)"
+variable "healthcheck_cmd" {
+  description = "A health check command, as either a list of arguments to be run directly with the 'CMD' tag or a string to be run via a shell with the 'CMD-SHELL' tag."
+  default     = null
+}
+
+variable "healthcheck_timings" {
+  description = "A map containing command (string), interval (duration in seconds), retries (1-10, number of times to retry before marking container unhealthy, startPeriod (0-300, optional grace period to wait, in seconds, before failed healthchecks count toward retries), and timeout (2-60, min. 2, time to wait for a health check to succeed)."
   default     = null
 }
 

@@ -309,10 +309,15 @@ variable "container_port" {
   description = "port defines the needed port of the container"
 }
 
-variable "container_healthcheck" {
-  type        = map(string)
+variable "container_healthcheck_cmd" {
+  description = "healthcheck command, either a string or array of strings"
+  default     = null
+}
+
+variable "container_healthcheck_timings" {
+  type        = map(number)
   default     = {}
-  description = "healthcheck, describes the extra HEALTHCHECK for the container"
+  description = "healthcheck timing parameters: interval, retries, startPeriod, timeout"
 }
 
 variable "container_command" {
@@ -553,7 +558,8 @@ variable "service_discovery_properties_routing_policy" {
 }
 
 variable "service_discovery_properties_healthcheck_custom_failure_threshold" {
-  default     = "1"
+  type        = number
+  default     = 1
   description = "The number of 30-second intervals that you want service discovery to wait before it changes the health status of a service instance. Maximum value of 10."
 }
 
