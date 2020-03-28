@@ -1,6 +1,9 @@
 **/*.tfstate*
 **/.terraform
 
+# Editor files
+.dir-locals.el
+
 # Dynamically created by data.archive_file
 modules/live_task_lookup/lookup.zip
 modules/lambda_ecs_task_scheduler/ecs_task_scheduler.zip
