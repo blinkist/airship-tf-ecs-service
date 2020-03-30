@@ -36,7 +36,7 @@ resource "aws_lambda_function" "lambda_lookup" {
 }
 
 data "aws_lambda_invocation" "lambda_lookup" {
-  count         = var.create && var.lookup_type == "lambda" ? 1 : 0
+  count         = var.create && var.lookup_type == "lambda" && length(aws_lambda_function.lambda_lookup) > 0 ? 1 : 0
   function_name = aws_lambda_function.lambda_lookup[0].function_name
   qualifier     = aws_lambda_function.lambda_lookup[0].version
 
