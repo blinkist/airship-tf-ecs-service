@@ -303,7 +303,7 @@ module "ecs_service" {
   name = var.name
 
   # create defines if resources are being created inside this module
-  create = var.create && false == var.is_scheduled_task
+  create = var.create && !var.is_scheduled_task
 
   cluster_id = var.ecs_cluster_id
 

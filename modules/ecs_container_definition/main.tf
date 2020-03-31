@@ -6,27 +6,20 @@
 locals {
   # null_resource turns "true" into true, adding a temporary string will fix that problem
   safe_search_replace_string = "#keep_true_a_string_hack#"
-}
 
-resource "null_resource" "envvars_as_list_of_maps" {
-  count = length(keys(var.container_envvars))
+  envvars_as_list_of_maps = flatten([
+    for key in keys(var.container_envvars) : {
+      name  = key
+      value = var.container_envvars[key]
+    }])
 
-  triggers = {
-    "name"  = "${local.safe_search_replace_string}${element(keys(var.container_envvars), count.index)}"
-    "value" = "${local.safe_search_replace_string}${element(values(var.container_envvars), count.index)}"
-  }
-}
+  secrets_as_list_of_maps = flatten([
+    for key in keys(var.container_secrets) : {
+      name      = key
+      valueFrom = var.container_secrets[key]
+    }])
 
-resource "null_resource" "secrets_as_list_of_maps" {
-  count = length(keys(var.container_secrets))
 
-  triggers = {
-    "name"      = "${local.safe_search_replace_string}${element(keys(var.container_secrets), count.index)}"
-    "valueFrom" = "${local.safe_search_replace_string}${element(values(var.container_secrets), count.index)}"
-  }
-}
-
-locals {
   port_mappings = {
     with_port = [
       {
@@ -75,9 +68,9 @@ locals {
       dockerLabels           = local.docker_labels
       privileged             = var.privileged
       hostname               = var.hostname
-      environment            = [null_resource.envvars_as_list_of_maps.*.triggers]
-      secrets                = [null_resource.secrets_as_list_of_maps.*.triggers]
-      mountPoints            = [var.mountpoints]
+      environment            = local.envvars_as_list_of_maps
+      secrets                = local.secrets_as_list_of_maps
+      mountPoints            = var.mountpoints
       portMappings           = local.port_mappings[local.use_port]
       healthCheck            = var.healthcheck
       repositoryCredentials  = local.repository_credentials[local.use_credentials]
