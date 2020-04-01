@@ -53,6 +53,10 @@ module "iam" {
   # ssm_paths define which SSM paths the ecs_service can access
   ssm_paths = var.ssm_paths
 
+  # The container uses Secrets Manager secrets and needs a task
+  # execution role to get access to them
+  secretsmanager_enabled = var.container_secrets_enabled
+
   # repository_credentials_secret_arn is the Secrets Manager secret
   # containing credentials for an external Docker repo
   secretsmanager_secret_arns = local.secret_arns
@@ -65,9 +69,6 @@ module "iam" {
 
   # In case Fargate is enabled an extra role needs to be added
   fargate_enabled = var.fargate_enabled
-
-  # The container uses secrets and needs a task execution role to get access to them
-  container_secrets_enabled = var.container_secrets_enabled
 
   # If this is a scheduled task, cloudwatch needs permission to start the task
   is_scheduled_task = var.is_scheduled_task

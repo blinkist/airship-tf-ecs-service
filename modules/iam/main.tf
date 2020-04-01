@@ -1,3 +1,25 @@
+## IAM
+
+# There are two different types of secrets: SSM Parameter Store
+# parameters and Secrets Manager secrets. Their uses partially
+# overlap: container secrets are injected into environment variables
+# and can come from either service. However, containers can also have
+# Docker repository credentials specified, and these can only be
+# Secrets Manager secrets.
+#
+# The relevant variables are:
+#
+#   var.ssm_enabled: whether to allow SSM access
+#
+#   var.ssm_paths: SSM paths to allow access to
+#
+#   var.secretsmanager_enabled: whether to allow Secrets Manager access
+#
+#   var.secretsmanager_secret_arns: Secrets Manager ARNs to allow
+#       access to, a combination of repository credentials specified
+#       as the top-level 'repository_credentials_secret_arn' parameter
+#       and any container secrets specified as Secrets Manager ARNs.
+
 # We need the AWS Account ID for the SSM Permissions
 data "aws_caller_identity" "current" {
   count = var.create ? 1 : 0
@@ -20,7 +42,7 @@ data "aws_iam_policy_document" "ecs_task_assume_role" {
 
 # The ECS TASK ROLE execution role needed for FARGATE & AWS LOGS
 resource "aws_iam_role" "ecs_task_execution_role" {
-  count              = var.create && var.fargate_enabled || var.container_secrets_enabled ? 1 : 0
+  count              = var.create && var.fargate_enabled || var.secretsmanager_enabled ? 1 : 0
   name               = "${var.name}-ecs-task-execution_role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role[0].json
   tags               = var.tags
@@ -28,7 +50,7 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 
 # We need this for tasks with an execution role, e.g. those using Fargate or SSM secrets
 resource "aws_iam_role_policy_attachment" "ecs_tasks_execution_role" {
-  count      = var.create && var.fargate_enabled || var.container_secrets_enabled ? 1 : 0
+  count      = var.create && var.fargate_enabled || var.secretsmanager_enabled ? 1 : 0
   role       = aws_iam_role.ecs_task_execution_role[0].id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
@@ -62,7 +84,7 @@ resource "aws_iam_role_policy" "kms_permissions" {
 
 # Policy Document to allow access to SSM Parameter Store paths
 data "aws_iam_policy_document" "ssm_permissions" {
-  count = var.create && var.ssm_enabled || var.container_secrets_enabled ? 1 : 0
+  count = var.create && var.ssm_enabled && length(var.ssm_paths) > 0 ? 1 : 0
 
   ## Add Describe Parameters as per https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html
   statement {
@@ -94,7 +116,7 @@ data "aws_iam_policy_document" "ssm_permissions" {
 
 # Add the SSM policy to the task role
 resource "aws_iam_role_policy" "ssm_permissions" {
-  count  = var.create && var.ssm_enabled ? 1 : 0
+  count  = var.create && var.ssm_enabled && length(var.ssm_paths) > 0 ? 1 : 0
   name   = "${var.name}-ssm-permissions"
   role   = aws_iam_role.ecs_tasks_role[0].id
   policy = data.aws_iam_policy_document.ssm_permissions[0].json
@@ -102,7 +124,7 @@ resource "aws_iam_role_policy" "ssm_permissions" {
 
 # Add the SSM policy to the task execution role
 resource "aws_iam_role_policy" "ssm_permissions_execution" {
-  count  = var.create && var.container_secrets_enabled ? 1 : 0
+  count  = var.create && var.ssm_enabled && length(var.ssm_paths) > 0 ? 1 : 0
   name   = "${var.name}-ssm-permissions-execution-role"
   role   = aws_iam_role.ecs_task_execution_role[0].id
   policy = data.aws_iam_policy_document.ssm_permissions[0].json
@@ -110,7 +132,7 @@ resource "aws_iam_role_policy" "ssm_permissions_execution" {
 
 # Policy document allowing access to the repository credentials secret
 data "aws_iam_policy_document" "sm_secrets" {
-  count = signum(length(var.secretsmanager_secret_arns))
+  count = var.secretsmanager_enabled && length(var.secretsmanager_secret_arns) > 0 ? 1 : 0
 
   statement {
     effect    = "Allow"
@@ -120,7 +142,7 @@ data "aws_iam_policy_document" "sm_secrets" {
 }
 
 resource "aws_iam_role_policy" "sm_secrets" {
-  count  = signum(length(var.secretsmanager_secret_arns))
+  count  = var.secretsmanager_enabled && length(var.secretsmanager_secret_arns) > 0 ? 1 : 0
   name   = "${var.name}-secretsmanager-permissions"
   role   = aws_iam_role.ecs_task_execution_role[0].id
   policy = data.aws_iam_policy_document.sm_secrets[0].json

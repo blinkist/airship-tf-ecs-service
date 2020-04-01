@@ -17,11 +17,6 @@ variable "fargate_enabled" {
   default = false
 }
 
-variable "container_secrets_enabled" {
-  description = "true, if the container needs access to SSM secrets"
-  default     = false
-}
-
 variable "kms_enabled" {
   description = "Whether to provide access to the supplied kms_keys. If no kms keys are passed, set this to false."
   default     = false
@@ -40,6 +35,11 @@ variable "ssm_enabled" {
 variable "ssm_paths" {
   description = "List of SSM Paths the task has access to."
   default     = []
+}
+
+variable "secretsmanager_enabled" {
+  description = "true, if the container needs access to Secrets Manager secrets"
+  default     = false
 }
 
 variable "secretsmanager_secret_arns" {
