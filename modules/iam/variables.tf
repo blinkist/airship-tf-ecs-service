@@ -62,6 +62,11 @@ variable "is_scheduled_task" {
   default     = false
 }
 
+variable "task_scheduler_enabled" {
+  description = "Whether to create a role for the Lambda-based task scheduler"
+  default = true
+}
+
 variable "tags" {
   description = "A map of tags to apply to all taggable resources"
   type        = map(string)

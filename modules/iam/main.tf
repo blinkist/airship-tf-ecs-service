@@ -361,14 +361,14 @@ data "aws_iam_policy_document" "lambda_ecs_task_scheduler_policy" {
 
 # Role for the lambda
 resource "aws_iam_role" "lambda_ecs_task_scheduler" {
-  count              = var.create ? 1 : 0
+  count              = var.create && var.task_scheduler_enabled ? 1 : 0
   name               = "ecs-lambda-task-scheduler-${var.name}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy.json
   tags               = var.tags
 }
 
 resource "aws_iam_role_policy" "lambda_ecs_task_scheduler_policy" {
-  count  = var.create ? 1 : 0
+  count  = var.create && var.task_scheduler_enabled ? 1 : 0
   role   = aws_iam_role.lambda_ecs_task_scheduler[0].name
   policy = data.aws_iam_policy_document.lambda_ecs_task_scheduler_policy[0].json
 }

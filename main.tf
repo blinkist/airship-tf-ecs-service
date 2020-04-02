@@ -73,6 +73,9 @@ module "iam" {
   # If this is a scheduled task, cloudwatch needs permission to start the task
   is_scheduled_task = var.is_scheduled_task
 
+  # If we're using the Lambda-based task scheduler, create a role and policy for it
+  task_scheduler_enabled = length(var.ecs_cron_tasks) > 0
+
   # Propagate tags to IAM resources
   tags = local.tags
 }
