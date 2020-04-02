@@ -188,6 +188,12 @@ variable "load_balancing_properties_healthy_threshold" {
   default     = 3
 }
 
+variable "load_balancing_properties_http_enabled" {
+  type        = bool
+  description = "load_balancing_properties_http_enabled enables listener rules creation for http"
+  default     = true
+}
+
 variable "load_balancing_properties_https_enabled" {
   type        = bool
   description = "load_balancing_properties_https_enabled enables listener rules creation for https"

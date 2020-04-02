@@ -131,6 +131,11 @@ variable "custom_listen_hosts_count" {
   default = "0"
 }
 
+# When http is enabled we create http listener_rules
+variable "http_enabled" {
+  default = true
+}
+
 # When https is enabled we create https listener_rules
 variable "https_enabled" {
   default = true

@@ -114,6 +114,9 @@ module "alb_handling" {
 
   healthy_threshold = var.load_balancing_properties_healthy_threshold
 
+  # if http_enabled is true, listener rules are made for a non-HTTPS listener
+  http_enabled = var.load_balancing_properties_http_enabled
+
   # if https_enabled is true, listener rules are made for the ssl listener
   https_enabled = var.load_balancing_properties_https_enabled
 
