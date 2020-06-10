@@ -21,13 +21,13 @@ locals {
 
 
   port_mappings = {
-    with_port = [
+    with_port = concat([
       {
         containerPort = var.container_port
         hostPort      = var.host_port
         protocol      = var.protocol
-      },
-    ]
+      }],
+      var.extra_ports)
     without_port = []
   }
 

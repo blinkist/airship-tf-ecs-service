@@ -26,6 +26,11 @@ variable "container_port" {
   default     = 80
 }
 
+variable "extra_ports" {
+  description = "Port mappings to apply besides the default"
+  default = []
+}
+
 variable "container_init_process_enabled" {
   description = "Should the container be run with initProcessEnabled (--init)"
   default     = false

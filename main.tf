@@ -226,6 +226,7 @@ module "container_definition" {
 
   container_port = var.container_port
   host_port      = var.awsvpc_enabled ? var.container_port : var.host_port
+  extra_ports    = var.extra_ports
 
   hostname = var.awsvpc_enabled ? "" : var.name
 

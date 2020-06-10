@@ -337,6 +337,11 @@ variable "host_port" {
   description = "host_port, to be filled in to have a static host port mapping for non-awsvpc ecs, defaults to dynamic port mapping"
 }
 
+variable "extra_ports" {
+  description = "Port mappings to apply besides the default"
+  default = []
+}
+
 variable "scaling_properties" {
   description = <<EOF
 Scaling properties holds a map of multiple maps defining scaling policies and alarms
