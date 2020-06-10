@@ -42,6 +42,10 @@ resource "aws_ecs_task_definition" "app" {
   requires_compatibilities = [var.launch_type]
 
   tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecs_task_definition" "app_with_docker_volume" {
